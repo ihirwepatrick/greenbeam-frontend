@@ -1,21 +1,9 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, User, LogOut } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Leaf, Zap, Shield, Truck } from "lucide-react"
 
 const featuredProducts = [
   {
@@ -58,16 +46,6 @@ const categories = [
 ]
 
 export default function HomePage() {
-  const { user, isAuthenticated, logout } = useAuth()
-
-  const handleLogout = async () => {
-    try {
-      await logout()
-    } catch (error) {
-      console.error("Logout failed:", error)
-    }
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -100,54 +78,9 @@ export default function HomePage() {
                   Cart (0)
                 </Button>
               </Link>
-              
-              {isAuthenticated ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-green-100 text-green-600">
-                          {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user?.firstName} {user?.lastName}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user?.email}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/orders">
-                        <Truck className="mr-2 h-4 w-4" />
-                        <span>Orders</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Link href="/login">
-                  <Button size="sm">Login</Button>
-                </Link>
-              )}
+              <Link href="/login">
+                <Button size="sm">Login</Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -165,23 +98,25 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/products">
-                  <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
+                  <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100">
                     Shop Now
                   </Button>
                 </Link>
-                <Link href="/about">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600">
-                    Learn More
-                  </Button>
-                </Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+                >
+                  Learn More
+                </Button>
               </div>
             </div>
             <div className="relative">
               <Image
-                src="/solar-panel-1.jpg"
-                alt="Solar panels installation"
+                src="/placeholder.svg?height=500&width=600"
+                alt="Solar panels on house"
                 width={600}
-                height={400}
+                height={500}
                 className="rounded-lg shadow-2xl"
               />
             </div>
@@ -189,104 +124,96 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Greenbeam?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're committed to providing the highest quality sustainable energy solutions with exceptional service and support.
-            </p>
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <Zap className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">High Efficiency</h3>
+              <p className="text-gray-600">Premium quality equipment with maximum energy output</p>
+            </div>
+            <div className="text-center">
+              <Shield className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">25-Year Warranty</h3>
+              <p className="text-gray-600">Long-term protection for your investment</p>
+            </div>
+            <div className="text-center">
+              <Truck className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Free Installation</h3>
+              <p className="text-gray-600">Professional installation included with every purchase</p>
+            </div>
+            <div className="text-center">
+              <Leaf className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Eco-Friendly</h3>
+              <p className="text-gray-600">Reduce your carbon footprint and save money</p>
+            </div>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center p-6">
-              <CardHeader>
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Zap className="w-6 h-6 text-green-600" />
-                </div>
-                <CardTitle>High Efficiency</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  Our products are designed for maximum energy output and efficiency, helping you get the most from your investment.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center p-6">
-              <CardHeader>
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Shield className="w-6 h-6 text-green-600" />
-                </div>
-                <CardTitle>Quality Guaranteed</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  All our products come with comprehensive warranties and our commitment to quality ensures long-term reliability.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="text-center p-6">
-              <CardHeader>
-                <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <Truck className="w-6 h-6 text-green-600" />
-                </div>
-                <CardTitle>Expert Support</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600">
-                  From consultation to installation, our team of experts is here to support you every step of the way.
-                </p>
-              </CardContent>
-            </Card>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {categories.map((category, index) => (
+              <Link key={index} href={`/products?category=${encodeURIComponent(category.name)}`}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6 text-center">
+                    <div className="text-4xl mb-4">{category.icon}</div>
+                    <h3 className="font-semibold mb-2">{category.name}</h3>
+                    <p className="text-sm text-gray-600">{category.count} products</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="py-16">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
-            <p className="text-lg text-gray-600">
-              Discover our most popular sustainable energy solutions
-            </p>
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl font-bold">Featured Products</h2>
+            <Link href="/products">
+              <Button variant="outline">View All Products</Button>
+            </Link>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden">
-                <div className="relative h-48">
+              <Card key={product.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="p-0">
                   <Image
-                    src={product.image}
+                    src={product.image || "/placeholder.svg"}
                     alt={product.name}
-                    fill
-                    className="object-cover"
+                    width={300}
+                    height={300}
+                    className="w-full h-64 object-cover rounded-t-lg"
                   />
-                  <Badge className="absolute top-4 left-4 bg-green-600">
+                </CardHeader>
+                <CardContent className="p-6">
+                  <Badge variant="secondary" className="mb-2">
                     {product.category}
                   </Badge>
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-lg">{product.name}</CardTitle>
-                  <div className="flex items-center space-x-2">
-                    <div className="flex text-yellow-400">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i}>★</span>
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">({product.reviews})</span>
+                  <CardTitle className="mb-2">{product.name}</CardTitle>
+                  <div className="flex items-center mb-4">
+                    <div className="flex text-yellow-400">{"★".repeat(Math.floor(product.rating))}</div>
+                    <span className="text-sm text-gray-600 ml-2">
+                      {product.rating} ({product.reviews} reviews)
+                    </span>
                   </div>
-                </CardHeader>
-                <CardContent>
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-2xl font-bold text-green-600">${product.price}</span>
                       {product.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through ml-2">
-                          ${product.originalPrice}
-                        </span>
+                        <span className="text-sm text-gray-500 line-through ml-2">${product.originalPrice}</span>
                       )}
                     </div>
-                    <Button size="sm">Add to Cart</Button>
+                    <Link href={`/products/${product.id}`}>
+                      <Button>View Details</Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -295,45 +222,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Shop by Category</h2>
-            <p className="text-lg text-gray-600">
-              Find exactly what you need in our comprehensive product categories
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {categories.map((category) => (
-              <Card key={category.name} className="text-center p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="text-4xl mb-4">{category.icon}</div>
-                <h3 className="font-semibold text-gray-900 mb-2">{category.name}</h3>
-                <p className="text-sm text-gray-600">{category.count} products</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
+      {/* Newsletter */}
       <section className="py-16 bg-green-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Go Green?</h2>
+          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
           <p className="text-xl mb-8 text-green-100">
-            Join thousands of customers who have already made the switch to sustainable energy
+            Get the latest news on green energy solutions and exclusive offers
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/products">
-              <Button size="lg" className="bg-white text-green-600 hover:bg-green-50">
-                Start Shopping
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-green-600">
-                Get a Quote
-              </Button>
-            </Link>
+          <div className="max-w-md mx-auto flex gap-4">
+            <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
+            <Button className="bg-white text-green-600 hover:bg-gray-100">Subscribe</Button>
           </div>
         </div>
       </section>
