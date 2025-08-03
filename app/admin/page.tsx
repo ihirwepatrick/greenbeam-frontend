@@ -8,28 +8,28 @@ import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangl
 
 const recentProducts = [
   {
-    id: "PROD-001",
-    name: "Solar Panel Kit 400W",
-    category: "Solar Panels",
-    status: "Available",
+    id: "ENQ-001",
+    customerName: "John Smith",
+    product: "Solar Panel Kit 400W",
+    status: "New",
     lastUpdated: "2024-01-15",
-    images: 3
+    priority: "High"
   },
   {
-    id: "PROD-002", 
-    name: "Wind Turbine Generator 1000W",
-    category: "Wind Energy",
-    status: "Available",
+    id: "ENQ-002", 
+    customerName: "Sarah Johnson",
+    product: "Wind Turbine Generator 1000W",
+    status: "In Progress",
     lastUpdated: "2024-01-14",
-    images: 2
+    priority: "Medium"
   },
   {
-    id: "PROD-003",
-    name: "Battery Storage System 10kWh",
-    category: "Energy Storage",
-    status: "Not Available",
+    id: "ENQ-003",
+    customerName: "Mike Wilson",
+    product: "Battery Storage System 10kWh",
+    status: "Responded",
     lastUpdated: "2024-01-13",
-    images: 1
+    priority: "Low"
   }
 ]
 
@@ -170,29 +170,29 @@ export default function AdminDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Package className="h-5 w-5 mr-2" />
-                  Recent Products
+                  <Users className="h-5 w-5 mr-2" />
+                  Recent Enquiries
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {recentProducts.map((product) => (
-                    <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  {recentProducts.map((enquiry) => (
+                    <div key={enquiry.id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
-                        <h4 className="font-medium">{product.name}</h4>
-                        <p className="text-sm text-gray-600">{product.category}</p>
-                        <p className="text-xs text-gray-500">{product.images} images</p>
+                        <h4 className="font-medium">{enquiry.customerName}</h4>
+                        <p className="text-sm text-gray-600">{enquiry.product}</p>
+                        <p className="text-xs text-gray-500">{enquiry.priority} priority</p>
                       </div>
                       <div className="flex items-center space-x-2">
                         <Badge 
-                          variant={product.status === "Available" ? "default" : "secondary"}
-                          className={product.status === "Available" ? "bg-green-100 text-green-800" : ""}
+                          variant={enquiry.status === "New" ? "default" : enquiry.status === "In Progress" ? "secondary" : "outline"}
+                          className={enquiry.status === "New" ? "bg-red-100 text-red-800" : enquiry.status === "In Progress" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}
                         >
-                          {product.status}
+                          {enquiry.status}
                         </Badge>
-                        <Link href={`/admin/products/${product.id}`}>
+                        <Link href={`/admin/enquiries/${enquiry.id}`}>
                           <Button variant="outline" size="sm">
-                            Edit
+                            View
                           </Button>
                         </Link>
                       </div>
@@ -200,9 +200,9 @@ export default function AdminDashboard() {
                   ))}
                 </div>
                 <div className="mt-4">
-                  <Link href="/admin/products">
+                  <Link href="/admin/enquiries">
                     <Button variant="outline" className="w-full">
-                      View All Products
+                      View All Enquiries
                     </Button>
                   </Link>
                 </div>
@@ -215,36 +215,38 @@ export default function AdminDashboard() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
                   <Link href="/admin/products/new">
-                    <Button className="w-full justify-start bg-[#0a6650] hover:bg-[#084c3d]">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add New Product
-                    </Button>
+                    <div className="p-6 rounded-lg border bg-gradient-to-br from-[#0a6650] to-[#084c3d] text-white hover:shadow-md transition-all duration-200 hover:scale-105 h-24 flex items-center justify-center">
+                      <div className="flex flex-col items-center text-center space-y-2">
+                        <Plus className="h-6 w-6" />
+                        <span className="text-sm font-medium">Add Product</span>
+                      </div>
+                    </div>
                   </Link>
                   <Link href="/admin/products">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Package className="h-4 w-4 mr-2" />
-                      Manage Products
-                    </Button>
+                    <div className="p-6 rounded-lg border bg-white hover:shadow-md transition-all duration-200 hover:scale-105 h-24 flex items-center justify-center">
+                      <div className="flex flex-col items-center text-center space-y-2">
+                        <Package className="h-6 w-6 text-[#0a6650]" />
+                        <span className="text-sm font-medium text-[#0a6650]">Manage Products</span>
+                      </div>
+                    </div>
                   </Link>
                   <Link href="/admin/enquiries">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Users className="h-4 w-4 mr-2" />
-                      View Enquiries
-                    </Button>
+                    <div className="p-6 rounded-lg border bg-white hover:shadow-md transition-all duration-200 hover:scale-105 h-24 flex items-center justify-center">
+                      <div className="flex flex-col items-center text-center space-y-2">
+                        <Users className="h-6 w-6 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-600">View Enquiries</span>
+                      </div>
+                    </div>
                   </Link>
                   <Link href="/admin/website">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Website Settings
-                    </Button>
-                  </Link>
-                  <Link href="/">
-                    <Button variant="outline" className="w-full justify-start">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Preview Website
-                    </Button>
+                    <div className="p-6 rounded-lg border bg-white hover:shadow-md transition-all duration-200 hover:scale-105 h-24 flex items-center justify-center">
+                      <div className="flex flex-col items-center text-center space-y-2">
+                        <Eye className="h-6 w-6 text-purple-600" />
+                        <span className="text-sm font-medium text-purple-600">Website Settings</span>
+                      </div>
+                    </div>
                   </Link>
                 </div>
               </CardContent>
