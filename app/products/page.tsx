@@ -1,11 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Star, ArrowRight, Search } from "lucide-react"
+import { Leaf, Star, ArrowRight, Search, X, Phone, Mail, MapPin } from "lucide-react"
 
 const products = [
   {
@@ -86,6 +87,19 @@ const categories = [
 ]
 
 export default function ProductsPage() {
+  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [showModal, setShowModal] = useState(false)
+
+  const handleViewDetails = (product: any) => {
+    setSelectedProduct(product)
+    setShowModal(true)
+  }
+
+  const closeModal = () => {
+    setShowModal(false)
+    setSelectedProduct(null)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -231,8 +245,11 @@ export default function ProductsPage() {
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]">
-                      Learn More
+                    <Button 
+                      className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]"
+                      onClick={() => handleViewDetails(product)}
+                    >
+                      View Details
                     </Button>
                     <Button variant="outline">
                       <ArrowRight className="h-4 w-4" />
@@ -337,6 +354,107 @@ export default function ProductsPage() {
           </div>
         </div>
       </footer>
+
+      {/* Product Details Modal */}
+      {showModal && selectedProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.name}</h2>
+                  <p className="text-gray-600">{selectedProduct.category}</p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={closeModal}>
+                  <X className="h-6 w-6" />
+                </Button>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-4">
+                    <Image
+                      src={selectedProduct.image}
+                      alt={selectedProduct.name}
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center mb-4">
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(selectedProduct.rating)
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-300"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600 ml-2">
+                      {selectedProduct.rating} ({selectedProduct.reviews} reviews)
+                    </span>
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="font-semibold mb-3">Key Features:</h4>
+                    <ul className="space-y-2">
+                      {selectedProduct.features.map((feature: string, index: number) => (
+                        <li key={index} className="flex items-center text-sm text-gray-600">
+                          <div className="h-2 w-2 bg-[#0a6650] rounded-full mr-3"></div>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold mb-3">Product Description</h3>
+                    <p className="text-gray-600">{selectedProduct.description}</p>
+                  </div>
+
+                  <div className="bg-[#0a6650] text-white p-6 rounded-lg">
+                    <h3 className="text-xl font-semibold mb-4">Interested in this product?</h3>
+                    <p className="mb-6">Contact us to learn more about availability, pricing, and installation options.</p>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center">
+                        <Phone className="h-5 w-5 mr-3" />
+                        <span>+250 788 123 456</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Mail className="h-5 w-5 mr-3" />
+                        <span>info@greenbeam.com</span>
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="h-5 w-5 mr-3" />
+                        <span>Kigali, Rwanda</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 space-y-3">
+                      <Link href="/contact">
+                        <Button className="w-full bg-white text-[#0a6650] hover:bg-gray-100">
+                          Request Quote
+                        </Button>
+                      </Link>
+                      <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-[#0a6650]">
+                        Schedule Consultation
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

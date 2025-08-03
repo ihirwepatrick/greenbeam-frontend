@@ -2,305 +2,323 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Leaf, Upload, X, Save, ArrowLeft } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import {
+  Database,
+  Package,
+  Users,
+  Eye,
+  Settings,
+  Home,
+  LogOut,
+  Save,
+  Plus,
+  X,
+  Image as ImageIcon,
+  Upload,
+  ArrowLeft,
+} from "lucide-react"
 
-export default function NewProductPage() {
-  const [images, setImages] = useState<string[]>([])
-  const [features, setFeatures] = useState<string[]>([""])
-  const [specifications, setSpecifications] = useState<{ key: string; value: string }[]>([{ key: "", value: "" }])
+const categories = [
+  "Solar Panels",
+  "Wind Energy", 
+  "Energy Storage",
+  "Inverters",
+  "Monitoring",
+  "Accessories"
+]
 
-  const addFeature = () => {
-    setFeatures([...features, ""])
+const sidebarLinks = [
+  { name: "Dashboard", href: "/admin", icon: Home },
+  { name: "Products", href: "/admin/products", icon: Package },
+  { name: "Enquiries", href: "/admin/enquiries", icon: Users },
+  { name: "Website", href: "/admin/website", icon: Eye },
+  { name: "Settings", href: "/admin/settings", icon: Settings },
+]
+
+export default function CreateProduct() {
+  const [formData, setFormData] = useState({
+    name: "",
+    category: "",
+    description: "",
+    status: "Available",
+    images: 0,
+    features: [""]
+  })
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleSave = () => {
+    setIsSaving(true)
+    // Simulate save operation
+    setTimeout(() => {
+      setIsSaving(false)
+      console.log("Product created:", formData)
+      // Here you would typically redirect to products list
+      window.location.href = "/admin/products"
+    }, 2000)
   }
 
-  const updateFeature = (index: number, value: string) => {
-    const newFeatures = [...features]
-    newFeatures[index] = value
-    setFeatures(newFeatures)
+  const addFeature = () => {
+    setFormData(prev => ({
+      ...prev,
+      features: [...prev.features, ""]
+    }))
   }
 
   const removeFeature = (index: number) => {
-    setFeatures(features.filter((_, i) => i !== index))
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index)
+    }))
   }
 
-  const addSpecification = () => {
-    setSpecifications([...specifications, { key: "", value: "" }])
+  const updateFeature = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.map((feature, i) => i === index ? value : feature)
+    }))
   }
 
-  const updateSpecification = (index: number, field: "key" | "value", value: string) => {
-    const newSpecs = [...specifications]
-    newSpecs[index][field] = value
-    setSpecifications(newSpecs)
-  }
-
-  const removeSpecification = (index: number) => {
-    setSpecifications(specifications.filter((_, i) => i !== index))
+  const updateFormData = (field: string, value: string | number) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/admin" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-green-600" />
-                <span className="text-2xl font-bold text-green-600">Greenbeam</span>
-              </Link>
-              <Badge variant="secondary">Admin</Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/admin/products">
-                <Button variant="outline" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Products
-                </Button>
-              </Link>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar - Fixed */}
+      <div className="w-64 bg-white border-r shadow-sm flex flex-col h-screen">
+        <div className="p-6">
+          <Link href="/admin" className="flex items-center space-x-2">
+            <Database className="h-8 w-8 text-[#0a6650]" />
+            <span className="text-xl font-bold text-[#0a6650]">Admin Portal</span>
+            <Badge variant="secondary" className="ml-2">v2.1</Badge>
+          </Link>
         </div>
-      </nav>
-
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
-            <p className="text-gray-600">Create a new product listing for your store</p>
+        
+        <nav className="flex-1 px-4">
+          <div className="space-y-2">
+            {sidebarLinks.map((link) => {
+              const Icon = link.icon
+              return (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    link.href === "/admin/products" 
+                      ? "bg-[#0a6650] text-white" 
+                      : "text-gray-700 hover:bg-gray-100 hover:text-[#0a6650]"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{link.name}</span>
+                </Link>
+              )
+            })}
           </div>
+        </nav>
 
-          <form className="space-y-8">
-            {/* Basic Information */}
+        <div className="p-4 border-t">
+          <Link href="/">
+            <Button variant="outline" className="w-full justify-start mb-2">
+              <Eye className="h-4 w-4 mr-2" />
+              View Website
+            </Button>
+          </Link>
+          <Button variant="outline" className="w-full justify-start">
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Content - Scrollable */}
+      <div className="flex-1 flex flex-col h-screen">
+        {/* Top Navigation - Fixed */}
+        <nav className="bg-white border-b shadow-sm">
+          <div className="px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Create New Product</h1>
+                <p className="text-gray-600">Add a new product to be displayed on the website</p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link href="/admin/settings">
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
+                  </Button>
+                </Link>
+                <Link href="/admin/products">
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Products
+                  </Button>
+                </Link>
+                <Button size="sm" className="bg-[#0a6650] hover:bg-[#084c3d]">
+                  Admin
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-4xl mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
+                <CardTitle className="flex items-center">
+                  <Plus className="h-5 w-5 mr-2" />
+                  Product Information
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Basic Information */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="name">Product Name *</Label>
-                    <Input id="name" placeholder="e.g., Solar Panel Kit 400W" />
+                    <Input
+                      id="name"
+                      placeholder="Enter product name"
+                      value={formData.name}
+                      onChange={(e) => updateFormData("name", e.target.value)}
+                      className="mt-1"
+                    />
                   </div>
-                  <div>
-                    <Label htmlFor="sku">SKU *</Label>
-                    <Input id="sku" placeholder="e.g., SPK-400W-001" />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea id="description" placeholder="Detailed product description..." className="min-h-[120px]" />
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6">
                   <div>
                     <Label htmlFor="category">Category *</Label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="solar-panels">Solar Panels</SelectItem>
-                        <SelectItem value="wind-energy">Wind Energy</SelectItem>
-                        <SelectItem value="energy-storage">Energy Storage</SelectItem>
-                        <SelectItem value="inverters">Inverters</SelectItem>
-                        <SelectItem value="monitoring">Monitoring</SelectItem>
-                        <SelectItem value="accessories">Accessories</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="brand">Brand *</Label>
-                    <Input id="brand" placeholder="e.g., SolarTech" />
-                  </div>
-                  <div>
-                    <Label htmlFor="power">Power Rating</Label>
-                    <Input id="power" placeholder="e.g., 400W" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Pricing & Inventory */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Pricing & Inventory</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div>
-                    <Label htmlFor="price">Price *</Label>
-                    <Input id="price" type="number" step="0.01" placeholder="0.00" />
-                  </div>
-                  <div>
-                    <Label htmlFor="comparePrice">Compare at Price</Label>
-                    <Input id="comparePrice" type="number" step="0.01" placeholder="0.00" />
-                  </div>
-                  <div>
-                    <Label htmlFor="cost">Cost per Item</Label>
-                    <Input id="cost" type="number" step="0.01" placeholder="0.00" />
+                    <select
+                      id="category"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
+                      value={formData.category}
+                      onChange={(e) => updateFormData("category", e.target.value)}
+                    >
+                      <option value="">Select Category</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
-                <Separator />
+                {/* Description */}
+                <div>
+                  <Label htmlFor="description">Product Description *</Label>
+                  <Textarea
+                    id="description"
+                    rows={4}
+                    placeholder="Describe the product features, specifications, and benefits..."
+                    value={formData.description}
+                    onChange={(e) => updateFormData("description", e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
 
-                <div className="grid md:grid-cols-3 gap-6">
+                {/* Status and Images */}
+                <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <Label htmlFor="stock">Stock Quantity *</Label>
-                    <Input id="stock" type="number" placeholder="0" />
+                    <Label htmlFor="status">Status</Label>
+                    <select
+                      id="status"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
+                      value={formData.status}
+                      onChange={(e) => updateFormData("status", e.target.value)}
+                    >
+                      <option value="Available">Available</option>
+                      <option value="Not Available">Not Available</option>
+                    </select>
                   </div>
                   <div>
-                    <Label htmlFor="lowStockThreshold">Low Stock Threshold</Label>
-                    <Input id="lowStockThreshold" type="number" placeholder="10" />
-                  </div>
-                  <div className="flex items-center space-x-2 pt-6">
-                    <Checkbox id="trackQuantity" />
-                    <Label htmlFor="trackQuantity">Track quantity</Label>
+                    <Label htmlFor="images">Number of Images (0-3)</Label>
+                    <Input
+                      id="images"
+                      type="number"
+                      min="0"
+                      max="3"
+                      value={formData.images}
+                      onChange={(e) => updateFormData("images", parseInt(e.target.value))}
+                      className="mt-1"
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Product Images */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Images</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">Drag and drop images here, or click to browse</p>
-                  <p className="text-sm text-gray-500">Supports: JPG, PNG, WebP (max 10MB each)</p>
-                  <Button variant="outline" className="mt-4 bg-transparent">
-                    Choose Files
-                  </Button>
-                </div>
-                {images.length > 0 && (
-                  <div className="grid grid-cols-4 gap-4 mt-4">
-                    {images.map((image, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={image || "/placeholder.svg"}
-                          alt={`Product ${index + 1}`}
-                          className="w-full h-24 object-cover rounded"
+                {/* Features */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label>Key Features</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addFeature}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Feature
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {formData.features.map((feature, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Input
+                          placeholder={`Feature ${index + 1}`}
+                          value={feature}
+                          onChange={(e) => updateFeature(index, e.target.value)}
                         />
-                        <button
-                          type="button"
-                          onClick={() => setImages(images.filter((_, i) => i !== index))}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
+                        {formData.features.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removeFeature(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     ))}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Features</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {features.map((feature, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={feature}
-                      onChange={(e) => updateFeature(index, e.target.value)}
-                      placeholder="Enter product feature"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeFeature(index)}
-                      disabled={features.length === 1}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addFeature}>
-                  Add Feature
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Specifications */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Technical Specifications</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {specifications.map((spec, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={spec.key}
-                      onChange={(e) => updateSpecification(index, "key", e.target.value)}
-                      placeholder="Specification name"
-                    />
-                    <Input
-                      value={spec.value}
-                      onChange={(e) => updateSpecification(index, "value", e.target.value)}
-                      placeholder="Specification value"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      onClick={() => removeSpecification(index)}
-                      disabled={specifications.length === 1}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addSpecification}>
-                  Add Specification
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Product Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Status</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="active" defaultChecked />
-                  <Label htmlFor="active">Product is active</Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="featured" />
-                  <Label htmlFor="featured">Featured product</Label>
+
+                {/* Image Upload Section */}
+                <div>
+                  <Label>Product Images</Label>
+                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 mb-2">Upload product images</p>
+                    <p className="text-sm text-gray-500 mb-4">Maximum 3 images allowed</p>
+                    <Button variant="outline">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Choose Files
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-4 pt-6 border-t">
+                  <Button 
+                    onClick={handleSave}
+                    disabled={isSaving || !formData.name || !formData.category || !formData.description}
+                    className="bg-[#0a6650] hover:bg-[#084c3d]"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {isSaving ? "Creating..." : "Create Product"}
+                  </Button>
+                  <Link href="/admin/products">
+                    <Button variant="outline">
+                      Cancel
+                    </Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-4">
-              <Link href="/admin/products">
-                <Button variant="outline">Cancel</Button>
-              </Link>
-              <Button type="submit">
-                <Save className="h-4 w-4 mr-2" />
-                Save Product
-              </Button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
