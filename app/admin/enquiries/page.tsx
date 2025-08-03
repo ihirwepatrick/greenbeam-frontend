@@ -30,7 +30,10 @@ import {
   Archive,
   Star,
   MapPin,
+  Bell,
 } from "lucide-react"
+import NotificationSystem from "../../components/NotificationSystem"
+import EmailService from "../../components/EmailService"
 
 const enquiries = [
   {
@@ -129,6 +132,7 @@ export default function AdminEnquiries() {
   const [statusFilter, setStatusFilter] = useState("All")
   const [priorityFilter, setPriorityFilter] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
+  const [showNotifications, setShowNotifications] = useState(false)
 
   const handleViewDetails = (enquiry: any) => {
     setSelectedEnquiry(enquiry)
@@ -147,11 +151,41 @@ export default function AdminEnquiries() {
     setResponseMessage("")
   }
 
-  const sendResponse = () => {
-    // Here you would typically send the response via email
-    console.log("Sending response to:", selectedEnquiry.email)
-    console.log("Response:", responseMessage)
-    closeModal()
+  const sendResponse = async () => {
+    if (!responseMessage.trim() || !selectedEnquiry) return
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      // Send response email to customer
+      const emailSent = await EmailService.sendEnquiryResponse(
+        selectedEnquiry.email,
+        selectedEnquiry.customerName,
+        responseMessage,
+        selectedEnquiry.id
+      )
+      
+      if (emailSent) {
+        console.log("✅ Response email sent to customer")
+        
+        // Update enquiry status to "Responded"
+        const updatedEnquiries = enquiries.map(enq => 
+          enq.id === selectedEnquiry.id 
+            ? { ...enq, status: "Responded", lastUpdated: new Date().toLocaleString() }
+            : enq
+        )
+        
+        // In a real app, you would update this in your database
+        console.log("Enquiry status updated to 'Responded'")
+      }
+      
+      setResponseMessage("")
+      setShowResponseModal(false)
+      setSelectedEnquiry(null)
+    } catch (error) {
+      console.error("Failed to send response:", error)
+    }
   }
 
   const updateStatus = (enquiryId: string, newStatus: string) => {
@@ -243,9 +277,21 @@ export default function AdminEnquiries() {
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Enquiry Management</h1>
-                <p className="text-gray-600">Manage and respond to customer enquiries about products</p>
+                <p className="text-gray-600">Manage and respond to customer enquiries</p>
               </div>
               <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNotifications(true)}
+                  className="relative"
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 text-white text-xs">
+                    2
+                  </Badge>
+                </Button>
                 <Link href="/admin/settings">
                   <Button variant="outline" size="sm">
                     <Settings className="h-4 w-4 mr-2" />
@@ -633,6 +679,12 @@ export default function AdminEnquiries() {
           </div>
         </div>
       )}
+
+      {/* Notification System */}
+      <NotificationSystem 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
     </div>
   )
 } 

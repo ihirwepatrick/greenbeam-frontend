@@ -4,7 +4,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangle, Home, LogOut } from "lucide-react"
+import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangle, Home, LogOut, Bell } from "lucide-react"
+import NotificationSystem from "../components/NotificationSystem"
+import { useState } from "react"
 
 const recentProducts = [
   {
@@ -73,6 +75,8 @@ const sidebarLinks = [
 ]
 
 export default function AdminDashboard() {
+  const [showNotifications, setShowNotifications] = useState(false)
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar - Fixed */}
@@ -132,6 +136,18 @@ export default function AdminDashboard() {
                 <p className="text-gray-600">Welcome back! Here's what's happening with your website.</p>
               </div>
               <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNotifications(true)}
+                  className="relative"
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 text-white text-xs">
+                    2
+                  </Badge>
+                </Button>
                 <Link href="/admin/settings">
                   <Button variant="outline" size="sm">
                     <Settings className="h-4 w-4 mr-2" />
@@ -279,6 +295,12 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Notification System */}
+        <NotificationSystem 
+          isOpen={showNotifications} 
+          onClose={() => setShowNotifications(false)} 
+        />
       </div>
     </div>
   )

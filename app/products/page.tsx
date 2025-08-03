@@ -6,7 +6,8 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Star, ArrowRight, Search, X, Phone, Mail, MapPin } from "lucide-react"
+import { Leaf, Star, ArrowRight, Search, X, Phone, Mail, MapPin, MessageCircle } from "lucide-react"
+import EnquiryForm from "../components/EnquiryForm"
 
 const products = [
   {
@@ -89,6 +90,7 @@ const categories = [
 export default function ProductsPage() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null)
   const [showModal, setShowModal] = useState(false)
+  const [showEnquiryForm, setShowEnquiryForm] = useState(false)
 
   const handleViewDetails = (product: any) => {
     setSelectedProduct(product)
@@ -98,6 +100,19 @@ export default function ProductsPage() {
   const closeModal = () => {
     setShowModal(false)
     setSelectedProduct(null)
+  }
+
+  const handleEnquireNow = () => {
+    setShowEnquiryForm(true)
+  }
+
+  const handleEnquireFromCard = (product: any) => {
+    setSelectedProduct(product)
+    setShowEnquiryForm(true)
+  }
+
+  const closeEnquiryForm = () => {
+    setShowEnquiryForm(false)
   }
 
   return (
@@ -251,8 +266,11 @@ export default function ProductsPage() {
                     >
                       View Details
                     </Button>
-                    <Button variant="outline">
-                      <ArrowRight className="h-4 w-4" />
+                    <Button 
+                      variant="outline"
+                      onClick={() => handleEnquireFromCard(product)}
+                    >
+                      <MessageCircle className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
@@ -447,6 +465,13 @@ export default function ProductsPage() {
                       <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-[#0a6650]">
                         Schedule Consultation
                       </Button>
+                      <Button 
+                        className="w-full bg-white text-[#0a6650] hover:bg-gray-100"
+                        onClick={handleEnquireNow}
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Enquire Now
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -454,6 +479,15 @@ export default function ProductsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Enquiry Form Modal */}
+      {showEnquiryForm && selectedProduct && (
+        <EnquiryForm 
+          isOpen={showEnquiryForm} 
+          onClose={closeEnquiryForm} 
+          product={selectedProduct}
+        />
       )}
     </div>
   )

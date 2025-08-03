@@ -1,9 +1,13 @@
+"use client"
+
+import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle } from "lucide-react"
+import EnquiryForm from "./components/EnquiryForm"
 
 const featuredProducts = [
   {
@@ -42,6 +46,19 @@ const categories = [
 ]
 
 export default function HomePage() {
+  const [showEnquiryForm, setShowEnquiryForm] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+
+  const handleEnquireNow = (product: any) => {
+    setSelectedProduct(product)
+    setShowEnquiryForm(true)
+  }
+
+  const closeEnquiryForm = () => {
+    setShowEnquiryForm(false)
+    setSelectedProduct(null)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -202,8 +219,15 @@ export default function HomePage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <Link href={`/products/${product.id}`}>
-                      <Button>View Details</Button>
+                      <Button variant="outline">View Details</Button>
                     </Link>
+                    <Button 
+                      onClick={() => handleEnquireNow(product)}
+                      className="bg-[#0a6650] hover:bg-[#084c3d]"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Enquire Now
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -296,6 +320,15 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Enquiry Form Modal */}
+      {showEnquiryForm && selectedProduct && (
+        <EnquiryForm 
+          isOpen={showEnquiryForm} 
+          onClose={closeEnquiryForm} 
+          product={selectedProduct}
+        />
+      )}
     </div>
   )
 }
