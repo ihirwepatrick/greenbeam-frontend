@@ -1,118 +1,107 @@
 "use client"
 
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  Leaf,
-  Package,
-  ShoppingCart,
-  Users,
-  DollarSign,
-  TrendingUp,
-  AlertCircle,
-  Plus,
-  Eye,
-  Settings,
-} from "lucide-react"
+import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangle } from "lucide-react"
 
-const stats = [
+const recentProducts = [
   {
-    title: "Total Revenue",
-    value: "$45,231.89",
-    change: "+20.1% from last month",
-    icon: DollarSign,
-    trend: "up",
+    id: "PROD-001",
+    name: "Solar Panel Kit 400W",
+    category: "Solar Panels",
+    status: "Available",
+    lastUpdated: "2024-01-15",
+    images: 3
   },
   {
-    title: "Orders",
-    value: "2,350",
-    change: "+180.1% from last month",
-    icon: ShoppingCart,
-    trend: "up",
+    id: "PROD-002", 
+    name: "Wind Turbine Generator 1000W",
+    category: "Wind Energy",
+    status: "Available",
+    lastUpdated: "2024-01-14",
+    images: 2
   },
   {
-    title: "Products",
-    value: "156",
-    change: "+19% from last month",
+    id: "PROD-003",
+    name: "Battery Storage System 10kWh",
+    category: "Energy Storage",
+    status: "Not Available",
+    lastUpdated: "2024-01-13",
+    images: 1
+  }
+]
+
+const quickStats = [
+  {
+    title: "Total Products",
+    value: "24",
+    change: "+3",
     icon: Package,
-    trend: "up",
+    color: "text-[#0a6650]"
   },
   {
-    title: "Active Users",
-    value: "573",
-    change: "+201 since last hour",
-    icon: Users,
-    trend: "up",
-  },
-]
-
-const recentOrders = [
-  {
-    id: "#3462",
-    customer: "John Smith",
-    product: "Solar Panel Kit 400W",
-    amount: "$899.99",
-    status: "completed",
-    date: "2024-01-15",
+    title: "Available Products",
+    value: "18",
+    change: "+2",
+    icon: TrendingUp,
+    color: "text-green-600"
   },
   {
-    id: "#3461",
-    customer: "Sarah Johnson",
-    product: "Battery Storage System",
-    amount: "$2,499.99",
-    status: "processing",
-    date: "2024-01-15",
+    title: "Categories",
+    value: "6",
+    change: "+1",
+    icon: Database,
+    color: "text-blue-600"
   },
   {
-    id: "#3460",
-    customer: "Mike Davis",
-    product: "Wind Turbine Generator",
-    amount: "$1,299.99",
-    status: "shipped",
-    date: "2024-01-14",
-  },
-  {
-    id: "#3459",
-    customer: "Emily Brown",
-    product: "Solar Panel Kit 600W",
-    amount: "$1,299.99",
-    status: "completed",
-    date: "2024-01-14",
-  },
-]
-
-const lowStockProducts = [
-  { name: "Solar Panel Kit 400W", stock: 5, threshold: 10 },
-  { name: "Hybrid Inverter 5000W", stock: 2, threshold: 5 },
-  { name: "Battery Storage System", stock: 8, threshold: 15 },
+    title: "Website Views",
+    value: "1,247",
+    change: "+12%",
+    icon: Eye,
+    color: "text-purple-600"
+  }
 ]
 
 export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b">
+      {/* Admin Portal Navigation */}
+      <nav className="bg-white border-b shadow-sm">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-green-600" />
-                <span className="text-2xl font-bold text-green-600">Greenbeam</span>
+              <Link href="/admin" className="flex items-center space-x-2">
+                <Database className="h-8 w-8 text-[#0a6650]" />
+                <span className="text-2xl font-bold text-[#0a6650]">Admin Portal</span>
+                <Badge variant="secondary" className="ml-2">v2.1</Badge>
               </Link>
-              <Badge variant="secondary">Admin</Badge>
+            </div>
+            <div className="hidden md:flex items-center space-x-6">
+              <Link href="/admin/products" className="text-[#0a6650] font-medium">
+                Products
+              </Link>
+              <Link href="/admin/website" className="text-gray-700 hover:text-[#0a6650]">
+                Website
+              </Link>
+              <Link href="/admin/settings" className="text-gray-700 hover:text-[#0a6650]">
+                Settings
+              </Link>
             </div>
             <div className="flex items-center space-x-4">
               <Link href="/">
                 <Button variant="outline" size="sm">
                   <Eye className="h-4 w-4 mr-2" />
-                  View Store
+                  View Website
                 </Button>
               </Link>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
+              </Button>
+              <Button size="sm" className="bg-[#0a6650] hover:bg-[#084c3d]">
+                Admin
               </Button>
             </div>
           </div>
@@ -123,12 +112,12 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Welcome back! Here's what's happening with your store.</p>
+            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p className="text-gray-600">Manage products and content for the Greenbeam website</p>
           </div>
           <div className="flex gap-4">
             <Link href="/admin/products/new">
-              <Button>
+              <Button className="bg-[#0a6650] hover:bg-[#084c3d]">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Product
               </Button>
@@ -136,144 +125,129 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+        {/* Quick Stats */}
+        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          {quickStats.map((stat, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
+                <stat.icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  <TrendingUp className="h-3 w-3 inline mr-1" />
-                  {stat.change}
+                <p className="text-xs text-green-600">
+                  {stat.change} from last month
                 </p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Orders */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Recent Orders</CardTitle>
-                    <CardDescription>Latest orders from your customers</CardDescription>
-                  </div>
-                  <Link href="/admin/orders">
-                    <Button variant="outline" size="sm">
-                      View All
-                    </Button>
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-4">
-                          <div>
-                            <p className="font-medium">{order.id}</p>
-                            <p className="text-sm text-gray-600">{order.customer}</p>
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm">{order.product}</p>
-                            <p className="text-xs text-gray-500">{order.date}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <Badge
-                          variant={
-                            order.status === "completed"
-                              ? "default"
-                              : order.status === "processing"
-                                ? "secondary"
-                                : order.status === "shipped"
-                                  ? "outline"
-                                  : "destructive"
-                          }
-                        >
-                          {order.status}
-                        </Badge>
-                        <p className="font-medium">{order.amount}</p>
-                      </div>
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Recent Products */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <Package className="h-5 w-5 mr-2" />
+                Recent Products
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentProducts.map((product) => (
+                  <div key={product.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <h4 className="font-medium">{product.name}</h4>
+                      <p className="text-sm text-gray-600">{product.category}</p>
+                      <p className="text-xs text-gray-500">{product.images} images</p>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge 
+                        variant={product.status === "Available" ? "default" : "secondary"}
+                        className={product.status === "Available" ? "bg-green-100 text-green-800" : ""}
+                      >
+                        {product.status}
+                      </Badge>
+                      <Link href={`/admin/products/${product.id}`}>
+                        <Button variant="outline" size="sm">
+                          Edit
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4">
+                <Link href="/admin/products">
+                  <Button variant="outline" className="w-full">
+                    View All Products
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Quick Actions & Alerts */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link href="/admin/products" className="block">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Link href="/admin/products/new">
+                  <Button className="w-full justify-start bg-[#0a6650] hover:bg-[#084c3d]">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Product
+                  </Button>
+                </Link>
+                <Link href="/admin/products">
+                  <Button variant="outline" className="w-full justify-start">
                     <Package className="h-4 w-4 mr-2" />
                     Manage Products
                   </Button>
                 </Link>
-                <Link href="/admin/orders" className="block">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <ShoppingCart className="h-4 w-4 mr-2" />
-                    View Orders
+                <Link href="/admin/website">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Website Settings
                   </Button>
                 </Link>
-                <Link href="/admin/customers" className="block">
-                  <Button variant="outline" className="w-full justify-start bg-transparent">
-                    <Users className="h-4 w-4 mr-2" />
-                    Customer Management
+                <Link href="/">
+                  <Button variant="outline" className="w-full justify-start">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview Website
                   </Button>
                 </Link>
-              </CardContent>
-            </Card>
-
-            {/* Low Stock Alert */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5 text-orange-500" />
-                  Low Stock Alert
-                </CardTitle>
-                <CardDescription>Products running low on inventory</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {lowStockProducts.map((product, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <div>
-                        <p className="text-sm font-medium">{product.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {product.stock} left (min: {product.threshold})
-                        </p>
-                      </div>
-                      <Badge variant="destructive" className="text-xs">
-                        Low Stock
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/admin/products" className="block mt-4">
-                  <Button variant="outline" size="sm" className="w-full bg-transparent">
-                    Manage Inventory
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
+
+        {/* System Status */}
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <AlertTriangle className="h-5 w-5 mr-2 text-yellow-600" />
+              System Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm">Website: Online</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm">Database: Connected</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm">Storage: 2.3GB used</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

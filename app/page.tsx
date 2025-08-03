@@ -9,8 +9,6 @@ const featuredProducts = [
   {
     id: 1,
     name: "Solar Panel Kit 400W",
-    price: 899.99,
-    originalPrice: 1199.99,
     image: "/solar-panel-1.jpg?height=300&width=300",
     category: "Solar Panels",
     rating: 4.8,
@@ -19,7 +17,6 @@ const featuredProducts = [
   {
     id: 2,
     name: "Wind Turbine Generator 1000W",
-    price: 1299.99,
     image: "/wind-turbine-1.jpg?height=300&width=300",
     category: "Wind Energy",
     rating: 4.6,
@@ -28,8 +25,7 @@ const featuredProducts = [
   {
     id: 3,
     name: "Battery Storage System 10kWh",
-    price: 2499.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: "/solar-panel-1.jpg?height=300&width=300",
     category: "Energy Storage",
     rating: 4.9,
     reviews: 156,
@@ -54,21 +50,21 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-green-600" />
-                <span className="text-2xl font-bold text-green-600">Greenbeam</span>
+                <Leaf className="h-8 w-8 text-[#0a6650]" />
+                <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/products" className="text-gray-700 hover:text-green-600">
+              <Link href="/" className="text-[#0a6650] font-medium">
+                Home
+              </Link>
+              <Link href="/products" className="text-gray-700 hover:text-[#0a6650]">
                 Products
               </Link>
-              <Link href="/categories" className="text-gray-700 hover:text-green-600">
-                Categories
-              </Link>
-              <Link href="/about" className="text-gray-700 hover:text-green-600">
+              <Link href="/about" className="text-gray-700 hover:text-[#0a6650]">
                 About
               </Link>
-              <Link href="/contact" className="text-gray-700 hover:text-green-600">
+              <Link href="/contact" className="text-gray-700 hover:text-[#0a6650]">
                 Contact
               </Link>
             </div>
@@ -87,7 +83,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-green-600 to-green-800 text-white">
+      <section className="relative bg-gradient-to-r from-[#0a6650] to-[#084c3d] text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -98,7 +94,7 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/products">
-                  <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100">
+                  <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100">
                     Shop Now
                   </Button>
                 </Link>
@@ -129,22 +125,22 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <Zap className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <Zap className="h-12 w-12 text-[#0a6650] mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">High Efficiency</h3>
               <p className="text-gray-600">Premium quality equipment with maximum energy output</p>
             </div>
             <div className="text-center">
-              <Shield className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <Shield className="h-12 w-12 text-[#0a6650] mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">25-Year Warranty</h3>
               <p className="text-gray-600">Long-term protection for your investment</p>
             </div>
             <div className="text-center">
-              <Truck className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <Truck className="h-12 w-12 text-[#0a6650] mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Free Installation</h3>
               <p className="text-gray-600">Professional installation included with every purchase</p>
             </div>
             <div className="text-center">
-              <Leaf className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <Leaf className="h-12 w-12 text-[#0a6650] mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Eco-Friendly</h3>
               <p className="text-gray-600">Reduce your carbon footprint and save money</p>
             </div>
@@ -205,12 +201,6 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold text-green-600">${product.price}</span>
-                      {product.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through ml-2">${product.originalPrice}</span>
-                      )}
-                    </div>
                     <Link href={`/products/${product.id}`}>
                       <Button>View Details</Button>
                     </Link>
@@ -223,7 +213,7 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-16 bg-green-600 text-white">
+      <section className="py-16 bg-[#0a6650] text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
           <p className="text-xl mb-8 text-green-100">
@@ -231,7 +221,7 @@ export default function HomePage() {
           </p>
           <div className="max-w-md mx-auto flex gap-4">
             <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
-            <Button className="bg-white text-green-600 hover:bg-gray-100">Subscribe</Button>
+            <Button className="bg-white text-[#0a6650] hover:bg-gray-100">Subscribe</Button>
           </div>
         </div>
       </section>
@@ -242,7 +232,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <Leaf className="h-8 w-8 text-green-600" />
+                <Leaf className="h-8 w-8 text-[#0a6650]" />
                 <span className="text-2xl font-bold">Greenbeam</span>
               </div>
               <p className="text-gray-400">
