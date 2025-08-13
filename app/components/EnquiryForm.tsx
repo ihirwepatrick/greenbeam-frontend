@@ -8,26 +8,25 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { X, Send, CheckCircle, AlertCircle, Phone, Mail, MapPin } from "lucide-react"
-import EmailService from "./EmailService"
+import { Product } from "../../lib/types/api"
+import { enquiryService } from "../../lib/services/api"
+import { useAuth } from "../../contexts/AuthContext"
 
 interface EnquiryFormProps {
   isOpen: boolean
   onClose: () => void
-  product?: {
-    id: number
-    name: string
-    category: string
-    description: string
-  }
+  product?: Product
 }
 
 export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormProps) {
+  const { user, isAuthenticated } = useAuth()
+  
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    firstName: user?.name?.split(' ')[0] || "",
+    lastName: user?.name?.split(' ').slice(1).join(' ') || "",
+    email: user?.email || "",
     phone: "",
-    subject: "",
+    subject: product ? `Enquiry about ${product.name}` : "",
     message: ""
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -48,94 +47,51 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
     setError("")
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Create enquiry object
-      const enquiry = {
-        id: `ENQ-${Date.now()}`,
-        customerName: `${formData.firstName} ${formData.lastName}`,
+      // Create enquiry using the API service
+      const enquiryData = {
+        name: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email,
-        phone: formData.phone,
-        product: product?.name || "General Inquiry",
         subject: formData.subject,
-        message: formData.message,
-        status: "New",
-        priority: "Medium",
-        createdAt: new Date().toLocaleString(),
-        lastUpdated: new Date().toLocaleString(),
-        location: "Website Form",
-        source: "Product Enquiry"
+        message: formData.message
       }
 
-      // In a real app, you would send this to your API
-      console.log("Enquiry submitted:", enquiry)
+      const response = await enquiryService.createEnquiry(enquiryData)
       
-      // Send confirmation email to customer
-      const customerEmailSent = await EmailService.sendCustomerConfirmation(
-        formData.email,
-        `${formData.firstName} ${formData.lastName}`,
-        product?.name || "General Inquiry",
-        enquiry.id
-      )
-      
-      // Send notification email to admin
-      const adminEmailSent = await EmailService.sendAdminNotification(
-        "admin@greenbeam.com", // Admin email
-        `${formData.firstName} ${formData.lastName}`,
-        product?.name || "General Inquiry",
-        enquiry.id
-      )
-      
-      if (customerEmailSent) {
-        console.log("✅ Confirmation email sent to customer")
+      if (response.success) {
+        setIsSubmitted(true)
+        setFormData({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: ""
+        })
+      } else {
+        setError("Failed to submit enquiry. Please try again.")
       }
-      
-      if (adminEmailSent) {
-        console.log("✅ Notification email sent to admin")
-      }
-      
-      setIsSubmitted(true)
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: ""
-      })
-    } catch (err) {
-      setError("Failed to submit enquiry. Please try again.")
+    } catch (error) {
+      console.error("Enquiry submission failed:", error)
+      setError("An error occurred while submitting your enquiry. Please try again.")
     } finally {
       setIsSubmitting(false)
-    }
-  }
-
-  const handleClose = () => {
-    if (!isSubmitting) {
-      onClose()
-      setIsSubmitted(false)
-      setError("")
     }
   }
 
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Product Enquiry</h2>
               {product && (
-                <div className="flex items-center space-x-2 mt-2">
-                  <Badge variant="outline">{product.category}</Badge>
-                  <span className="text-gray-600">{product.name}</span>
-                </div>
+                <p className="text-gray-600 mt-1">Enquiring about: {product.name}</p>
               )}
             </div>
-            <Button variant="ghost" size="sm" onClick={handleClose} disabled={isSubmitting}>
+            <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-6 w-6" />
             </Button>
           </div>
@@ -145,28 +101,31 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
               <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Enquiry Submitted!</h3>
               <p className="text-gray-600 mb-6">
-                Thank you for your enquiry. We've received your message and will get back to you within 24 hours.
+                Thank you for your enquiry. We'll get back to you within 24 hours.
               </p>
-              <div className="bg-green-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-green-800 mb-2">What happens next?</h4>
-                <ul className="text-sm text-green-700 space-y-1">
-                  <li>• You'll receive a confirmation email shortly</li>
-                  <li>• Our team will review your enquiry within 24 hours</li>
-                  <li>• We'll contact you with detailed information and pricing</li>
-                  <li>• You can track your enquiry status in your email</li>
-                </ul>
-              </div>
-              <Button onClick={handleClose} className="bg-[#0a6650] hover:bg-[#084c3d]">
+              <Button onClick={onClose} className="bg-[#0a6650] hover:bg-[#084c3d]">
                 Close
               </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center space-x-2">
-                  <AlertCircle className="h-5 w-5 text-red-500" />
-                  <span className="text-red-700">{error}</span>
-                </div>
+              {product && (
+                <Card className="bg-gray-50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">Product Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <span className="text-2xl">🔋</span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">{product.name}</h4>
+                        <Badge variant="secondary">{product.category}</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               <div className="grid md:grid-cols-2 gap-4">
@@ -178,7 +137,7 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    placeholder="John"
+                    className="mt-1"
                   />
                 </div>
                 <div>
@@ -189,7 +148,7 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    placeholder="Doe"
+                    className="mt-1"
                   />
                 </div>
               </div>
@@ -204,18 +163,17 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    placeholder="john@example.com"
+                    className="mt-1"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">Phone Number</Label>
                   <Input
                     id="phone"
                     name="phone"
-                    type="tel"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="+250 788 123 456"
+                    className="mt-1"
                   />
                 </div>
               </div>
@@ -228,7 +186,7 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                   value={formData.subject}
                   onChange={handleInputChange}
                   required
-                  placeholder="Product availability and pricing inquiry"
+                  className="mt-1"
                 />
               </div>
 
@@ -240,34 +198,31 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                   value={formData.message}
                   onChange={handleInputChange}
                   required
-                  placeholder="Please provide details about your requirements, timeline, and any specific questions you have..."
-                  rows={5}
+                  rows={4}
+                  placeholder="Please provide details about your enquiry, including any specific questions or requirements..."
+                  className="mt-1"
                 />
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-gray-900 mb-2">Contact Information</h4>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 mr-2" />
-                    <span>+250 788 123 456</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2" />
-                    <span>info@greenbeam.com</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>Kigali, Rwanda</span>
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-4">
+                  <div className="flex">
+                    <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                    <div className="ml-3">
+                      <p className="text-sm text-red-800">{error}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              <div className="flex gap-3">
-                <Button
-                  type="submit"
+              <div className="flex justify-end space-x-3 pt-4">
+                <Button type="button" variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
                   disabled={isSubmitting}
-                  className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]"
+                  className="bg-[#0a6650] hover:bg-[#084c3d]"
                 >
                   {isSubmitting ? (
                     <>
@@ -277,17 +232,9 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      Send Enquiry
+                      Submit Enquiry
                     </>
                   )}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isSubmitting}
-                >
-                  Cancel
                 </Button>
               </div>
             </form>

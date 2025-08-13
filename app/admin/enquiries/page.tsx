@@ -34,8 +34,9 @@ import {
 } from "lucide-react"
 import NotificationSystem from "../../components/NotificationSystem"
 import EmailService from "../../components/EmailService"
+import { useEnquiries } from "../../../hooks/use-api"
 
-const enquiries = [
+const enquiriesSeed = [
   {
     id: "ENQ-001",
     customerName: "John Smith",
@@ -133,6 +134,24 @@ export default function AdminEnquiries() {
   const [priorityFilter, setPriorityFilter] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
   const [showNotifications, setShowNotifications] = useState(false)
+
+  const { data: apiEnquiriesResponse, loading: enquiriesLoading } = useEnquiries({ limit: 20 })
+  const mappedApiEnquiries = (apiEnquiriesResponse?.data || []).map((e: any) => ({
+    id: e.id,
+    customerName: e.name,
+    email: e.email,
+    phone: "",
+    product: "",
+    subject: e.subject,
+    message: e.message,
+    status: e.status || "pending",
+    priority: "Medium",
+    createdAt: e.createdAt,
+    lastUpdated: e.updatedAt,
+    location: "",
+    source: "API"
+  }))
+  const enquiries = mappedApiEnquiries.length ? mappedApiEnquiries : enquiriesSeed
 
   const handleViewDetails = (enquiry: any) => {
     setSelectedEnquiry(enquiry)

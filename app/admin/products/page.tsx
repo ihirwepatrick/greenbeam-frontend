@@ -1,110 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import Image from "next/image"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
 import {
   Database,
   Package,
-  Plus,
-  Search,
-  Filter,
-  Edit,
-  Trash2,
+  Users,
   Eye,
-  MoreHorizontal,
-  ArrowUpDown,
   Settings,
-  Image as ImageIcon,
-  CheckCircle,
-  XCircle,
   Home,
   LogOut,
-  Grid3X3,
-  List,
-  X,
-  Save,
-  AlertTriangle,
-  Users,
+  Search,
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
+  Star,
+  Calendar,
+  Tag,
+  Bell,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react"
-
-const products = [
-  {
-    id: "PROD-001",
-    name: "Solar Panel Kit 400W",
-    category: "Solar Panels",
-    description: "High-efficiency solar panel kit perfect for residential installations.",
-    status: "Available",
-    images: 3,
-    lastUpdated: "2024-01-15",
-    features: ["400W output", "25-year warranty", "Easy installation"]
-  },
-  {
-    id: "PROD-002",
-    name: "Wind Turbine Generator 1000W",
-    category: "Wind Energy",
-    description: "Residential wind turbine generator designed for optimal energy production.",
-    status: "Available",
-    images: 2,
-    lastUpdated: "2024-01-14",
-    features: ["1000W output", "Low noise design", "Automatic braking"]
-  },
-  {
-    id: "PROD-003",
-    name: "Battery Storage System 10kWh",
-    category: "Energy Storage",
-    description: "Advanced lithium-ion battery storage system for storing excess solar energy.",
-    status: "Not Available",
-    images: 1,
-    lastUpdated: "2024-01-13",
-    features: ["10kWh capacity", "Smart monitoring", "10-year warranty"]
-  },
-  {
-    id: "PROD-004",
-    name: "Hybrid Inverter 5000W",
-    category: "Inverters",
-    description: "Hybrid inverter that can work with both solar panels and battery storage systems.",
-    status: "Available",
-    images: 3,
-    lastUpdated: "2024-01-12",
-    features: ["5000W output", "Hybrid capability", "Grid-tied"]
-  },
-  {
-    id: "PROD-005",
-    name: "Solar Panel Kit 600W",
-    category: "Solar Panels",
-    description: "Premium solar panel kit with higher efficiency and advanced monitoring capabilities.",
-    status: "Not Available",
-    images: 0,
-    lastUpdated: "2024-01-11",
-    features: ["600W output", "Premium efficiency", "Smart monitoring"]
-  },
-  {
-    id: "PROD-006",
-    name: "Monitoring System Pro",
-    category: "Monitoring",
-    description: "Professional monitoring system for tracking energy production and system performance.",
-    status: "Available",
-    images: 2,
-    lastUpdated: "2024-01-10",
-    features: ["Real-time monitoring", "Mobile app", "Performance alerts"]
-  }
-]
-
-const categories = [
-  "All Categories",
-  "Solar Panels",
-  "Wind Energy",
-  "Energy Storage",
-  "Inverters",
-  "Monitoring",
-  "Accessories"
-]
+import NotificationSystem from "../../components/NotificationSystem"
+import { useAuth } from "../../../contexts/AuthContext"
+import { useProducts } from "../../../hooks/use-api"
+import { productService } from "../../../lib/services/api"
+import { Product } from "../../../lib/types/api"
 
 const sidebarLinks = [
   { name: "Dashboard", href: "/admin", icon: Home },
@@ -115,46 +42,124 @@ const sidebarLinks = [
 ]
 
 export default function AdminProducts() {
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid")
-  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [editForm, setEditForm] = useState<any>({})
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "",
+    status: "",
+    sortBy: "createdAt",
+    sortOrder: "desc" as "asc" | "desc"
+  })
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(12)
 
-  const handleViewDetails = (product: any) => {
+  const { logout, user } = useAuth()
+  
+  const { data: productsResponse, loading: productsLoading, execute: refetchProducts } = useProducts({
+    ...filters,
+    page: currentPage,
+    limit: itemsPerPage
+  })
+
+  // Map backend response structure
+  const products = (productsResponse as any)?.products || []
+  const pagination = (productsResponse as any)?.pagination
+
+  useEffect(() => {
+    refetchProducts({
+      ...filters,
+      page: currentPage,
+      limit: itemsPerPage
+    })
+  }, [filters, currentPage, itemsPerPage, refetchProducts])
+
+  const handleViewDetails = (product: Product) => {
     setSelectedProduct(product)
     setShowDetailsModal(true)
   }
 
-  const handleEdit = (product: any) => {
-    setEditForm(product)
-    setShowEditModal(true)
-  }
-
-  const handleDelete = (product: any) => {
-    setSelectedProduct(product)
-    setShowDeleteModal(true)
-  }
-
   const closeModal = () => {
     setShowDetailsModal(false)
-    setShowEditModal(false)
-    setShowDeleteModal(false)
     setSelectedProduct(null)
-    setEditForm({})
   }
 
-  const saveEdit = () => {
-    // Here you would typically save to database
-    console.log("Saving product:", editForm)
-    closeModal()
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }))
+    setCurrentPage(1)
   }
 
-  const confirmDelete = () => {
-    // Here you would typically delete from database
-    console.log("Deleting product:", selectedProduct)
-    closeModal()
+  const handleSortChange = (sortBy: string) => {
+    setFilters(prev => ({
+      ...prev,
+      sortBy,
+      sortOrder: prev.sortOrder === "asc" ? "desc" : "asc"
+    }))
+    setCurrentPage(1)
+  }
+
+  const clearFilters = () => {
+    setFilters({
+      search: "",
+      category: "",
+      status: "",
+      sortBy: "createdAt",
+      sortOrder: "desc"
+    })
+    setCurrentPage(1)
+  }
+
+  const handleDeleteProduct = async (productId: string | number) => {
+    if (!confirm("Are you sure you want to delete this product?")) return
+    
+    try {
+      await productService.deleteProduct(String(productId))
+      refetchProducts({
+        ...filters,
+        page: currentPage,
+        limit: itemsPerPage
+      })
+    } catch (error) {
+      console.error("Failed to delete product:", error)
+    }
+  }
+
+  const getStatusColor = (status?: string) => {
+    switch (status?.toLowerCase()) {
+      case 'available':
+        return 'bg-green-100 text-green-800'
+      case 'out_of_stock':
+      case 'out-of-stock':
+        return 'bg-red-100 text-red-800'
+      case 'discontinued':
+        return 'bg-gray-100 text-gray-800'
+      case 'pre_order':
+      case 'pre-order':
+        return 'bg-blue-100 text-blue-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const formatStatus = (status?: string) => {
+    if (!status) return 'Available'
+    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
+
+  const totalPages = pagination?.totalPages || pagination?.pages || 1
+
+  // Type-safe helper functions for filtering
+  const getAvailableCount = () => {
+    return products.filter((p: Product) => p.status?.toLowerCase() === 'available').length
+  }
+
+  const getOutOfStockCount = () => {
+    return products.filter((p: Product) => p.status?.toLowerCase().includes('out')).length
+  }
+
+  const getUniqueCategories = (): string[] => {
+    return Array.from(new Set(products.map((p: Product) => p.category).filter(Boolean)))
   }
 
   return (
@@ -198,7 +203,7 @@ export default function AdminProducts() {
               View Website
             </Button>
           </Link>
-          <Button variant="outline" className="w-full justify-start">
+          <Button variant="outline" className="w-full justify-start" onClick={() => logout()}>
             <LogOut className="h-4 w-4 mr-2" />
             Logout
           </Button>
@@ -213,24 +218,27 @@ export default function AdminProducts() {
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Product Management</h1>
-                <p className="text-gray-600">Manage products to be displayed on the Greenbeam website</p>
+                <p className="text-gray-600">Manage your product catalog and inventory</p>
               </div>
               <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowNotifications(true)}
+                  className="relative"
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                  <Badge className="absolute -top-2 -right-2 h-5 w-5 bg-red-500 text-white text-xs">
+                    2
+                  </Badge>
+                </Button>
                 <Link href="/admin/products/new">
-                  <Button className="bg-[#0a6650] hover:bg-[#084c3d]">
+                  <Button size="sm" className="bg-[#0a6650] hover:bg-[#084c3d]">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </Button>
                 </Link>
-                <Link href="/admin/settings">
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Button>
-                </Link>
-                <Button size="sm" className="bg-[#0a6650] hover:bg-[#084c3d]">
-                  Admin
-                </Button>
               </div>
             </div>
           </div>
@@ -242,52 +250,50 @@ export default function AdminProducts() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+                <Package className="h-4 w-4 text-[#0a6650]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">24</div>
-                <p className="text-xs text-muted-foreground">
-                  +3 from last month
-                </p>
+                <div className="text-2xl font-bold">{pagination?.total || 0}</div>
+                <p className="text-xs text-green-600">Live count</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Available Products</CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <CardTitle className="text-sm font-medium">Available</CardTitle>
+                <Eye className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">18</div>
-                <p className="text-xs text-muted-foreground">
-                  +2 from last month
-                </p>
+                <div className="text-2xl font-bold">
+                  {getAvailableCount()}
+                </div>
+                <p className="text-xs text-green-600">In stock</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Not Available</CardTitle>
-                <XCircle className="h-4 w-4 text-red-600" />
+                <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+                <Package className="h-4 w-4 text-red-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">6</div>
-                <p className="text-xs text-muted-foreground">
-                  -1 from last month
-                </p>
+                <div className="text-2xl font-bold">
+                  {getOutOfStockCount()}
+                </div>
+                <p className="text-xs text-red-600">Need restock</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Categories</CardTitle>
-                <Database className="h-4 w-4 text-muted-foreground" />
+                <Tag className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">6</div>
-                <p className="text-xs text-muted-foreground">
-                  +1 from last month
-                </p>
+                <div className="text-2xl font-bold">
+                  {getUniqueCategories().length}
+                </div>
+                <p className="text-xs text-blue-600">Unique categories</p>
               </CardContent>
             </Card>
           </div>
@@ -295,222 +301,220 @@ export default function AdminProducts() {
           {/* Filters and Search */}
           <Card className="mb-6">
             <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col md:flex-row gap-4 mb-4">
                 <div className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                     <Input
-                      placeholder="Search products by name, category, or description..."
+                      placeholder="Search products by name or description..."
                       className="pl-10"
+                      value={filters.search}
+                      onChange={(e) => handleFilterChange("search", e.target.value)}
                     />
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filter
-                  </Button>
-                  <Button variant="outline">
-                    <ArrowUpDown className="h-4 w-4 mr-2" />
-                    Sort
-                  </Button>
-                  <div className="flex border rounded-lg">
-                    <Button
-                      variant={viewMode === "grid" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("grid")}
-                      className="rounded-r-none"
-                    >
-                      <Grid3X3 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant={viewMode === "table" ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setViewMode("table")}
-                      className="rounded-l-none"
-                    >
-                      <List className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <select
+                    className="px-3 py-2 border border-gray-300 rounded-md"
+                    value={filters.category}
+                    onChange={(e) => handleFilterChange("category", e.target.value)}
+                  >
+                    <option value="">All Categories</option>
+                    {getUniqueCategories().map((category: string) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                  <select
+                    className="px-3 py-2 border border-gray-300 rounded-md"
+                    value={filters.status}
+                    onChange={(e) => handleFilterChange("status", e.target.value)}
+                  >
+                    <option value="">All Status</option>
+                    <option value="available">Available</option>
+                    <option value="out_of_stock">Out of Stock</option>
+                    <option value="discontinued">Discontinued</option>
+                    <option value="pre_order">Pre Order</option>
+                  </select>
                 </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm font-medium text-gray-700">Sort by:</span>
+                  <Button
+                    variant={filters.sortBy === "name" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSortChange("name")}
+                  >
+                    Name {filters.sortBy === "name" && (filters.sortOrder === "asc" ? "↑" : "↓")}
+                  </Button>
+                  <Button
+                    variant={filters.sortBy === "rating" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSortChange("rating")}
+                  >
+                    Rating {filters.sortBy === "rating" && (filters.sortOrder === "asc" ? "↑" : "↓")}
+                  </Button>
+                  <Button
+                    variant={filters.sortBy === "createdAt" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleSortChange("createdAt")}
+                  >
+                    Date {filters.sortBy === "createdAt" && (filters.sortOrder === "asc" ? "↑" : "↓")}
+                  </Button>
+                </div>
+                <Button variant="outline" size="sm" onClick={clearFilters}>
+                  Clear Filters
+                </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Category Tabs */}
-          <div className="flex space-x-2 mb-6 overflow-x-auto">
-            {categories.map((category, index) => (
-              <Button
-                key={index}
-                variant={index === 0 ? "default" : "outline"}
-                size="sm"
-                className="whitespace-nowrap"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
-
-          {/* Products Display */}
-          {viewMode === "grid" ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader className="p-0">
-                    <div className="h-48 bg-gray-100 rounded-t-lg flex items-center justify-center">
-                      <Package className="h-16 w-16 text-gray-400" />
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 mb-3">
-                      <Badge variant="outline">{product.category}</Badge>
-                      <Badge
-                        variant={product.status === "Available" ? "default" : "secondary"}
-                        className={product.status === "Available" ? "bg-green-100 text-green-800" : ""}
-                      >
-                        {product.status}
-                      </Badge>
-                    </div>
-                    
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
-                    
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span>{product.images}/3 images</span>
-                      <span>Updated: {product.lastUpdated}</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleViewDetails(product)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        View
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEdit(product)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDelete(product)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+          {/* Products Grid */}
+          {productsLoading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-12">
+              <Package className="h-24 w-24 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
+              <p className="text-gray-600 mb-4">Get started by adding your first product</p>
+              <Link href="/admin/products/new">
+                <Button className="bg-[#0a6650] hover:bg-[#084c3d]">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </Link>
             </div>
           ) : (
-            <div className="space-y-4">
-              {products.map((product) => (
-                <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="h-16 w-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <Package className="h-8 w-8 text-gray-400" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg">{product.name}</h3>
-                          <p className="text-sm text-gray-600">ID: {product.id}</p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Badge variant="outline">{product.category}</Badge>
-                            <Badge
-                              variant={product.status === "Available" ? "default" : "secondary"}
-                              className={product.status === "Available" ? "bg-green-100 text-green-800" : ""}
-                            >
-                              {product.status === "Available" ? (
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                              ) : (
-                                <XCircle className="h-3 w-3 mr-1" />
-                              )}
-                              {product.status}
-                            </Badge>
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {products.map((product: Product) => (
+                  <Card key={product.id} className="hover:shadow-lg transition-shadow">
+                    <CardHeader className="p-0">
+                      <div className="relative">
+                        <Image
+                          src={product.image || "/placeholder.svg"}
+                          alt={product.name}
+                          width={300}
+                          height={200}
+                          className="w-full h-48 object-cover rounded-t-lg"
+                        />
+                        {product.status && (
+                          <Badge 
+                            className={`absolute top-2 right-2 ${getStatusColor(product.status)}`}
+                          >
+                            {formatStatus(product.status)}
+                          </Badge>
+                        )}
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {product.category}
+                        </Badge>
+                        {Number(product.rating) > 0 && (
+                          <div className="flex items-center">
+                            <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                            <span className="text-sm text-gray-600 ml-1">
+                              {product.rating}
+                            </span>
                           </div>
-                        </div>
+                        )}
                       </div>
                       
-                      <div className="flex items-center space-x-4">
-                        <div className="text-right">
-                          <div className="flex items-center space-x-1 text-sm text-gray-600">
-                            <ImageIcon className="h-4 w-4" />
-                            <span>{product.images}/3 images</span>
-                          </div>
-                          <p className="text-xs text-gray-500">Updated: {product.lastUpdated}</p>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleViewDetails(product)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleEdit(product)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleDelete(product)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
+                      <h3 className="font-semibold text-sm mb-2 line-clamp-2">{product.name}</h3>
+                      <p className="text-gray-600 text-xs mb-3 line-clamp-2">{product.description}</p>
+                      
+                      <div className="flex items-center text-xs text-gray-500 mb-3">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {new Date(product.createdAt).toLocaleDateString()}
                       </div>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <p className="text-gray-600 text-sm">{product.description}</p>
-                    </div>
-                    
-                    <div className="mt-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Key Features:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {product.features.map((feature, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {feature}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
 
-          {/* Pagination */}
-          <div className="flex justify-between items-center mt-8">
-            <p className="text-sm text-gray-600">
-              Showing 1-6 of 6 products
-            </p>
-            <div className="flex space-x-2">
-              <Button variant="outline" size="sm" disabled>
-                Previous
-              </Button>
-              <Button variant="outline" size="sm" disabled>
-                Next
-              </Button>
-            </div>
-          </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewDetails(product)}
+                          className="flex-1"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                        <Link href={`/admin/products/${product.id}/edit`} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Edit className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                        </Link>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center">
+                  <nav className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Previous
+                    </Button>
+                    
+                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                      const page = currentPage <= 3 ? i + 1 : currentPage - 2 + i
+                      if (page > totalPages) return null
+                      return (
+                        <Button
+                          key={page}
+                          variant={page === currentPage ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Button>
+                      )
+                    })}
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </nav>
+                </div>
+              )}
+
+              {/* Results Info */}
+              {pagination && (
+                <div className="mt-4 text-center text-sm text-gray-500">
+                  Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+                  {pagination.total} products
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -522,227 +526,94 @@ export default function AdminProducts() {
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">{selectedProduct.name}</h2>
-                  <p className="text-gray-600">{selectedProduct.category}</p>
+                  <div className="flex items-center space-x-2 mt-2">
+                    <Badge variant="secondary">{selectedProduct.category}</Badge>
+                    <Badge className={getStatusColor(selectedProduct.status)}>
+                      {formatStatus(selectedProduct.status)}
+                    </Badge>
+                  </div>
                 </div>
                 <Button variant="ghost" size="sm" onClick={closeModal}>
-                  <X className="h-6 w-6" />
+                  ×
                 </Button>
               </div>
 
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <div className="bg-gray-100 rounded-lg h-64 flex items-center justify-center mb-4">
-                    <Package className="h-16 w-16 text-gray-400" />
-                  </div>
-                  
-                  <div className="mb-6">
-                    <h4 className="font-semibold mb-3">Key Features:</h4>
-                    <ul className="space-y-2">
-                      {selectedProduct.features.map((feature: string, index: number) => (
-                        <li key={index} className="flex items-center text-sm text-gray-600">
-                          <div className="h-2 w-2 bg-[#0a6650] rounded-full mr-3"></div>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold mb-3">Product Description</h3>
-                    <p className="text-gray-600">{selectedProduct.description}</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium">Status:</span>
-                      <Badge
-                        variant={selectedProduct.status === "Available" ? "default" : "secondary"}
-                        className={selectedProduct.status === "Available" ? "bg-green-100 text-green-800" : ""}
-                      >
-                        {selectedProduct.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium">Images:</span>
-                      <span>{selectedProduct.images}/3</span>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium">Last Updated:</span>
-                      <span>{selectedProduct.lastUpdated}</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex gap-3">
-                    <Button 
-                      className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]"
-                      onClick={() => {
-                        closeModal()
-                        handleEdit(selectedProduct)
-                      }}
-                    >
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Product
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => {
-                        closeModal()
-                        handleDelete(selectedProduct)
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Product Modal */}
-      {showEditModal && editForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Edit Product</h2>
-                  <p className="text-gray-600">Update product information</p>
-                </div>
-                <Button variant="ghost" size="sm" onClick={closeModal}>
-                  <X className="h-6 w-6" />
-                </Button>
-              </div>
-
-              <form className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Product Name</Label>
-                    <Input
-                      id="name"
-                      value={editForm.name || ""}
-                      onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="category">Category</Label>
-                    <select
-                      id="category"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      value={editForm.category || ""}
-                      onChange={(e) => setEditForm({...editForm, category: e.target.value})}
-                    >
-                      <option value="">Select Category</option>
-                      <option value="Solar Panels">Solar Panels</option>
-                      <option value="Wind Energy">Wind Energy</option>
-                      <option value="Energy Storage">Energy Storage</option>
-                      <option value="Inverters">Inverters</option>
-                      <option value="Monitoring">Monitoring</option>
-                      <option value="Accessories">Accessories</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    rows={4}
-                    value={editForm.description || ""}
-                    onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                  <Image
+                    src={selectedProduct.image || "/placeholder.svg"}
+                    alt={selectedProduct.name}
+                    width={400}
+                    height={400}
+                    className="w-full h-80 object-cover rounded-lg"
                   />
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="status">Status</Label>
-                    <select
-                      id="status"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                      value={editForm.status || ""}
-                      onChange={(e) => setEditForm({...editForm, status: e.target.value})}
-                    >
-                      <option value="Available">Available</option>
-                      <option value="Not Available">Not Available</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="images">Images (0-3)</Label>
-                    <Input
-                      id="images"
-                      type="number"
-                      min="0"
-                      max="3"
-                      value={editForm.images || 0}
-                      onChange={(e) => setEditForm({...editForm, images: parseInt(e.target.value)})}
-                    />
+                <div>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Description</h3>
+                      <p className="text-gray-600">{selectedProduct.description}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Details</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Rating:</span>
+                          <span>{selectedProduct.rating || 0}/5</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Reviews:</span>
+                          <span>{selectedProduct.reviews || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Created:</span>
+                          <span>{new Date(selectedProduct.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedProduct.features && selectedProduct.features.length > 0 && (
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Features</h3>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {selectedProduct.features.map((feature, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-3 mt-6">
+                      <Link href={`/admin/products/${selectedProduct.id}/edit`} className="flex-1">
+                        <Button className="w-full bg-[#0a6650] hover:bg-[#084c3d]">
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Product
+                        </Button>
+                      </Link>
+                      <Link href={`/products/${selectedProduct.id}`} className="flex-1">
+                        <Button variant="outline" className="w-full">
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Public
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex gap-3">
-                  <Button 
-                    type="button"
-                    className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]"
-                    onClick={saveEdit}
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </Button>
-                  <Button 
-                    type="button"
-                    variant="outline"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <AlertTriangle className="h-6 w-6 text-red-600 mr-3" />
-                <h2 className="text-xl font-bold text-gray-900">Delete Product</h2>
-              </div>
-              
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete <strong>{selectedProduct.name}</strong>? This action cannot be undone.
-              </p>
-
-              <div className="flex gap-3">
-                <Button 
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={confirmDelete}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-                <Button 
-                  variant="outline"
-                  className="flex-1"
-                  onClick={closeModal}
-                >
-                  Cancel
-                </Button>
               </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Notification System */}
+      <NotificationSystem 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+      />
     </div>
   )
 }

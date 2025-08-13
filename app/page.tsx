@@ -1,55 +1,59 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, MessageCircle } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle, ShoppingCart, User, LogOut } from "lucide-react"
 import EnquiryForm from "./components/EnquiryForm"
-
-const featuredProducts = [
-  {
-    id: 1,
-    name: "Solar Panel Kit 400W",
-    image: "/solar-panel-1.jpg?height=300&width=300",
-    category: "Solar Panels",
-    rating: 4.8,
-    reviews: 124,
-  },
-  {
-    id: 2,
-    name: "Wind Turbine Generator 1000W",
-    image: "/wind-turbine-1.jpg?height=300&width=300",
-    category: "Wind Energy",
-    rating: 4.6,
-    reviews: 89,
-  },
-  {
-    id: 3,
-    name: "Battery Storage System 10kWh",
-    image: "/solar-panel-1.jpg?height=300&width=300",
-    category: "Energy Storage",
-    rating: 4.9,
-    reviews: 156,
-  },
-]
-
-const categories = [
-  { name: "Solar Panels", icon: "☀️", count: 45 },
-  { name: "Wind Energy", icon: "💨", count: 23 },
-  { name: "Energy Storage", icon: "🔋", count: 34 },
-  { name: "Inverters", icon: "⚡", count: 28 },
-  { name: "Monitoring", icon: "📊", count: 19 },
-  { name: "Accessories", icon: "🔧", count: 67 },
-]
+import ProductCard from "../components/ProductCard"
+import { useAuth } from "../contexts/AuthContext"
+import { useProducts } from "../hooks/use-api"
+import { Product } from "../lib/types/api"
+import { useApi } from "../hooks/use-api"
+import { productService } from "../lib/services/api"
 
 export default function HomePage() {
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<any>(null)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  
+  const { user, isAuthenticated, logout } = useAuth()
+  
+  // Memoize the query parameters for featured products
+  const featuredProductsParams = useMemo(() => ({
+    limit: 6, 
+    sortBy: 'rating', 
+    sortOrder: 'desc' 
+  }), [])
+  
+  // Fetch featured products and categories
+  const { data: productsResponse, loading: productsLoading } = useProducts(featuredProductsParams)
+  
+  // Use public categories endpoint instead of admin-only settings endpoint
+  const { data: categoriesResponse, loading: categoriesLoading } = useApi(
+    () => productService.getCategories(),
+    true
+  )
+  
+  // Get featured products (top 3 by rating) - properly map backend structure
+  const featuredProducts = (productsResponse as any)?.products?.slice(0, 3) || []
+  
+  // Get categories with counts - properly handle string[] response
+  const categoryNames = (categoriesResponse as any)?.data || []
+  const categories = categoryNames.length > 0 
+    ? categoryNames.map((name: string) => ({ name, icon: "📦", count: 0 }))
+    : [
+        { name: "Solar Panels", icon: "☀️", count: 0 },
+        { name: "Wind Energy", icon: "💨", count: 0 },
+        { name: "Energy Storage", icon: "🔋", count: 0 },
+        { name: "Inverters", icon: "⚡", count: 0 },
+        { name: "Monitoring", icon: "📊", count: 0 },
+        { name: "Accessories", icon: "🔧", count: 0 },
+      ]
 
-  const handleEnquireNow = (product: any) => {
+  const handleEnquireNow = (product: Product) => {
     setSelectedProduct(product)
     setShowEnquiryForm(true)
   }
@@ -57,6 +61,10 @@ export default function HomePage() {
   const closeEnquiryForm = () => {
     setShowEnquiryForm(false)
     setSelectedProduct(null)
+  }
+
+  const handleLogout = async () => {
+    await logout()
   }
 
   return (
@@ -88,12 +96,26 @@ export default function HomePage() {
             <div className="flex items-center space-x-4">
               <Link href="/cart">
                 <Button variant="outline" size="sm">
+                  <ShoppingCart className="h-4 w-4 mr-2" />
                   Cart (0)
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button size="sm">Login</Button>
-              </Link>
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <Button size="sm">
+                    <User className="h-4 w-4 mr-2" />
+                    Login
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -169,19 +191,25 @@ export default function HomePage() {
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
-          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {categories.map((category, index) => (
-              <Link key={index} href={`/products?category=${encodeURIComponent(category.name)}`}>
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardContent className="p-6 text-center">
-                    <div className="text-4xl mb-4">{category.icon}</div>
-                    <h3 className="font-semibold mb-2">{category.name}</h3>
-                    <p className="text-sm text-gray-600">{category.count} products</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          {categoriesLoading ? (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+              {categories.map((category: any, index: number) => (
+                <Link key={index} href={`/products?category=${encodeURIComponent(category.name)}`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                    <CardContent className="p-6 text-center">
+                      <div className="text-4xl mb-4">{category.icon}</div>
+                      <h3 className="font-semibold mb-2">{category.name}</h3>
+                      <p className="text-sm text-gray-600">{category.count || 0} products</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -194,45 +222,27 @@ export default function HomePage() {
               <Button variant="outline">View All Products</Button>
             </Link>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {featuredProducts.map((product) => (
-              <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="p-0">
-                  <Image
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    width={300}
-                    height={300}
-                    className="w-full h-64 object-cover rounded-t-lg"
-                  />
-                </CardHeader>
-                <CardContent className="p-6">
-                  <Badge variant="secondary" className="mb-2">
-                    {product.category}
-                  </Badge>
-                  <CardTitle className="mb-2">{product.name}</CardTitle>
-                  <div className="flex items-center mb-4">
-                    <div className="flex text-yellow-400">{"★".repeat(Math.floor(product.rating))}</div>
-                    <span className="text-sm text-gray-600 ml-2">
-                      {product.rating} ({product.reviews} reviews)
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Link href={`/products/${product.id}`}>
-                      <Button variant="outline">View Details</Button>
-                    </Link>
-                    <Button 
-                      onClick={() => handleEnquireNow(product)}
-                      className="bg-[#0a6650] hover:bg-[#084c3d]"
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Enquire Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-8">
+              {featuredProducts.map((product: Product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onEnquire={handleEnquireNow}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">🌱</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Products Available</h3>
+              <p className="text-gray-600">Check back soon for our sustainable energy solutions!</p>
+            </div>
+          )}
         </div>
       </section>
 
