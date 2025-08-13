@@ -1,6 +1,6 @@
 export const config = {
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://greenbeam-backend.onrender.com/api/v1',
     timeout: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000'),
     retryAttempts: parseInt(process.env.NEXT_PUBLIC_API_RETRY_ATTEMPTS || '3'),
     retryDelay: parseInt(process.env.NEXT_PUBLIC_API_RETRY_DELAY || '1000'),
@@ -62,7 +62,7 @@ export const getConfig = (): Config => {
       ...config,
       api: {
         ...config.api,
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
+        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://greenbeam-backend.onrender.com/api/v1',
       },
     };
   }
