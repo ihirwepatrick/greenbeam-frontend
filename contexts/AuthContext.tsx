@@ -37,43 +37,66 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('AuthContext: Initializing authentication...')
       try {
         const token = apiClient.getToken();
+        console.log('AuthContext: Found token:', !!token)
         if (token) {
+          console.log('AuthContext: Token found, refreshing user...')
           await refreshUser();
+        } else {
+          console.log('AuthContext: No token found')
         }
       } catch (error) {
-        console.error('Failed to initialize auth:', error);
+        console.error('AuthContext: Failed to initialize auth:', error);
         apiClient.setToken(null);
       } finally {
+        console.log('AuthContext: Initialization complete, setting loading to false')
         setIsLoading(false);
       }
     };
 
-    initializeAuth();
+    // Add a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      console.log('AuthContext: Initialization timeout, forcing loading to false')
+      setIsLoading(false);
+    }, 10000); // 10 second timeout
+
+    initializeAuth().finally(() => {
+      clearTimeout(timeout);
+    });
+
+    return () => clearTimeout(timeout);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      console.log('AuthContext: Attempting login for:', email)
       setIsLoading(true);
       const response = await authService.login({ email, password });
       
       if (response.success) {
         const { user: userData, token, refreshToken } = response.data;
+        console.log('AuthContext: Login successful, user data:', { name: userData.name, role: userData.role, email: userData.email })
         
         // Store tokens
         apiClient.setToken(token);
         localStorage.setItem('refresh_token', refreshToken);
+        console.log('AuthContext: Tokens stored successfully')
         
         // Set user
         setUser(userData);
+        console.log('AuthContext: User state updated')
         return true;
+      } else {
+        console.log('AuthContext: Login failed - response not successful')
       }
       return false;
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('AuthContext: Login failed:', error);
       return false;
     } finally {
+      console.log('AuthContext: Setting login loading to false')
       setIsLoading(false);
     }
   };
@@ -119,14 +142,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async (): Promise<void> => {
     try {
+      console.log('AuthContext: Refreshing user profile...')
       const response = await authService.getProfile();
       if (response.success) {
+        console.log('AuthContext: User profile retrieved:', { name: response.data.name, role: response.data.role, email: response.data.email })
         setUser(response.data);
       } else {
+        console.log('AuthContext: Failed to get user profile - response not successful')
         throw new Error('Failed to get user profile');
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      console.error('AuthContext: Failed to refresh user:', error);
       // If refresh fails, clear auth state
       apiClient.setToken(null);
       localStorage.removeItem('refresh_token');

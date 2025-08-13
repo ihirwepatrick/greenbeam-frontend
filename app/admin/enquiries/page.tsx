@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -34,7 +34,8 @@ import {
 } from "lucide-react"
 import NotificationSystem from "../../components/NotificationSystem"
 import EmailService from "../../components/EmailService"
-import { useEnquiries } from "../../../hooks/use-api"
+import { useEnquiries, useDashboardStats } from "../../../hooks/use-api"
+import { useAuth } from "../../../contexts/AuthContext"
 
 const enquiriesSeed = [
   {

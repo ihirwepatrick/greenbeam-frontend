@@ -10,15 +10,17 @@ class ApiClient {
 
   setToken(token: string | null) {
     this.token = token;
-    if (token) {
-      localStorage.setItem('auth_token', token);
-    } else {
-      localStorage.removeItem('auth_token');
+    if (typeof window !== 'undefined') {
+      if (token) {
+        localStorage.setItem('auth_token', token);
+      } else {
+        localStorage.removeItem('auth_token');
+      }
     }
   }
 
   getToken(): string | null {
-    if (!this.token) {
+    if (!this.token && typeof window !== 'undefined') {
       this.token = localStorage.getItem('auth_token');
     }
     return this.token;
@@ -31,6 +33,8 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`;
     const token = this.getToken();
 
+    console.log('ApiClient: Making request to:', url, 'with token:', !!token)
+
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -42,25 +46,27 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
+      console.log('ApiClient: Response status:', response.status, 'for:', url)
       
       if (!response.ok) {
         if (response.status === 401) {
+          console.log('ApiClient: 401 Unauthorized, clearing token')
           // Token expired or invalid
           this.setToken(null);
           throw new Error('Authentication failed');
         }
         
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+        const errorText = await response.text();
+        console.error('ApiClient: Request failed:', response.status, errorText)
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('ApiClient: Response data for', endpoint, ':', data)
       return data;
     } catch (error) {
-      if (error instanceof Error) {
-        throw error;
-      }
-      throw new Error('Network error');
+      console.error('ApiClient: Request error for', url, ':', error)
+      throw error;
     }
   }
 

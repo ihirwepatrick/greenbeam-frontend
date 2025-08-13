@@ -142,8 +142,10 @@ export default function AboutPage() {
                   Contact Us
                 </Button>
               </Link>
-              <Link href="/login">
-                <Button size="sm">Login</Button>
+              <Link href="/admin">
+                <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
+                  Admin Login
+                </Button>
               </Link>
             </div>
           </div>

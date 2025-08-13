@@ -15,27 +15,50 @@ export default function AdminLoginForm() {
 	const [password, setPassword] = useState("")
 	const [isLoading, setIsLoading] = useState(false)
 	const [error, setError] = useState("")
+	const [success, setSuccess] = useState(false)
 	const searchParams = useSearchParams()
 	const router = useRouter()
-	const { isAuthenticated, login } = useAuth()
+	const { isAuthenticated, login, user } = useAuth()
 
-	const redirect = searchParams.get("redirect") || "/admin"
+	const redirect = searchParams.get("redirect") || "/admin" // /admin is the dashboard
 
 	useEffect(() => {
-		if (isAuthenticated) {
-			router.replace(redirect)
+		// Only redirect if authenticated and user is confirmed to be admin
+		if (isAuthenticated && user) {
+			const userRole = user.role?.trim().toLowerCase()
+			const isAdmin = userRole === "admin" || userRole === "administrator"
+			
+			if (isAdmin) {
+				console.log("AdminLoginForm: Admin user authenticated, redirecting to dashboard immediately...")
+				console.log("AdminLoginForm: User details:", { name: user.name, role: user.role, email: user.email })
+				console.log("AdminLoginForm: Executing redirect to:", redirect)
+				router.replace(redirect)
+			} else {
+				console.log("AdminLoginForm: User authenticated but not admin:", user.role)
+			}
+		} else if (isAuthenticated) {
+			console.log("AdminLoginForm: Authenticated but no user data yet")
+		} else {
+			console.log("AdminLoginForm: Not authenticated yet")
 		}
-	}, [isAuthenticated, redirect, router])
+	}, [isAuthenticated, user, redirect, router])
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setIsLoading(true)
 		setError("")
+		setSuccess(false)
+		
 		try {
-			const ok = await login(email, password)
-			if (!ok) setError("Invalid credentials")
+			const success = await login(email, password)
+			if (success) {
+				setSuccess(true)
+				console.log("Login successful, redirecting to dashboard...")
+			} else {
+				setError("Invalid credentials. Please check your email and password.")
+			}
 		} catch (err: any) {
-			setError(err?.message || "Login failed")
+			setError(err?.message || "Login failed. Please try again.")
 		} finally {
 			setIsLoading(false)
 		}
@@ -60,6 +83,9 @@ export default function AdminLoginForm() {
 					<CardContent>
 						<form onSubmit={handleSubmit} className="space-y-6">
 							{error && <div className="text-sm text-red-600">{error}</div>}
+							{success && (
+								<div className="text-sm text-green-600">Login successful! Redirecting to admin dashboard...</div>
+							)}
 							<div>
 								<Label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</Label>
 								<div className="mt-1 relative">
@@ -80,8 +106,8 @@ export default function AdminLoginForm() {
 							</div>
 
 							<div>
-								<Button type="submit" className="w-full bg-[#0a6650] hover:bg-[#084c3d]" disabled={isLoading}>
-									{isLoading ? "Signing in..." : "Sign in"}
+								<Button type="submit" className="w-full bg-[#0a6650] hover:bg-[#084c3d]" disabled={isLoading || success}>
+									{success ? "Redirecting to Dashboard..." : isLoading ? "Signing in..." : "Sign in to Dashboard"}
 								</Button>
 							</div>
 						</form>

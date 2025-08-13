@@ -137,10 +137,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                   </Button>
                 </div>
               ) : (
-                <Link href="/login">
-                  <Button size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Login
+                <Link href="/admin">
+                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
+                    Admin Login
                   </Button>
                 </Link>
               )}

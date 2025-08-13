@@ -3,6 +3,7 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { AuthProvider } from '../contexts/AuthContext'
+import AuthDebug from '../components/AuthDebug'
 
 export const metadata: Metadata = {
   title: 'GreenBeam',
@@ -28,6 +29,7 @@ html {
       </head>
       <body>
         <AuthProvider>
+          <AuthDebug />
           {children}
         </AuthProvider>
       </body>

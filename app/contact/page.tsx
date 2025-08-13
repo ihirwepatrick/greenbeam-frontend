@@ -131,7 +131,7 @@ export default function ContactPage() {
 
     try {
       const enquiryData = {
-        name: `${formData.firstName} ${formData.lastName}`.trim(),
+        customerName: `${formData.firstName} ${formData.lastName}`.trim(),
         email: formData.email,
         subject: formData.subject,
         message: formData.message
@@ -206,10 +206,9 @@ export default function ContactPage() {
                   </Button>
                 </div>
               ) : (
-                <Link href="/login">
-                  <Button size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    Login
+                <Link href="/admin">
+                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
+                    Admin Login
                   </Button>
                 </Link>
               )}

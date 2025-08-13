@@ -73,10 +73,13 @@ export interface EnquiryResponse {
 }
 
 export interface CreateEnquiryRequest {
-  name: string;
+  customerName: string;
   email: string;
+  phone?: string;
+  product?: string;
   subject: string;
   message: string;
+  priority?: 'LOW' | 'MEDIUM' | 'HIGH';
 }
 
 export interface UpdateEnquiryStatusRequest {

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { ApiResponse, ApiError } from '../lib/types/api';
 
 interface UseApiState<T> {
@@ -13,9 +13,8 @@ interface UseApiReturn<T> extends UseApiState<T> {
 }
 
 export function useApi<T>(
-  apiFunction: (...args: any[]) => Promise<ApiResponse<T> | ApiError>,
-  immediate = false,
-  ...immediateArgs: any[]
+  apiFunction: () => Promise<ApiResponse<T> | ApiError>,
+  immediate = false
 ): UseApiReturn<T> {
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
@@ -23,11 +22,15 @@ export function useApi<T>(
     error: null,
   });
 
+  // Track if we've executed on mount to prevent multiple calls
+  const hasExecutedRef = useRef(false);
+  const mountedRef = useRef(false);
+
   const execute = useCallback(
-    async (...args: any[]) => {
+    async () => {
       try {
         setState(prev => ({ ...prev, loading: true, error: null }));
-        const response = await apiFunction(...args);
+        const response = await apiFunction();
         
         if (response.success) {
           setState(prev => ({ ...prev, data: response.data, loading: false }));
@@ -52,92 +55,135 @@ export function useApi<T>(
 
   const reset = useCallback(() => {
     setState({ data: null, loading: false, error: null });
+    hasExecutedRef.current = false;
   }, []);
 
-  // Stabilize the immediate arguments with JSON.stringify for comparison
-  const stableArgs = useMemo(() => immediateArgs, [JSON.stringify(immediateArgs)]);
-
+  // Use a simpler effect that only runs once on mount if immediate is true
   useEffect(() => {
-    if (immediate) {
-      execute(...stableArgs);
+    mountedRef.current = true;
+    
+    if (immediate && !hasExecutedRef.current) {
+      hasExecutedRef.current = true;
+      execute();
     }
-  }, [immediate, execute, stableArgs]);
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []); // Empty dependency array - only run on mount
+
+  // Separate effect for when apiFunction changes
+  useEffect(() => {
+    if (mountedRef.current && immediate) {
+      hasExecutedRef.current = true;
+      execute();
+    }
+  }, [apiFunction, immediate, execute]);
 
   return { ...state, execute, reset };
 }
 
 // Specific hooks for common use cases
 export function useProducts(params?: any) {
-  // Memoize the clean params to prevent recreation on every render
-  const cleanParams = useMemo(() => {
-    if (!params) return undefined;
+  // Create a stable API function
+  const apiFunction = useCallback(async () => {
+    const { productService } = await import('../lib/services/api');
     
-    return Object.fromEntries(
+    // Filter parameters inside the function to avoid dependency issues
+    const cleanParams = params ? Object.fromEntries(
       Object.entries(params).filter(([key, value]) => 
         value !== "" && value !== null && value !== undefined
       )
-    );
+    ) : undefined;
+    
+    return productService.getProducts(cleanParams);
   }, [JSON.stringify(params)]);
 
-  return useApi(
-    () => import('../lib/services/api').then(m => m.productService.getProducts(cleanParams)),
-    true
-  );
+  return useApi(apiFunction, true);
 }
 
 export function useProduct(id: string | number) {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.productService.getProductById(String(id))),
-    !!id,
-    id
-  );
+  const apiFunction = useCallback(async () => {
+    const { productService } = await import('../lib/services/api');
+    return productService.getProductById(String(id));
+  }, [id]);
+  
+  return useApi(apiFunction, !!id);
 }
 
 export function useEnquiries(params?: any) {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.enquiryService.getEnquiries(params)),
-    true,
-    params
-  );
+  const apiFunction = useCallback(async () => {
+    const { enquiryService } = await import('../lib/services/api');
+    
+    const cleanParams = params ? Object.fromEntries(
+      Object.entries(params).filter(([key, value]) => 
+        value !== "" && value !== null && value !== undefined
+      )
+    ) : undefined;
+    
+    return enquiryService.getEnquiries(cleanParams);
+  }, [JSON.stringify(params)]);
+
+  return useApi(apiFunction, true);
 }
 
 export function useEnquiry(id: string) {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.enquiryService.getEnquiryById(id)),
-    !!id,
-    id
-  );
+  const apiFunction = useCallback(async () => {
+    const { enquiryService } = await import('../lib/services/api');
+    return enquiryService.getEnquiryById(id);
+  }, [id]);
+  
+  return useApi(apiFunction, !!id);
 }
 
 export function useDashboardStats() {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.dashboardService.getStats()),
-    true
-  );
+  const apiFunction = useCallback(async () => {
+    const { dashboardService } = await import('../lib/services/api');
+    return dashboardService.getStats();
+  }, []);
+
+  return useApi(apiFunction, true);
 }
 
 export function useNotifications(params?: any) {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.notificationService.getNotifications(params)),
-    true,
-    params
-  );
+  const apiFunction = useCallback(async () => {
+    const { notificationService } = await import('../lib/services/api');
+    
+    const cleanParams = params ? Object.fromEntries(
+      Object.entries(params).filter(([key, value]) => 
+        value !== "" && value !== null && value !== undefined
+      )
+    ) : undefined;
+    
+    return notificationService.getNotifications(cleanParams);
+  }, [JSON.stringify(params)]);
+
+  return useApi(apiFunction, true);
 }
 
 export function useSettings(category?: string) {
-  return useApi(
-    () => category 
-      ? import('../lib/services/api').then(m => m.settingsService.getSettingsByCategory(category))
-      : import('../lib/services/api').then(m => m.settingsService.getAllSettings()),
-    true,
-    category
-  );
+  const apiFunction = useCallback(async () => {
+    const { settingsService } = await import('../lib/services/api');
+    return category 
+      ? settingsService.getSettingsByCategory(category)
+      : settingsService.getAllSettings();
+  }, [category]);
+  
+  return useApi(apiFunction, true);
 }
 
 export function useFiles(params?: any) {
-  return useApi(
-    () => import('../lib/services/api').then(m => m.uploadService.getFiles(params)),
-    true,
-    params
-  );
+  const apiFunction = useCallback(async () => {
+    const { uploadService } = await import('../lib/services/api');
+    
+    const cleanParams = params ? Object.fromEntries(
+      Object.entries(params).filter(([key, value]) => 
+        value !== "" && value !== null && value !== undefined
+      )
+    ) : undefined;
+    
+    return uploadService.getFiles(cleanParams);
+  }, [JSON.stringify(params)]);
+
+  return useApi(apiFunction, true);
 } 
