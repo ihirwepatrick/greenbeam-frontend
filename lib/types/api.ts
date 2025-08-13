@@ -88,6 +88,8 @@ export interface UpdateEnquiryStatusRequest {
 
 export interface RespondToEnquiryRequest {
   message: string;
+  subject?: string;
+  sendEmail?: boolean;
 }
 
 // Product Types

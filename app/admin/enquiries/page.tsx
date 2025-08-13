@@ -223,10 +223,17 @@ export default function AdminEnquiries() {
 
     try {
       setIsSendingResponse(true)
-      const res = await enquiryService.respondToEnquiry(selectedEnquiry.id, { message: responseMessage.trim() })
+      const payload = {
+        message: responseMessage.trim(),
+        subject: `Re: ${selectedEnquiry.subject}`,
+        sendEmail: true,
+      }
+      const res = await enquiryService.respondToEnquiry(selectedEnquiry.id, payload)
       if (res.success) {
-        // Refresh list to reflect updated status/last response
         await refetchEnquiries()
+        console.log('Response sent successfully (email dispatched by backend).')
+      } else {
+        console.warn('Response API did not return success; check backend logs.')
       }
       setResponseMessage("")
       setShowResponseModal(false)
