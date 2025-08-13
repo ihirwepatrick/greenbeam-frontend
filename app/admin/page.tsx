@@ -15,6 +15,7 @@ const sidebarLinks = [
 	{ name: "Dashboard", href: "/admin", icon: Home },
 	{ name: "Products", href: "/admin/products", icon: Package },
 	{ name: "Enquiries", href: "/admin/enquiries", icon: Users },
+	// { name: "Orders", href: "/admin/orders", icon: Package },
 	{ name: "Website", href: "/admin/website", icon: Eye },
 	{ name: "Settings", href: "/admin/settings", icon: Settings },
 ]
@@ -27,6 +28,16 @@ export default function AdminDashboard() {
 	const { data: statsResponse, loading: statsLoading } = useDashboardStats()
 	const { data: enquiriesResponse, loading: enquiriesLoading } = useEnquiries({ limit: 5 })
 
+	// Normalize stats for cards
+	const cards = {
+		totalEnquiries: statsResponse?.enquiries?.total ?? 0,
+		pendingEnquiries: statsResponse?.enquiries?.new ?? 0,
+		totalProducts: statsResponse?.products?.total ?? 0,
+		totalUsers: 0,
+	}
+
+	const recentEnquiries = enquiriesResponse?.data || []
+
 	useEffect(() => {
 		let mounted = true
 		notificationService.getNotificationStats()
@@ -36,9 +47,6 @@ export default function AdminDashboard() {
 			.catch(() => {})
 		return () => { mounted = false }
 	}, [])
-
-	const stats = statsResponse || { totalEnquiries: 0, pendingEnquiries: 0, totalProducts: 0, totalUsers: 0 }
-	const recentEnquiries = enquiriesResponse?.data || []
 
 	return (
 		<div className="min-h-screen bg-gray-50 flex">
@@ -136,7 +144,7 @@ export default function AdminDashboard() {
 								<Users className="h-4 w-4 text-[#0a6650]" />
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">{stats.totalEnquiries}</div>
+								<div className="text-2xl font-bold">{cards.totalEnquiries}</div>
 								<p className="text-xs text-green-600">Live</p>
 							</CardContent>
 						</Card>
@@ -146,7 +154,7 @@ export default function AdminDashboard() {
 								<TrendingUp className="h-4 w-4 text-green-600" />
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">{stats.pendingEnquiries}</div>
+								<div className="text-2xl font-bold">{cards.pendingEnquiries}</div>
 								<p className="text-xs text-green-600">Live</p>
 							</CardContent>
 						</Card>
@@ -156,7 +164,7 @@ export default function AdminDashboard() {
 								<Package className="h-4 w-4 text-blue-600" />
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">{stats.totalProducts}</div>
+								<div className="text-2xl font-bold">{cards.totalProducts}</div>
 								<p className="text-xs text-green-600">Live</p>
 							</CardContent>
 						</Card>
@@ -166,7 +174,7 @@ export default function AdminDashboard() {
 								<Database className="h-4 w-4 text-purple-600" />
 							</CardHeader>
 							<CardContent>
-								<div className="text-2xl font-bold">{stats.totalUsers}</div>
+								<div className="text-2xl font-bold">{cards.totalUsers}</div>
 								<p className="text-xs text-green-600">Live</p>
 							</CardContent>
 						</Card>

@@ -36,6 +36,7 @@ import NotificationSystem from "../../components/NotificationSystem"
 import EmailService from "../../components/EmailService"
 import { useEnquiries, useDashboardStats } from "../../../hooks/use-api"
 import { useAuth } from "../../../contexts/AuthContext"
+import { enquiryService } from "../../../lib/services/api"
 
 const enquiriesSeed = [
   {
@@ -131,28 +132,74 @@ export default function AdminEnquiries() {
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showResponseModal, setShowResponseModal] = useState(false)
   const [responseMessage, setResponseMessage] = useState("")
+  const [isSendingResponse, setIsSendingResponse] = useState(false)
   const [statusFilter, setStatusFilter] = useState("All")
   const [priorityFilter, setPriorityFilter] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
   const [showNotifications, setShowNotifications] = useState(false)
 
-  const { data: apiEnquiriesResponse, loading: enquiriesLoading } = useEnquiries({ limit: 20 })
+  const { logout, user } = useAuth()
+  const { data: apiEnquiriesResponse, loading: enquiriesLoading, execute: refetchEnquiries } = useEnquiries({ limit: 50 })
+  const { data: statsResponse, loading: statsLoading } = useDashboardStats()
+  
+  const normalizeStatusLabel = (value: string | undefined) => {
+    const v = (value || '').toUpperCase()
+    if (v === 'NEW' || v === 'PENDING') return 'New'
+    if (v === 'IN_PROGRESS' || v === 'IN-PROGRESS' || v === 'ASSIGNED') return 'In Progress'
+    if (v === 'RESPONDED' || v === 'RESOLVED') return 'Responded'
+    if (v === 'CLOSED') return 'Closed'
+    return 'New'
+  }
+
+  const normalizePriorityLabel = (value: string | undefined) => {
+    const v = (value || '').toUpperCase()
+    if (v === 'HIGH') return 'High'
+    if (v === 'LOW') return 'Low'
+    return 'Medium'
+  }
+  
+  // Map API enquiries to component format
   const mappedApiEnquiries = (apiEnquiriesResponse?.data || []).map((e: any) => ({
     id: e.id,
-    customerName: e.name,
+    customerName: e.customerName || e.name,
     email: e.email,
-    phone: "",
-    product: "",
+    phone: e.phone || "",
+    product: e.product || "",
     subject: e.subject,
     message: e.message,
-    status: e.status || "pending",
-    priority: "Medium",
+    status: normalizeStatusLabel(e.status),
+    priority: normalizePriorityLabel(e.priority),
     createdAt: e.createdAt,
     lastUpdated: e.updatedAt,
-    location: "",
-    source: "API"
+    location: e.location || "",
+    source: e.source || "API"
   }))
+  
+  // Use API data if available, fallback to seed data for demo
   const enquiries = mappedApiEnquiries.length ? mappedApiEnquiries : enquiriesSeed
+  
+  // Calculate dynamic stats
+  const stats = useMemo(() => {
+    const totalEnquiries = enquiries.length
+    const newEnquiries = enquiries.filter(e => e.status === "pending" || e.status === "new").length
+    const inProgress = enquiries.filter(e => e.status === "in-progress" || e.status === "assigned").length
+    const resolved = enquiries.filter(e => e.status === "resolved" || e.status === "completed").length
+    
+    return {
+      total: totalEnquiries,
+      new: newEnquiries,
+      inProgress: inProgress,
+      resolved: resolved
+    }
+  }, [enquiries])
+  
+  // Use dashboard stats if available, fallback to calculated stats
+  const displayStats = statsResponse ? {
+    total: statsResponse.enquiries?.total ?? stats.total,
+    new: statsResponse.enquiries?.new ?? stats.new,
+    inProgress: statsResponse.enquiries?.inProgress ?? stats.inProgress,
+    resolved: ((statsResponse.enquiries?.responded ?? 0) + (statsResponse.enquiries?.closed ?? 0)) || stats.resolved
+  } : stats
 
   const handleViewDetails = (enquiry: any) => {
     setSelectedEnquiry(enquiry)
@@ -175,36 +222,19 @@ export default function AdminEnquiries() {
     if (!responseMessage.trim() || !selectedEnquiry) return
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // Send response email to customer
-      const emailSent = await EmailService.sendEnquiryResponse(
-        selectedEnquiry.email,
-        selectedEnquiry.customerName,
-        responseMessage,
-        selectedEnquiry.id
-      )
-      
-      if (emailSent) {
-        console.log("✅ Response email sent to customer")
-        
-        // Update enquiry status to "Responded"
-        const updatedEnquiries = enquiries.map(enq => 
-          enq.id === selectedEnquiry.id 
-            ? { ...enq, status: "Responded", lastUpdated: new Date().toLocaleString() }
-            : enq
-        )
-        
-        // In a real app, you would update this in your database
-        console.log("Enquiry status updated to 'Responded'")
+      setIsSendingResponse(true)
+      const res = await enquiryService.respondToEnquiry(selectedEnquiry.id, { message: responseMessage.trim() })
+      if (res.success) {
+        // Refresh list to reflect updated status/last response
+        await refetchEnquiries()
       }
-      
       setResponseMessage("")
       setShowResponseModal(false)
       setSelectedEnquiry(null)
     } catch (error) {
       console.error("Failed to send response:", error)
+    } finally {
+      setIsSendingResponse(false)
     }
   }
 
@@ -335,9 +365,9 @@ export default function AdminEnquiries() {
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">24</div>
+                <div className="text-2xl font-bold">{displayStats.total}</div>
                 <p className="text-xs text-muted-foreground">
-                  +5 from last week
+                  {statsLoading ? "Loading..." : "Live count"}
                 </p>
               </CardContent>
             </Card>
@@ -348,9 +378,9 @@ export default function AdminEnquiries() {
                 <AlertCircle className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">8</div>
+                <div className="text-2xl font-bold">{displayStats.new}</div>
                 <p className="text-xs text-muted-foreground">
-                  +2 from yesterday
+                  Pending review
                 </p>
               </CardContent>
             </Card>
@@ -361,22 +391,22 @@ export default function AdminEnquiries() {
                 <Clock className="h-4 w-4 text-yellow-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">6</div>
+                <div className="text-2xl font-bold">{displayStats.inProgress}</div>
                 <p className="text-xs text-muted-foreground">
-                  -1 from yesterday
+                  Being processed
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Response Rate</CardTitle>
+                <CardTitle className="text-sm font-medium">Resolved</CardTitle>
                 <CheckCircle className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">92%</div>
+                <div className="text-2xl font-bold">{displayStats.resolved}</div>
                 <p className="text-xs text-muted-foreground">
-                  +3% from last week
+                  Completed
                 </p>
               </CardContent>
             </Card>
@@ -683,10 +713,10 @@ export default function AdminEnquiries() {
                 <Button 
                   className="flex-1 bg-[#0a6650] hover:bg-[#084c3d]"
                   onClick={sendResponse}
-                  disabled={!responseMessage.trim()}
+                  disabled={!responseMessage.trim() || isSendingResponse}
                 >
                   <Send className="h-4 w-4 mr-2" />
-                  Send Response
+                  {isSendingResponse ? 'Sending...' : 'Send Response'}
                 </Button>
                 <Button 
                   variant="outline"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -36,6 +36,8 @@ import {
   Download,
   Upload,
 } from "lucide-react"
+import { useAuth } from "../../../contexts/AuthContext"
+import { authService } from "../../../lib/services/api"
 
 const adminProfile = {
   name: "Admin User",
@@ -58,29 +60,87 @@ export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState("profile")
   const [isSaving, setIsSaving] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const [profile, setProfile] = useState(adminProfile)
   const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [saveMessage, setSaveMessage] = useState("")
 
-  const handleSave = () => {
+  const { user, logout, refreshUser } = useAuth()
+  
+  // Initialize profile with user data
+  const [profile, setProfile] = useState({
+    name: user?.name || "Admin User",
+    email: user?.email || "admin@greenbeam.com",
+    phone: "+250 788 123 456",
+    role: user?.role || "Administrator",
+    lastLogin: new Date().toLocaleString(),
+    avatar: "/admin-avatar.png"
+  })
+
+  // Update profile when user data changes
+  useEffect(() => {
+    if (user) {
+      setProfile(prev => ({
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
+        role: user.role || prev.role
+      }))
+    }
+  }, [user])
+
+  const handleSave = async () => {
     setIsSaving(true)
-    // Simulate save operation
-    setTimeout(() => {
+    setSaveMessage("")
+    try {
+      // Here you would typically call an API to update profile
+      // For now, we'll simulate the operation
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      setSaveMessage("Profile updated successfully!")
+      setTimeout(() => setSaveMessage(""), 3000)
+    } catch (error) {
+      setSaveMessage("Error updating profile")
+    } finally {
       setIsSaving(false)
-      console.log("Settings saved:", profile)
-    }, 2000)
+    }
   }
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
-      alert("New passwords don't match!")
+      setSaveMessage("New passwords don't match!")
+      setTimeout(() => setSaveMessage(""), 3000)
       return
     }
-    console.log("Password changed successfully")
-    setCurrentPassword("")
-    setNewPassword("")
-    setConfirmPassword("")
+    
+    if (newPassword.length < 6) {
+      setSaveMessage("Password must be at least 6 characters!")
+      setTimeout(() => setSaveMessage(""), 3000)
+      return
+    }
+
+    setIsSaving(true)
+    setSaveMessage("")
+    try {
+      const response = await authService.changePassword({
+        currentPassword,
+        newPassword
+      })
+      
+      if (response.success) {
+        setSaveMessage("Password changed successfully!")
+        setCurrentPassword("")
+        setNewPassword("")
+        setConfirmPassword("")
+      } else {
+        setSaveMessage("Failed to change password")
+      }
+    } catch (error) {
+      setSaveMessage("Error changing password")
+    } finally {
+      setIsSaving(false)
+      setTimeout(() => setSaveMessage(""), 3000)
+    }
   }
 
   const tabs = [

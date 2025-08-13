@@ -130,10 +130,58 @@ export interface RateProductRequest {
 
 // Dashboard Types
 export interface DashboardStats {
-  totalEnquiries: number;
-  pendingEnquiries: number;
-  totalProducts: number;
-  totalUsers: number;
+  products: {
+    total: number;
+    available: number;
+    categories: number;
+    newThisMonth: number;
+    categoryBreakdown: Array<{
+      category: string;
+      count: number;
+    }>;
+  };
+  enquiries: {
+    total: number;
+    new: number;
+    inProgress: number;
+    responded: number;
+    closed: number;
+    responseRate: number;
+    priorityBreakdown: Array<{
+      priority: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+      count: number;
+    }>;
+    recent: number;
+  };
+  notifications: {
+    total: number;
+    unread: number;
+    read: number;
+  };
+  emails: {
+    total: number;
+    sent: number;
+    failed: number;
+    successRate: number;
+  };
+  activity: {
+    recentEnquiries: number;
+    recentProducts: number;
+    recentEnquiryList: Array<{
+      id: string;
+      customerName: string;
+      product: string;
+      status: string;
+      priority: 'HIGH' | 'MEDIUM' | 'LOW' | string;
+      createdAt: string;
+    }>;
+  };
+  system: {
+    status: string;
+    lastBackup: string;
+    storageUsed: string;
+    uptime: string;
+  };
 }
 
 export interface ChartData {
@@ -285,6 +333,7 @@ export const API_ENDPOINTS = {
     BY_ID: (id: string | number) => `/products/${id}`,
     CATEGORIES: '/products/categories/all',
     RATE: (id: string | number) => `/products/${id}/rate`,
+    
   },
   DASHBOARD: {
     STATS: '/dashboard/stats',

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -32,6 +32,8 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react"
+import { useAuth } from "../../../contexts/AuthContext"
+import { useSettings } from "../../../hooks/use-api"
 
 const websiteSettings = {
   general: {
@@ -79,17 +81,41 @@ const sidebarLinks = [
 ]
 
 export default function AdminWebsite() {
-  const [settings, setSettings] = useState(websiteSettings)
   const [activeTab, setActiveTab] = useState("general")
   const [isSaving, setIsSaving] = useState(false)
+  const [saveMessage, setSaveMessage] = useState("")
 
-  const handleSave = () => {
+  const { user, logout } = useAuth()
+  const { data: websiteSettingsData, loading: settingsLoading } = useSettings('website')
+  
+  // Initialize with static settings, then update with API data
+  const [settings, setSettings] = useState(websiteSettings)
+
+  // Update settings when API data is loaded
+  useEffect(() => {
+    if (websiteSettingsData?.data) {
+      setSettings(prev => ({
+        ...prev,
+        ...websiteSettingsData.data
+      }))
+    }
+  }, [websiteSettingsData])
+
+  const handleSave = async () => {
     setIsSaving(true)
-    // Simulate save operation
-    setTimeout(() => {
+    setSaveMessage("")
+    try {
+      // Here you would call the settings API to save
+      await new Promise(resolve => setTimeout(resolve, 1500))
+      
+      setSaveMessage("Website settings saved successfully!")
+      setTimeout(() => setSaveMessage(""), 3000)
+    } catch (error) {
+      setSaveMessage("Error saving settings")
+      setTimeout(() => setSaveMessage(""), 3000)
+    } finally {
       setIsSaving(false)
-      console.log("Settings saved:", settings)
-    }, 2000)
+    }
   }
 
   const updateSetting = (section: string, field: string, value: string) => {

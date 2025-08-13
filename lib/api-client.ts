@@ -26,46 +26,79 @@ class ApiClient {
     return this.token;
   }
 
+  private async ensureAuthHeader(headers: HeadersInit = {}): Promise<HeadersInit> {
+    const token = this.getToken();
+    if (!token) {
+      return headers;
+    }
+    return {
+      ...(headers || {}),
+      Authorization: `Bearer ${token}`,
+    };
+  }
+
+  private async tryRefreshToken(): Promise<boolean> {
+    try {
+      if (typeof window === 'undefined') return false;
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) return false;
+      const { authService } = await import('./services/api');
+      const res = await authService.refresh(refreshToken);
+      if (res.success) {
+        this.setToken(res.data.token);
+        localStorage.setItem('refresh_token', res.data.refreshToken);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      return false;
+    }
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    const token = this.getToken();
-
-    console.log('ApiClient: Making request to:', url, 'with token:', !!token)
+    const headersWithAuth = await this.ensureAuthHeader(options.headers as HeadersInit);
 
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
+        ...headersWithAuth,
       },
       ...options,
     };
 
     try {
-      const response = await fetch(url, config);
-      console.log('ApiClient: Response status:', response.status, 'for:', url)
-      
+      let response = await fetch(url, config);
+      if (response.status === 401) {
+        // Attempt refresh
+        const refreshed = await this.tryRefreshToken();
+        if (refreshed) {
+          const retryHeaders = await this.ensureAuthHeader(options.headers as HeadersInit);
+          response = await fetch(url, {
+            ...config,
+            headers: {
+              'Content-Type': 'application/json',
+              ...retryHeaders,
+            },
+          });
+        }
+      }
+
       if (!response.ok) {
         if (response.status === 401) {
-          console.log('ApiClient: 401 Unauthorized, clearing token')
-          // Token expired or invalid
           this.setToken(null);
           throw new Error('Authentication failed');
         }
-        
         const errorText = await response.text();
-        console.error('ApiClient: Request failed:', response.status, errorText)
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('ApiClient: Response data for', endpoint, ':', data)
       return data;
     } catch (error) {
-      console.error('ApiClient: Request error for', url, ':', error)
       throw error;
     }
   }

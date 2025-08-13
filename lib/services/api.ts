@@ -54,8 +54,9 @@ export const authService = {
     return apiClient.post<ApiResponse<{ message: string }>>(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
   },
 
-  async refreshToken(): Promise<ApiResponse<{ token: string; refreshToken: string }>> {
-    return apiClient.post<ApiResponse<{ token: string; refreshToken: string }>>(API_ENDPOINTS.AUTH.REFRESH);
+  async refresh(refreshToken: string): Promise<ApiResponse<{ token: string; refreshToken: string }>> {
+    // Some backends expect the refreshToken in the body; adjust if needed
+    return apiClient.post<ApiResponse<{ token: string; refreshToken: string }>>(API_ENDPOINTS.AUTH.REFRESH, { refreshToken });
   },
 
   async logout(): Promise<ApiResponse<{ message: string }>> {
@@ -70,11 +71,81 @@ export const enquiryService = {
   },
 
   async getEnquiries(params?: EnquiryQueryParams): Promise<ApiResponse<PaginationResponse<Enquiry>>> {
-    return apiClient.get<ApiResponse<PaginationResponse<Enquiry>>>(API_ENDPOINTS.ENQUIRIES.BASE, params);
+    // Fetch raw response
+    const resp = await apiClient.get<ApiResponse<any>>(API_ENDPOINTS.ENQUIRIES.BASE, params as any);
+
+    if (!resp.success) return resp as any;
+
+    const rawData = resp.data || {};
+    const rawList: any[] = rawData.enquiries || rawData.data || [];
+    const rawPagination = rawData.pagination || {};
+
+    const normalizeStatus = (value: string | undefined): Enquiry['status'] => {
+      const v = (value || '').toLowerCase();
+      if (v === 'new') return 'pending';
+      if (v === 'in_progress' || v === 'in-progress') return 'in-progress';
+      if (v === 'responded' || v === 'resolved') return 'resolved';
+      if (v === 'closed') return 'closed';
+      return 'pending';
+    };
+
+    const list: Enquiry[] = rawList.map((e: any) => ({
+      id: e.id,
+      name: e.customerName || e.name,
+      email: e.email,
+      subject: e.subject,
+      message: e.message,
+      status: normalizeStatus(e.status),
+      createdAt: e.createdAt,
+      updatedAt: e.updatedAt,
+      responses: e.responses,
+    }));
+
+    const mapped: ApiResponse<PaginationResponse<Enquiry>> = {
+      success: true,
+      data: {
+        data: list,
+        pagination: {
+          page: rawPagination.page ?? 1,
+          limit: rawPagination.limit ?? list.length,
+          total: rawPagination.total ?? list.length,
+          pages: rawPagination.totalPages ?? (rawPagination.pages ?? 1),
+        },
+      },
+    };
+
+    return mapped;
   },
 
   async getEnquiryById(id: string): Promise<ApiResponse<Enquiry>> {
-    return apiClient.get<ApiResponse<Enquiry>>(API_ENDPOINTS.ENQUIRIES.BY_ID(id));
+    const resp = await apiClient.get<ApiResponse<any>>(API_ENDPOINTS.ENQUIRIES.BY_ID(id));
+    if (!resp.success) return resp as any;
+
+    const e = resp.data;
+    const normalizeStatus = (value: string | undefined): Enquiry['status'] => {
+      const v = (value || '').toLowerCase();
+      if (v === 'new') return 'pending';
+      if (v === 'in_progress' || v === 'in-progress') return 'in-progress';
+      if (v === 'responded' || v === 'resolved') return 'resolved';
+      if (v === 'closed') return 'closed';
+      return 'pending';
+    };
+
+    const mapped: ApiResponse<Enquiry> = {
+      success: true,
+      data: {
+        id: e.id,
+        name: e.customerName || e.name,
+        email: e.email,
+        subject: e.subject,
+        message: e.message,
+        status: normalizeStatus(e.status),
+        createdAt: e.createdAt,
+        updatedAt: e.updatedAt,
+        responses: e.responses,
+      },
+    };
+    return mapped;
   },
 
   async updateEnquiryStatus(id: string, data: UpdateEnquiryStatusRequest): Promise<ApiResponse<{ id: string; status: string; message: string }>> {
