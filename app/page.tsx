@@ -6,7 +6,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, MessageCircle, ShoppingCart, User, LogOut } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle, ShoppingCart, User, LogOut, Menu, X } from "lucide-react"
 import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import { useAuth } from "../contexts/AuthContext"
@@ -18,6 +18,7 @@ import { productService } from "../lib/services/api"
 export default function HomePage() {
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const { user, isAuthenticated, logout } = useAuth()
   
@@ -107,10 +108,14 @@ export default function HomePage() {
     await logout()
   }
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen)
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
@@ -119,6 +124,8 @@ export default function HomePage() {
                 {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
               </Link>
             </div>
+            
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/" className="text-[#0a6650] font-medium">
                 Home
@@ -133,7 +140,8 @@ export default function HomePage() {
                 Contact
               </Link>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            <div className="hidden md:flex items-center space-x-4">
               <Link href="/cart">
                 <Button variant="outline" size="sm">
                   <ShoppingCart className="h-4 w-4 mr-2" />
@@ -156,7 +164,87 @@ export default function HomePage() {
                 </Link>
               )}
             </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleMobileMenu}
+                className="p-2"
+              >
+                {mobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Navigation Menu */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t bg-white">
+              <div className="px-2 py-2 space-y-1">
+                <Link 
+                  href="/" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Home
+                </Link>
+                <Link 
+                  href="/products" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Products
+                </Link>
+                <Link 
+                  href="/about" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  About
+                </Link>
+                <Link 
+                  href="/contact" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Contact
+                </Link>
+                <div className="border-t pt-2 mt-2">
+                  <Link href="/cart" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
+                    <ShoppingCart className="h-4 w-4 inline mr-2" />
+                    Cart (0)
+                  </Link>
+                  {isAuthenticated ? (
+                    <div className="px-3 py-2">
+                      <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={handleLogout}
+                        className="w-full mt-2"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link 
+                      href="/admin" 
+                      className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Admin Login
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -172,18 +260,18 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/products">
-                  <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100 relative overflow-hidden group">
+                  <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100 active:bg-gray-200 relative overflow-hidden group transition-all duration-300">
                     <span className="relative z-10">Shop Now</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
                   </Button>
                 </Link>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent relative overflow-hidden group"
+                  className="border-white text-white hover:bg-white hover:text-green-600 active:bg-white active:text-green-600 bg-transparent relative overflow-hidden group transition-all duration-300"
                 >
                   <span className="relative z-10">Learn More</span>
-                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
                 </Button>
               </div>
             </div>
@@ -281,10 +369,10 @@ export default function HomePage() {
           {/* View All Categories Button */}
           <div className="text-center mt-12">
             <Link href="/products">
-              <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden group">
+              <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 active:from-green-800 active:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl active:shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group">
                 <span className="relative z-10">View All Categories</span>
                 <span className="ml-2 relative z-10">→</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
               </Button>
             </Link>
           </div>
@@ -297,9 +385,9 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl font-bold">Featured Products</h2>
             <Link href="/products">
-              <Button variant="outline" className="relative overflow-hidden group">
+              <Button variant="outline" className="relative overflow-hidden group transition-all duration-300 hover:shadow-md active:shadow-lg">
                 <span className="relative z-10">View All Products</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
               </Button>
             </Link>
           </div>
@@ -336,9 +424,9 @@ export default function HomePage() {
           </p>
           <div className="max-w-md mx-auto flex gap-4">
             <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
-            <Button className="bg-white text-[#0a6650] hover:bg-gray-100 relative overflow-hidden group">
+            <Button className="bg-white text-[#0a6650] hover:bg-gray-100 active:bg-gray-200 relative overflow-hidden group transition-all duration-300">
               <span className="relative z-10">Subscribe</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
             </Button>
           </div>
         </div>

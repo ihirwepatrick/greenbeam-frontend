@@ -187,13 +187,13 @@ export default function ProductCard({
               <Button 
                 variant="outline" 
                 size={compact ? "sm" : "default"} 
-                className="w-full relative overflow-hidden group/btn transition-all duration-200 hover:shadow-md"
+                className="w-full relative overflow-hidden group/btn transition-all duration-200 hover:shadow-md active:shadow-lg"
               >
                 <span className="relative z-10 flex items-center">
                   <Eye className="h-4 w-4 mr-2" />
                   View Details
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover/btn:scale-x-100 group-active/btn:scale-x-100 transition-transform duration-500 origin-left"></div>
               </Button>
             </Link>
             
@@ -201,13 +201,13 @@ export default function ProductCard({
               <Button 
                 onClick={() => onEnquire(product)}
                 size={compact ? "sm" : "default"}
-                className="bg-[#0a6650] hover:bg-[#084c3d] flex-1 relative overflow-hidden group/btn transition-all duration-200 hover:shadow-md"
+                className="bg-[#0a6650] hover:bg-[#084c3d] active:bg-[#063a2e] flex-1 relative overflow-hidden group/btn transition-all duration-200 hover:shadow-md active:shadow-lg"
               >
                 <span className="relative z-10 flex items-center">
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Enquire
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover/btn:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 group-hover/btn:scale-x-100 group-active/btn:scale-x-100 transition-transform duration-500 origin-left"></div>
               </Button>
             )}
           </div>
