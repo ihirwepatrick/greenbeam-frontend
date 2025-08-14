@@ -27,6 +27,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 import NotificationSystem from "../../components/NotificationSystem"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useProducts } from "../../../hooks/use-api"
@@ -45,6 +48,21 @@ export default function AdminProducts() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [showDetailsModal, setShowDetailsModal] = useState(false)
   const [showNotifications, setShowNotifications] = useState(false)
+  const [showEdit, setShowEdit] = useState(false)
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [editForm, setEditForm] = useState({
+    name: "",
+    category: "",
+    description: "",
+    status: "AVAILABLE",
+    features: [""] as string[],
+    specifications: "",
+  })
+  const [categoriesList, setCategoriesList] = useState<string[]>([])
+  const [newCategory, setNewCategory] = useState("")
+  const [editThumbnail, setEditThumbnail] = useState<File | null>(null)
+  const [editGallery, setEditGallery] = useState<File[]>([])
+
   const [filters, setFilters] = useState({
     search: "",
     category: "",
@@ -75,9 +93,36 @@ export default function AdminProducts() {
     })
   }, [filters, currentPage, itemsPerPage, refetchProducts])
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const resp = await productService.getCategories()
+        if (resp.success) setCategoriesList(resp.data || [])
+      } catch (e) {
+        console.error("Failed to load categories", e)
+      }
+    }
+    fetchCategories()
+  }, [])
+
   const handleViewDetails = (product: Product) => {
     setSelectedProduct(product)
     setShowDetailsModal(true)
+  }
+
+  const handleOpenEdit = (product: Product) => {
+    setSelectedProduct(product)
+    setEditForm({
+      name: product.name || "",
+      category: product.category || "",
+      description: product.description || "",
+      status: (product.status || "AVAILABLE").toUpperCase(),
+      features: product.features && product.features.length ? [...product.features] : [""],
+      specifications: product as any && (product as any).specifications ? JSON.stringify((product as any).specifications) : "",
+    })
+    setEditThumbnail(null)
+    setEditGallery([])
+    setShowEdit(true)
   }
 
   const closeModal = () => {
@@ -160,6 +205,73 @@ export default function AdminProducts() {
 
   const getUniqueCategories = (): string[] => {
     return Array.from(new Set(products.map((p: Product) => p.category).filter(Boolean)))
+  }
+
+  const updateEditForm = (key: string, value: any) => {
+    setEditForm(prev => ({ ...prev, [key]: value }))
+  }
+
+  const addEditFeature = () => {
+    setEditForm(prev => ({ ...prev, features: [...prev.features, ""] }))
+  }
+
+  const removeEditFeature = (index: number) => {
+    setEditForm(prev => ({ ...prev, features: prev.features.filter((_, i) => i !== index) }))
+  }
+
+  const updateEditFeature = (index: number, value: string) => {
+    setEditForm(prev => ({ ...prev, features: prev.features.map((f, i) => i === index ? value : f) }))
+  }
+
+  const handleEditThumbSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null
+    setEditThumbnail(file)
+  }
+
+  const handleEditGallerySelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : []
+    if (files.length === 0) return
+    setEditGallery(prev => [...prev, ...files].slice(0, 3))
+  }
+
+  const saveEdit = async () => {
+    if (!selectedProduct) return
+    setSavingEdit(true)
+    try {
+      const nonEmptyFeatures = editForm.features.map(f => f.trim()).filter(Boolean)
+      let specs: any = undefined
+      if (editForm.specifications && editForm.specifications.trim()) {
+        try { specs = JSON.parse(editForm.specifications) } catch { specs = editForm.specifications }
+      }
+
+      const payload: any = {
+        name: editForm.name,
+        description: editForm.description,
+        category: editForm.category,
+        status: editForm.status,
+        features: nonEmptyFeatures.length ? nonEmptyFeatures : undefined,
+        specifications: specs,
+      }
+      if (editThumbnail) payload.image = editThumbnail
+      if (editGallery.length) payload.images = editGallery
+
+      const res = await productService.updateProduct(String(selectedProduct.id), payload)
+      if (res.success) {
+        setShowEdit(false)
+        setSelectedProduct(null)
+        await refetchProducts({
+          ...filters,
+          page: currentPage,
+          limit: itemsPerPage
+        })
+      } else {
+        console.error("Update failed", res)
+      }
+    } catch (e) {
+      console.error("Update error", e)
+    } finally {
+      setSavingEdit(false)
+    }
   }
 
   return (
@@ -443,12 +555,15 @@ export default function AdminProducts() {
                           <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
-                        <Link href={`/admin/products/${product.id}/edit`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                        </Link>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full flex-1"
+                          onClick={() => handleOpenEdit(product)}
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -588,12 +703,10 @@ export default function AdminProducts() {
                     )}
 
                     <div className="flex gap-3 mt-6">
-                      <Link href={`/admin/products/${selectedProduct.id}/edit`} className="flex-1">
-                        <Button className="w-full bg-[#0a6650] hover:bg-[#084c3d]">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Product
-                        </Button>
-                      </Link>
+                      <Button className="w-full bg-[#0a6650] hover:bg-[#084c3d]" onClick={() => handleOpenEdit(selectedProduct)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Product
+                      </Button>
                       <Link href={`/products/${selectedProduct.id}`} className="flex-1">
                         <Button variant="outline" className="w-full">
                           <Eye className="h-4 w-4 mr-2" />
@@ -608,6 +721,116 @@ export default function AdminProducts() {
           </div>
         </div>
       )}
+
+      {/* Edit Overlay */}
+      <Dialog open={showEdit} onOpenChange={setShowEdit}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Product</DialogTitle>
+            <DialogDescription>Update product details. Leave fields empty to keep unchanged.</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-name">Name</Label>
+                <Input id="edit-name" value={editForm.name} onChange={(e) => updateEditForm("name", e.target.value)} className="mt-1" />
+              </div>
+              <div>
+                <Label htmlFor="edit-category">Category</Label>
+                <div className="mt-1 space-y-2">
+                  <select
+                    id="edit-category"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    value={editForm.category}
+                    onChange={(e) => updateEditForm("category", e.target.value)}
+                  >
+                    <option value="">Select Category</option>
+                    {categoriesList.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <Input placeholder="Add new category" value={newCategory} onChange={(e) => setNewCategory(e.target.value)} />
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (newCategory.trim()) {
+                          if (!categoriesList.includes(newCategory.trim())) setCategoriesList(prev => [...prev, newCategory.trim()])
+                          updateEditForm("category", newCategory.trim())
+                          setNewCategory("")
+                        }
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea id="edit-description" rows={4} value={editForm.description} onChange={(e) => updateEditForm("description", e.target.value)} className="mt-1" />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-status">Status</Label>
+                <select id="edit-status" className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1" value={editForm.status} onChange={(e) => updateEditForm("status", e.target.value)}>
+                  <option value="AVAILABLE">AVAILABLE</option>
+                  <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+                  <option value="DISCONTINUED">DISCONTINUED</option>
+                  <option value="PRE_ORDER">PRE_ORDER</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="edit-specs">Specifications (JSON)</Label>
+                <Textarea id="edit-specs" rows={4} value={editForm.specifications} onChange={(e) => updateEditForm("specifications", e.target.value)} className="mt-1" />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Features</Label>
+                <Button variant="outline" size="sm" onClick={addEditFeature}>
+                  <Plus className="h-4 w-4 mr-1" /> Add Feature
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {editForm.features.map((f, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input value={f} onChange={(e) => updateEditFeature(i, e.target.value)} />
+                    {editForm.features.length > 1 && (
+                      <Button variant="outline" size="sm" onClick={() => removeEditFeature(i)}>Remove</Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label>Thumbnail (image)</Label>
+                <Input type="file" accept="image/*" onChange={handleEditThumbSelected} className="mt-1" />
+                {editThumbnail && <p className="text-xs text-gray-600 mt-1">Selected: {editThumbnail.name}</p>}
+              </div>
+              <div>
+                <Label>Gallery (images)</Label>
+                <Input type="file" accept="image/*" multiple onChange={handleEditGallerySelected} className="mt-1" />
+                {editGallery.length > 0 && <p className="text-xs text-gray-600 mt-1">{editGallery.length} selected</p>}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="sm:justify-start gap-2 mt-4">
+            <Button className="bg-[#0a6650] hover:bg-[#084c3d]" onClick={saveEdit} disabled={savingEdit}>
+              {savingEdit ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button variant="outline" onClick={() => setShowEdit(false)}>Cancel</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Notification System */}
       <NotificationSystem 

@@ -101,6 +101,7 @@ export interface Product {
   image: string;
   images: string[] | null;
   features?: string[];
+  specifications?: any;
   status?: string;
   rating?: number | string;
   reviews?: number;
@@ -111,17 +112,21 @@ export interface Product {
 export interface CreateProductRequest {
   name: string;
   description: string;
-  price: number;
   category: string;
-  image: File;
-  images?: File[];
+  status?: string;
+  features?: string[];
+  specifications?: any;
+  image: File; // thumbnail
+  images?: File[]; // gallery
 }
 
 export interface UpdateProductRequest {
   name?: string;
   description?: string;
-  price?: number;
   category?: string;
+  status?: string;
+  features?: string[];
+  specifications?: any;
   image?: File;
   images?: File[];
 }

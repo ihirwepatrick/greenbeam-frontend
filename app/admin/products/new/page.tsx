@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -22,16 +22,10 @@ import {
   Image as ImageIcon,
   Upload,
   ArrowLeft,
+  CheckCircle2,
 } from "lucide-react"
-
-const categories = [
-  "Solar Panels",
-  "Wind Energy", 
-  "Energy Storage",
-  "Inverters",
-  "Monitoring",
-  "Accessories"
-]
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { productService } from "@/lib/services/api"
 
 const sidebarLinks = [
   { name: "Dashboard", href: "/admin", icon: Home },
@@ -46,21 +40,99 @@ export default function CreateProduct() {
     name: "",
     category: "",
     description: "",
-    status: "Available",
+    status: "AVAILABLE",
     images: 0,
-    features: [""]
+    features: [""],
+    specifications: ""
   })
   const [isSaving, setIsSaving] = useState(false)
+  const [categories, setCategories] = useState<string[]>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false)
+  const [newCategory, setNewCategory] = useState("")
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const thumbInputRef = useRef<HTMLInputElement | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [thumbnail, setThumbnail] = useState<File | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
 
-  const handleSave = () => {
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await productService.getCategories()
+        if (response.success) {
+          setCategories(response.data || [])
+        }
+      } catch (error) {
+        console.error("Failed to fetch categories:", error)
+      } finally {
+        setIsLoadingCategories(false)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      category: "",
+      description: "",
+      status: "AVAILABLE",
+      images: 0,
+      features: [""],
+      specifications: "",
+    })
+    setSelectedFiles([])
+    setThumbnail(null)
+  }
+
+  const handleSave = async () => {
+    if (!formData.name || !formData.category || !formData.description || !thumbnail) return
     setIsSaving(true)
-    // Simulate save operation
-    setTimeout(() => {
+    try {
+      const nonEmptyFeatures = formData.features.map(f => f.trim()).filter(Boolean)
+      let specs: any = undefined
+      if (formData.specifications && formData.specifications.trim()) {
+        try { specs = JSON.parse(formData.specifications) } catch { specs = formData.specifications }
+      }
+
+      const payload: any = {
+        name: formData.name,
+        description: formData.description,
+        category: formData.category,
+        status: formData.status,
+        image: thumbnail,
+      }
+
+      // Only add optional fields if they have valid values
+      if (nonEmptyFeatures.length > 0) {
+        payload.features = nonEmptyFeatures
+      }
+      if (specs && specs.trim()) {
+        payload.specifications = specs
+      }
+      if (selectedFiles.length > 0) {
+        payload.images = selectedFiles
+      }
+
+      console.log("Sending payload:", payload)
+      const res = await productService.createProduct(payload as any)
+      if (res.success) {
+        setShowSuccess(true)
+      } else {
+        console.error("Create product failed", res)
+      }
+    } catch (e) {
+      console.error("Create product error:", e)
+      // Log more details about the error
+      if (e instanceof Error) {
+        console.error("Error message:", e.message)
+        console.error("Error stack:", e.stack)
+      }
+    } finally {
       setIsSaving(false)
-      console.log("Product created:", formData)
-      // Here you would typically redirect to products list
-      window.location.href = "/admin/products"
-    }, 2000)
+    }
   }
 
   const addFeature = () => {
@@ -89,6 +161,41 @@ export default function CreateProduct() {
       ...prev,
       [field]: value
     }))
+  }
+
+  const openFilePicker = () => {
+    fileInputRef.current?.click()
+  }
+  const openThumbPicker = () => {
+    thumbInputRef.current?.click()
+  }
+
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : []
+    if (files.length === 0) return
+    const combined = [...selectedFiles, ...files].slice(0, 3)
+    setSelectedFiles(combined)
+    updateFormData("images", combined.length)
+  }
+
+  const handleThumbSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0] ? e.target.files[0] : null
+    setThumbnail(file)
+  }
+
+  const removeSelectedFile = (index: number) => {
+    const next = selectedFiles.filter((_, i) => i !== index)
+    setSelectedFiles(next)
+    updateFormData("images", next.length)
+  }
+
+  const handleAddNewCategory = () => {
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      setCategories(prev => [...prev, newCategory.trim()])
+      setFormData(prev => ({ ...prev, category: newCategory.trim() }))
+      setNewCategory("")
+      setShowNewCategoryInput(false)
+    }
   }
 
   return (
@@ -194,17 +301,62 @@ export default function CreateProduct() {
                   </div>
                   <div>
                     <Label htmlFor="category">Category *</Label>
-                    <select
-                      id="category"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md mt-1"
-                      value={formData.category}
-                      onChange={(e) => updateFormData("category", e.target.value)}
-                    >
-                      <option value="">Select Category</option>
-                      {categories.map((category) => (
-                        <option key={category} value={category}>{category}</option>
-                      ))}
-                    </select>
+                    <div className="mt-1 space-y-2">
+                      <select
+                        id="category"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        value={formData.category}
+                        onChange={(e) => updateFormData("category", e.target.value)}
+                        disabled={isLoadingCategories}
+                      >
+                        <option value="">{isLoadingCategories ? "Loading categories..." : "Select Category"}</option>
+                        {categories.map((category) => (
+                          <option key={category} value={category}>{category}</option>
+                        ))}
+                      </select>
+                      
+                      {!showNewCategoryInput ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowNewCategoryInput(true)}
+                          className="w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add New Category
+                        </Button>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <Input
+                            placeholder="Enter new category name"
+                            value={newCategory}
+                            onChange={(e) => setNewCategory(e.target.value)}
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleAddNewCategory}
+                            disabled={!newCategory.trim()}
+                          >
+                            Add
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setShowNewCategoryInput(false)
+                              setNewCategory("")
+                            }}
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -221,7 +373,7 @@ export default function CreateProduct() {
                   />
                 </div>
 
-                {/* Status and Images */}
+                {/* Status and Specs */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <Label htmlFor="status">Status</Label>
@@ -231,19 +383,20 @@ export default function CreateProduct() {
                       value={formData.status}
                       onChange={(e) => updateFormData("status", e.target.value)}
                     >
-                      <option value="Available">Available</option>
-                      <option value="Not Available">Not Available</option>
+                      <option value="AVAILABLE">AVAILABLE</option>
+                      <option value="OUT_OF_STOCK">OUT_OF_STOCK</option>
+                      <option value="DISCONTINUED">DISCONTINUED</option>
+                      <option value="PRE_ORDER">PRE_ORDER</option>
                     </select>
                   </div>
                   <div>
-                    <Label htmlFor="images">Number of Images (0-3)</Label>
-                    <Input
-                      id="images"
-                      type="number"
-                      min="0"
-                      max="3"
-                      value={formData.images}
-                      onChange={(e) => updateFormData("images", parseInt(e.target.value))}
+                    <Label htmlFor="specs">Specifications (JSON)</Label>
+                    <Textarea
+                      id="specs"
+                      rows={4}
+                      placeholder='e.g. {"power": "400W", "efficiency": "21.5%"}'
+                      value={formData.specifications}
+                      onChange={(e) => updateFormData("specifications", e.target.value)}
                       className="mt-1"
                     />
                   </div>
@@ -292,11 +445,65 @@ export default function CreateProduct() {
                   <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600 mb-2">Upload product images</p>
-                    <p className="text-sm text-gray-500 mb-4">Maximum 3 images allowed</p>
-                    <Button variant="outline">
+                    <p className="text-sm text-gray-500 mb-4">Thumbnail under image, gallery under images (max 3)</p>
+
+                    {/* Thumbnail */}
+                    <input
+                      ref={thumbInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleThumbSelected}
+                    />
+                    <div className="mb-4">
+                      <Button type="button" variant="outline" onClick={openThumbPicker}>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Choose Thumbnail (image)
+                      </Button>
+                      {thumbnail && (
+                        <p className="mt-2 text-sm text-gray-600 truncate" title={thumbnail.name}>Selected: {thumbnail.name}</p>
+                      )}
+                    </div>
+
+                    {/* Gallery */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={handleFilesSelected}
+                    />
+
+                    <Button type="button" variant="outline" onClick={openFilePicker}>
                       <Upload className="h-4 w-4 mr-2" />
-                      Choose Files
+                      Choose Gallery Files (images)
                     </Button>
+
+                    {selectedFiles.length > 0 && (
+                      <div className="mt-4">
+                        <p className="text-sm text-gray-600 mb-2">
+                          {selectedFiles.length} file{selectedFiles.length > 1 ? "s" : ""} selected
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                          {selectedFiles.map((file, index) => (
+                            <div key={index} className="border rounded p-2 text-left">
+                              <p className="text-xs font-medium truncate" title={file.name}>{file.name}</p>
+                              <p className="text-[10px] text-gray-500">{Math.round(file.size / 1024)} KB</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="mt-2 w-full"
+                                onClick={() => removeSelectedFile(index)}
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -304,7 +511,7 @@ export default function CreateProduct() {
                 <div className="flex gap-4 pt-6 border-t">
                   <Button 
                     onClick={handleSave}
-                    disabled={isSaving || !formData.name || !formData.category || !formData.description}
+                    disabled={isSaving || !formData.name || !formData.category || !formData.description || !thumbnail}
                     className="bg-[#0a6650] hover:bg-[#084c3d]"
                   >
                     <Save className="h-4 w-4 mr-2" />
@@ -321,6 +528,35 @@ export default function CreateProduct() {
           </div>
         </div>
       </div>
+
+      {/* Success Overlay */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-600" />
+              Product Created
+            </DialogTitle>
+            <DialogDescription>
+              Your product has been uploaded successfully. What would you like to do next?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-start gap-2">
+            <Button
+              className="bg-[#0a6650] hover:bg-[#084c3d]"
+              onClick={() => { window.location.href = "/admin/products" }}
+            >
+              Go to Products
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => { setShowSuccess(false); resetForm(); }}
+            >
+              Create Another
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

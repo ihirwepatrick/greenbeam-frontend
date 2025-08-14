@@ -166,7 +166,22 @@ class ApiClient {
             reject(new Error('Invalid JSON response'));
           }
         } else {
-          reject(new Error(`HTTP ${xhr.status}`));
+          // Provide more detailed error information
+          let errorMessage = `HTTP ${xhr.status}`;
+          try {
+            const errorData = JSON.parse(xhr.responseText);
+            if (errorData.error && errorData.error.message) {
+              errorMessage += `: ${errorData.error.message}`;
+            } else if (errorData.message) {
+              errorMessage += `: ${errorData.message}`;
+            }
+          } catch {
+            // If response is not JSON, include response text if available
+            if (xhr.responseText) {
+              errorMessage += `: ${xhr.responseText}`;
+            }
+          }
+          reject(new Error(errorMessage));
         }
       });
 

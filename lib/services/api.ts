@@ -181,28 +181,36 @@ export const productService = {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('description', data.description);
-    formData.append('price', data.price.toString());
     formData.append('category', data.category);
+    if (data.status) formData.append('status', data.status);
+    if (data.features) formData.append('features', JSON.stringify(data.features));
+    if (data.specifications) formData.append('specifications', typeof data.specifications === 'string' ? data.specifications : JSON.stringify(data.specifications));
     formData.append('image', data.image);
-    
     if (data.images) {
       data.images.forEach((image) => {
         formData.append('images', image);
       });
     }
 
+    // Debug logging
+    console.log('createProduct - FormData contents:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    console.log('createProduct - Endpoint:', API_ENDPOINTS.PRODUCTS.BASE);
+
     return apiClient.upload<ApiResponse<Product>>(API_ENDPOINTS.PRODUCTS.BASE, formData);
   },
 
   async updateProduct(id: string, data: UpdateProductRequest): Promise<ApiResponse<Product>> {
     const formData = new FormData();
-    
     if (data.name) formData.append('name', data.name);
     if (data.description) formData.append('description', data.description);
-    if (data.price) formData.append('price', data.price.toString());
     if (data.category) formData.append('category', data.category);
+    if (data.status) formData.append('status', data.status);
+    if (data.features) formData.append('features', JSON.stringify(data.features));
+    if (data.specifications) formData.append('specifications', typeof data.specifications === 'string' ? data.specifications : JSON.stringify(data.specifications));
     if (data.image) formData.append('image', data.image);
-    
     if (data.images) {
       data.images.forEach((image) => {
         formData.append('images', image);
