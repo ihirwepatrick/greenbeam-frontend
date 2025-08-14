@@ -115,7 +115,7 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src="/logo.png" alt="Greenbeam Logo" width={32} height={32} />
+                <Image src="/logo.jpg" alt="Greenbeam Logo" width={140} height={72} />
                 {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
               </Link>
             </div>
@@ -172,16 +172,18 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/products">
-                  <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100">
-                    Shop Now
+                  <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100 relative overflow-hidden group">
+                    <span className="relative z-10">Shop Now</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                   </Button>
                 </Link>
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent"
+                  className="border-white text-white hover:bg-white hover:text-green-600 bg-transparent relative overflow-hidden group"
                 >
-                  Learn More
+                  <span className="relative z-10">Learn More</span>
+                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 </Button>
               </div>
             </div>
@@ -279,9 +281,10 @@ export default function HomePage() {
           {/* View All Categories Button */}
           <div className="text-center mt-12">
             <Link href="/products">
-              <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                View All Categories
-                <span className="ml-2">→</span>
+              <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 relative overflow-hidden group">
+                <span className="relative z-10">View All Categories</span>
+                <span className="ml-2 relative z-10">→</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
               </Button>
             </Link>
           </div>
@@ -294,7 +297,10 @@ export default function HomePage() {
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl font-bold">Featured Products</h2>
             <Link href="/products">
-              <Button variant="outline">View All Products</Button>
+              <Button variant="outline" className="relative overflow-hidden group">
+                <span className="relative z-10">View All Products</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+              </Button>
             </Link>
           </div>
           {productsLoading ? (
@@ -330,7 +336,10 @@ export default function HomePage() {
           </p>
           <div className="max-w-md mx-auto flex gap-4">
             <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
-            <Button className="bg-white text-[#0a6650] hover:bg-gray-100">Subscribe</Button>
+            <Button className="bg-white text-[#0a6650] hover:bg-gray-100 relative overflow-hidden group">
+              <span className="relative z-10">Subscribe</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+            </Button>
           </div>
         </div>
       </section>
