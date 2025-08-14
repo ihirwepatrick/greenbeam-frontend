@@ -115,8 +115,8 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
+                <Image src="/logo.png" alt="Greenbeam Logo" width={32} height={32} />
+                {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">
