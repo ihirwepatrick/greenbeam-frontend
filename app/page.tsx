@@ -42,8 +42,48 @@ export default function HomePage() {
   
   // Get categories with counts - properly handle string[] response
   const categoryNames = (categoriesResponse as any)?.data || []
+  
+  // Define category icons and get product counts
+  const getCategoryIcon = (categoryName: string) => {
+    const iconMap: { [key: string]: string } = {
+      'Solar Panels': '☀️',
+      'Wind Energy': '💨',
+      'Energy Storage': '🔋',
+      'Inverters': '⚡',
+      'Monitoring': '📊',
+      'Accessories': '🔧',
+      'Batteries': '🔋',
+      'Solar Inverters': '⚡',
+      'Solar Mounting': '🏗️',
+      'Solar Cables': '🔌',
+      'Solar Controllers': '🎛️',
+      'Solar Pumps': '💧',
+      'LED Lighting': '💡',
+      'Smart Home': '🏠',
+      'Electric Vehicles': '🚗',
+      'Heat Pumps': '🔥',
+      'Biomass': '🌿',
+      'Hydroelectric': '💧',
+      'Geothermal': '🌋',
+      'Tidal Energy': '🌊'
+    }
+    return iconMap[categoryName] || '📦'
+  }
+
+  // Get product count for each category
+  const getCategoryProductCount = (categoryName: string) => {
+    const products = (productsResponse as any)?.products || []
+    return products.filter(
+      (product: Product) => product.category === categoryName
+    ).length
+  }
+
   const categories = categoryNames.length > 0 
-    ? categoryNames.map((name: string) => ({ name, icon: "📦", count: 0 }))
+    ? categoryNames.map((name: string) => ({ 
+        name, 
+        icon: getCategoryIcon(name), 
+        count: getCategoryProductCount(name) 
+      }))
     : [
         { name: "Solar Panels", icon: "☀️", count: 0 },
         { name: "Wind Energy", icon: "💨", count: 0 },
@@ -187,28 +227,64 @@ export default function HomePage() {
       </section>
 
       {/* Categories */}
-      <section className="py-16">
+      <section className="py-16 bg-gradient-to-br from-green-50 to-blue-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Shop by Category</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover our comprehensive range of sustainable energy solutions
+            </p>
+          </div>
+          
           {categoriesLoading ? (
             <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
               {categories.map((category: any, index: number) => (
-                <Link key={index} href={`/products?category=${encodeURIComponent(category.name)}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardContent className="p-6 text-center">
-                      <div className="text-4xl mb-4">{category.icon}</div>
-                      <h3 className="font-semibold mb-2">{category.name}</h3>
-                      <p className="text-sm text-gray-600">{category.count || 0} products</p>
+                <Link 
+                  key={index} 
+                  href={`/products?category=${encodeURIComponent(category.name)}`}
+                  className="group"
+                >
+                  <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white/80 backdrop-blur-sm hover:bg-white hover:scale-105 hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-green-200/50">
+                    <CardContent className="p-6 text-center h-full flex flex-col justify-center">
+                      <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+                        {category.icon}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm lg:text-base group-hover:text-green-700 transition-colors duration-300">
+                        {category.name}
+                      </h3>
+                      <div className="flex items-center justify-center space-x-1">
+                        <span className="text-xs text-gray-500 group-hover:text-green-600 transition-colors duration-300">
+                          {category.count}
+                        </span>
+                        <span className="text-xs text-gray-400 group-hover:text-green-500 transition-colors duration-300">
+                          products
+                        </span>
+                      </div>
+                      
+                      {/* Hover indicator */}
+                      <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="w-8 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mx-auto"></div>
+                      </div>
                     </CardContent>
                   </Card>
                 </Link>
               ))}
             </div>
           )}
+          
+          {/* View All Categories Button */}
+          <div className="text-center mt-12">
+            <Link href="/products">
+              <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                View All Categories
+                <span className="ml-2">→</span>
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
