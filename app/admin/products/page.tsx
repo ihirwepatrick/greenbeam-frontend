@@ -347,11 +347,11 @@ export default function AdminProducts() {
                 </Button>
                 <Link href="/admin/products/new">
                   <Button className="bg-[#0a6650] hover:bg-[#084c3d] relative overflow-hidden group">
-                    <span className="relative z-10 flex items-center">
+                    <span className="relative z-20 flex items-center">
                       <Plus className="h-4 w-4 mr-2" />
                       Add Product
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                   </Button>
                 </Link>
               </div>
@@ -479,8 +479,8 @@ export default function AdminProducts() {
                   </Button>
                 </div>
                 <Button variant="outline" size="sm" onClick={clearFilters} className="relative overflow-hidden group">
-                  <span className="relative z-10">Clear Filters</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                  <span className="relative z-20">Clear Filters</span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                 </Button>
               </div>
             </CardContent>
@@ -498,11 +498,11 @@ export default function AdminProducts() {
               <p className="text-gray-600 mb-4">Get started by adding your first product</p>
               <Link href="/admin/products/new">
                 <Button className="bg-[#0a6650] hover:bg-[#084c3d] relative overflow-hidden group">
-                  <span className="relative z-10 flex items-center">
+                  <span className="relative z-20 flex items-center">
                     <Plus className="h-4 w-4 mr-2" />
                     Add Product
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                 </Button>
               </Link>
             </div>

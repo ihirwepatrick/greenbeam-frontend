@@ -13,7 +13,6 @@ import {
   Shield, 
   Truck, 
   MessageCircle, 
-  ShoppingCart, 
   User, 
   LogOut, 
   Search, 
@@ -26,7 +25,6 @@ import {
 import ProductCard from "../../components/ProductCard"
 import { useAuth } from "../../contexts/AuthContext"
 import { useProducts } from "../../hooks/use-api"
-import { useApi } from "../../hooks/use-api"
 import { productService } from "../../lib/services/api"
 import { Product } from "../../lib/types/api"
 import EnquiryForm from "../components/EnquiryForm"
@@ -63,18 +61,47 @@ export default function ProductsPage() {
   // Fetch products and categories
   const { data: productsResponse, loading: productsLoading, execute: refetchProducts } = useProducts(queryParams)
   
-  // Use public categories endpoint
-  const { data: categoriesResponse, loading: categoriesLoading } = useApi(
-    () => productService.getCategories(),
-    true
-  )
+  // Custom categories fetch with timeout
+  const [categoriesData, setCategoriesData] = useState<any>(null)
+  const [categoriesLoadingState, setCategoriesLoadingState] = useState(true)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoadingState(true)
+        
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        )
+        
+        const categoriesPromise = productService.getCategories()
+        const response = await Promise.race([categoriesPromise, timeoutPromise]) as any
+        
+        if (response.success) {
+          setCategoriesData(response.data)
+        } else {
+          // Fallback to empty array if API fails
+          setCategoriesData([])
+        }
+      } catch (error) {
+        console.error('Categories fetch error:', error)
+        // Fallback to empty array if API fails
+        setCategoriesData([])
+      } finally {
+        setCategoriesLoadingState(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
   
   // Map backend response structure
   const products = (productsResponse as any)?.products || []
   const pagination = (productsResponse as any)?.pagination
   
   // Get categories for filtering
-  const categoryNames = (categoriesResponse as any)?.data || []
+  const categoryNames = categoriesData || []
   
   // Update URL when filters change
   useEffect(() => {
@@ -170,9 +197,16 @@ export default function ProductsPage() {
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src="/logo.jpg" alt="Greenbeam Logo" width={140} height={72} />
+                <Image 
+                  src="/logo.jpg" 
+                  alt="Greenbeam Logo" 
+                  width={140} 
+                  height={72} 
+                  className="w-20 h-10 sm:w-24 sm:h-12 md:w-36 md:h-16 lg:w-40 lg:h-20 transition-all duration-300 hover:scale-105"
+                  priority
+                />
               </Link>
             </div>
             
@@ -193,12 +227,6 @@ export default function ProductsPage() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/cart">
-                <Button variant="outline" size="sm">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Cart (0)
-                </Button>
-              </Link>
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
@@ -266,10 +294,6 @@ export default function ProductsPage() {
                   Contact
                 </Link>
                 <div className="border-t pt-2 mt-2">
-                  <Link href="/cart" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
-                    <ShoppingCart className="h-4 w-4 inline mr-2" />
-                    Cart (0)
-                  </Link>
                   {isAuthenticated ? (
                     <div className="px-3 py-2">
                       <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
@@ -349,8 +373,9 @@ export default function ProductsPage() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0a6650] focus:border-[#0a6650]"
                       value={filters.category}
                       onChange={(e) => handleFilterChange("category", e.target.value)}
+                      disabled={categoriesLoadingState}
                     >
-                      <option value="">All Categories</option>
+                      <option value="">{categoriesLoadingState ? "Loading categories..." : "All Categories"}</option>
                       {categoryNames.map((category: string, index: number) => (
                         <option key={index} value={category}>
                           {category}
@@ -390,8 +415,8 @@ export default function ProductsPage() {
                     onClick={clearFilters}
                     className="relative overflow-hidden group transition-all duration-300"
                   >
-                    <span className="relative z-10">Clear Filters</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <span className="relative z-20">Clear Filters</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                   </Button>
                 </div>
               </div>

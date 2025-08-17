@@ -6,13 +6,12 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, MessageCircle, ShoppingCart, User, LogOut, Menu, X } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle, User, LogOut, Menu, X } from "lucide-react"
 import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import { useAuth } from "../contexts/AuthContext"
 import { useProducts } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
-import { useApi } from "../hooks/use-api"
 import { productService } from "../lib/services/api"
 
 export default function HomePage() {
@@ -32,17 +31,46 @@ export default function HomePage() {
   // Fetch featured products and categories
   const { data: productsResponse, loading: productsLoading } = useProducts(featuredProductsParams)
   
-  // Use public categories endpoint instead of admin-only settings endpoint
-  const { data: categoriesResponse, loading: categoriesLoading } = useApi(
-    () => productService.getCategories(),
-    true
-  )
+  // Custom categories fetch with timeout
+  const [categoriesData, setCategoriesData] = useState<any>(null)
+  const [categoriesLoadingState, setCategoriesLoadingState] = useState(true)
+  const [categoriesErrorState, setCategoriesErrorState] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setCategoriesLoadingState(true)
+        setCategoriesErrorState(null)
+        
+        // Add timeout to prevent infinite loading
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        )
+        
+        const categoriesPromise = productService.getCategories()
+        const response = await Promise.race([categoriesPromise, timeoutPromise]) as any
+        
+        if (response.success) {
+          setCategoriesData(response.data)
+        } else {
+          setCategoriesErrorState('Failed to load categories')
+        }
+      } catch (error) {
+        console.error('Categories fetch error:', error)
+        setCategoriesErrorState(error instanceof Error ? error.message : 'Failed to load categories')
+      } finally {
+        setCategoriesLoadingState(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
   
   // Get featured products (top 3 by rating) - properly map backend structure
   const featuredProducts = (productsResponse as any)?.products?.slice(0, 3) || []
   
-  // Get categories with counts - properly handle string[] response
-  const categoryNames = (categoriesResponse as any)?.data || []
+  // Get categories with counts - properly handle string[] response with fallback
+  const categoryNames = categoriesData || []
   
   // Define category icons and get product counts
   const getCategoryIcon = (categoryName: string) => {
@@ -79,20 +107,23 @@ export default function HomePage() {
     ).length
   }
 
+  // Fallback categories if API fails or returns empty
+  const fallbackCategories = [
+    { name: "Solar Panels", icon: "☀️", count: 0 },
+    { name: "Wind Energy", icon: "💨", count: 0 },
+    { name: "Energy Storage", icon: "🔋", count: 0 },
+    { name: "Inverters", icon: "⚡", count: 0 },
+    { name: "Monitoring", icon: "📊", count: 0 },
+    { name: "Accessories", icon: "🔧", count: 0 },
+  ]
+
   const categories = categoryNames.length > 0 
     ? categoryNames.map((name: string) => ({ 
         name, 
         icon: getCategoryIcon(name), 
         count: getCategoryProductCount(name) 
       }))
-    : [
-        { name: "Solar Panels", icon: "☀️", count: 0 },
-        { name: "Wind Energy", icon: "💨", count: 0 },
-        { name: "Energy Storage", icon: "🔋", count: 0 },
-        { name: "Inverters", icon: "⚡", count: 0 },
-        { name: "Monitoring", icon: "📊", count: 0 },
-        { name: "Accessories", icon: "🔧", count: 0 },
-      ]
+    : fallbackCategories
 
   const handleEnquireNow = (product: Product) => {
     setSelectedProduct(product)
@@ -118,9 +149,9 @@ export default function HomePage() {
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src="/logo.jpg" alt="Greenbeam Logo" width={140} height={72} />
+                <Image src="/logo.jpg" alt="Greenbeam Logo" width={140} height={64} />
                 {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
               </Link>
             </div>
@@ -142,12 +173,6 @@ export default function HomePage() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
-              <Link href="/cart">
-                <Button variant="outline" size="sm">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Cart (0)
-                </Button>
-              </Link>
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
@@ -215,10 +240,6 @@ export default function HomePage() {
                   Contact
                 </Link>
                 <div className="border-t pt-2 mt-2">
-                  <Link href="/cart" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50">
-                    <ShoppingCart className="h-4 w-4 inline mr-2" />
-                    Cart (0)
-                  </Link>
                   {isAuthenticated ? (
                     <div className="px-3 py-2">
                       <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
@@ -261,8 +282,8 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/products">
                   <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100 active:bg-gray-200 relative overflow-hidden group transition-all duration-300">
-                    <span className="relative z-10">Shop Now</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+                    <span className="relative z-20">Shop Now</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                   </Button>
                 </Link>
                 <Button
@@ -270,8 +291,8 @@ export default function HomePage() {
                   variant="outline"
                   className="border-white text-white hover:bg-white hover:text-green-600 active:bg-white active:text-green-600 bg-transparent relative overflow-hidden group transition-all duration-300"
                 >
-                  <span className="relative z-10">Learn More</span>
-                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+                  <span className="relative z-20">Learn More</span>
+                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                 </Button>
               </div>
             </div>
@@ -326,9 +347,46 @@ export default function HomePage() {
             </p>
           </div>
           
-          {categoriesLoading ? (
+          {categoriesLoadingState && !categoriesErrorState ? (
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            </div>
+          ) : categoriesErrorState ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">Unable to load categories. Showing default categories.</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+                {fallbackCategories.map((category: any, index: number) => (
+                  <Link 
+                    key={index} 
+                    href={`/products?category=${encodeURIComponent(category.name)}`}
+                    className="group"
+                  >
+                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white/80 backdrop-blur-sm hover:bg-white hover:scale-105 hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-green-200/50">
+                      <CardContent className="p-6 text-center h-full flex flex-col justify-center">
+                        <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
+                          {category.icon}
+                        </div>
+                        <h3 className="font-semibold text-gray-900 mb-2 text-sm lg:text-base group-hover:text-green-700 transition-colors duration-300">
+                          {category.name}
+                        </h3>
+                        <div className="flex items-center justify-center space-x-1">
+                          <span className="text-xs text-gray-500 group-hover:text-green-600 transition-colors duration-300">
+                            {category.count}
+                          </span>
+                          <span className="text-xs text-gray-400 group-hover:text-green-500 transition-colors duration-300">
+                            products
+                          </span>
+                        </div>
+                        
+                        {/* Hover indicator */}
+                        <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="w-8 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mx-auto"></div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
@@ -370,9 +428,9 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link href="/products">
               <Button className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 active:from-green-800 active:to-blue-800 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl active:shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 relative overflow-hidden group">
-                <span className="relative z-10">View All Categories</span>
-                <span className="ml-2 relative z-10">→</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <span className="relative z-20">View All Categories</span>
+                <span className="ml-2 relative z-20">→</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
               </Button>
             </Link>
           </div>
@@ -386,8 +444,8 @@ export default function HomePage() {
             <h2 className="text-3xl font-bold">Featured Products</h2>
             <Link href="/products">
               <Button variant="outline" className="relative overflow-hidden group transition-all duration-300 hover:shadow-md active:shadow-lg">
-                <span className="relative z-10">View All Products</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <span className="relative z-20">View All Products</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
               </Button>
             </Link>
           </div>
@@ -425,8 +483,8 @@ export default function HomePage() {
           <div className="max-w-md mx-auto flex gap-4">
             <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
             <Button className="bg-white text-[#0a6650] hover:bg-gray-100 active:bg-gray-200 relative overflow-hidden group transition-all duration-300">
-              <span className="relative z-10">Subscribe</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left"></div>
+              <span className="relative z-20">Subscribe</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
             </Button>
           </div>
         </div>

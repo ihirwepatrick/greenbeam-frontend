@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, ShoppingCart, User, LogOut } from "lucide-react"
+import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, User, LogOut } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
 import { enquiryService } from "../../lib/services/api"
 import { useSettings } from "../../hooks/use-api"
@@ -191,12 +191,6 @@ export default function ContactPage() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/cart">
-                <Button variant="outline" size="sm">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Cart (0)
-                </Button>
-              </Link>
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
