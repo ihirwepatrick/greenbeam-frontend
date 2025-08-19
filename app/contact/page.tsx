@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,10 +16,8 @@ import { useSettings } from "../../hooks/use-api"
 export default function ContactPage() {
   const { user, isAuthenticated, logout } = useAuth()
   
-  // Fetch contact information and team data from settings
-  const { data: contactSettings } = useSettings('contact')
-  const { data: teamSettings } = useSettings('team')
-  const { data: faqSettings } = useSettings('faqs')
+  // Load all settings once
+  const { data: settingsData } = useSettings()
   
   const [formData, setFormData] = useState({
     firstName: user?.name?.split(' ')[0] || "",
@@ -33,7 +32,7 @@ export default function ContactPage() {
   const [error, setError] = useState("")
 
   // Default data if API doesn't return anything
-  const team = teamSettings?.data || [
+  const team = [
     {
       name: "Sarah Johnson",
       role: "CEO & Founder",
@@ -68,7 +67,7 @@ export default function ContactPage() {
     }
   ]
 
-  const faqs = faqSettings?.data || [
+  const faqs = [
     {
       question: "How long does installation take?",
       answer: "Most residential solar installations are completed within 1-3 days, depending on the system size and complexity."
@@ -95,26 +94,18 @@ export default function ContactPage() {
     }
   ]
 
-  const contactInfo = contactSettings?.data || [
-    {
-      icon: Mail,
-      title: "Email Us",
-      details: ["info@greenbeam.com", "support@greenbeam.com"],
-      description: "We'll respond within 24 hours",
-    },
-    {
-      icon: Phone,
-      title: "Call Us",
-      details: ["+250 788 123 456", "+250 788 987 654"],
-      description: "Mon-Fri 8AM-6PM CAT",
-    },
-    {
-      icon: MapPin,
-      title: "Visit Us",
-      details: ["Kigali ST RN 1000", "Kigali, Rwanda"],
-      description: "By appointment only",
-    },
-  ]
+  const contactInfo = (() => {
+    const info = (settingsData as any)?.data?.website?.content?.contactInfo
+    const address = info?.address || "Kigali, Rwanda"
+    const phone = info?.phone || "+250 788 123 456"
+    const email = info?.email || "info@greenbeam.com"
+    const workingHours = info?.workingHours || "Mon-Fri: 8AM-6PM"
+    return [
+      { icon: Mail, title: "Email Us", details: [email], description: "We'll respond within 24 hours" },
+      { icon: Phone, title: "Call Us", details: [phone], description: workingHours },
+      { icon: MapPin, title: "Visit Us", details: [address], description: "By appointment only" },
+    ]
+  })()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -172,8 +163,15 @@ export default function ContactPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
+                <Image
+                  src="/logo.jpg"
+                  alt="Greenbeam Logo"
+                  width={140}
+                  height={64}
+                  className="h-10 w-auto sm:h-12 object-contain"
+                  priority
+                  sizes="(max-width: 768px) 120px, 160px"
+                />
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">

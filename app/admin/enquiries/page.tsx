@@ -225,8 +225,6 @@ export default function AdminEnquiries() {
       setIsSendingResponse(true)
       const payload = {
         message: responseMessage.trim(),
-        subject: `Re: ${selectedEnquiry.subject}`,
-        sendEmail: true,
       }
       const res = await enquiryService.respondToEnquiry(selectedEnquiry.id, payload)
       if (res.success) {

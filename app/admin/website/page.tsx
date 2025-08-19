@@ -34,6 +34,7 @@ import {
 } from "lucide-react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useSettings } from "../../../hooks/use-api"
+import { settingsService } from "../../../lib/services/api"
 
 const websiteSettings = {
   general: {
@@ -105,8 +106,11 @@ export default function AdminWebsite() {
     setIsSaving(true)
     setSaveMessage("")
     try {
-      // Here you would call the settings API to save
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // Persist website settings to backend
+      const response = await settingsService.updateSettingsByCategory('website', settings)
+      if (!response.success) {
+        throw new Error(response?.error?.message || 'Failed to save website settings')
+      }
       
       setSaveMessage("Website settings saved successfully!")
       setTimeout(() => setSaveMessage(""), 3000)

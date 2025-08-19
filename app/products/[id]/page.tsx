@@ -1,27 +1,30 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Star, ArrowLeft, MessageCircle, User, LogOut, Heart, Share2 } from "lucide-react"
+import { Leaf, Star, ArrowLeft, MessageCircle, User, LogOut, Heart, Share2, CheckCircle2 } from "lucide-react"
 import { useAuth } from "../../../contexts/AuthContext"
 import { useProduct } from "../../../hooks/use-api"
+import { productService } from "../../../lib/services/api"
 import EnquiryForm from "../../components/EnquiryForm"
 import { Product } from "../../../lib/types/api"
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 
-interface ProductDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-export default function ProductDetailPage({ params }: ProductDetailPageProps) {
-  const { id } = params
+export default function ProductDetailPage() {
+  const routeParams = useParams<{ id: string }>()
+  const id = routeParams?.id as string
   const { user, isAuthenticated, logout } = useAuth()
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
+  const [userRating, setUserRating] = useState<number>(0)
+  const [submittingRating, setSubmittingRating] = useState<boolean>(false)
+  const [currentRating, setCurrentRating] = useState<number>(0)
+  const [currentReviews, setCurrentReviews] = useState<number>(0)
+  const [showRatingSuccess, setShowRatingSuccess] = useState<boolean>(false)
   
   const { data: product, loading, error } = useProduct(id)
 
@@ -35,6 +38,35 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
   const handleLogout = async () => {
     await logout()
+  }
+
+  // Sync rating state when product loads
+  useEffect(() => {
+    if (product) {
+      setCurrentRating(Number(product.rating) || 0)
+      setCurrentReviews((product as any).reviews || 0)
+    }
+  }, [product])
+
+  const submitProductRating = async () => {
+    if (!userRating) return
+    setSubmittingRating(true)
+    try {
+      const response: any = await productService.rateProduct(id, { rating: userRating })
+      if (response?.success) {
+        const newRating = response.data?.rating ?? response.data?.newRating ?? currentRating
+        const newReviews = response.data?.reviews ?? currentReviews + 1
+        setCurrentRating(Number(newRating) || 0)
+        setCurrentReviews(Number(newReviews) || 0)
+        setUserRating(0)
+        setShowRatingSuccess(true)
+        setTimeout(() => setShowRatingSuccess(false), 2000)
+      }
+    } catch (e) {
+      // no-op; could add a toast here
+    } finally {
+      setSubmittingRating(false)
+    }
   }
 
   const getStatusColor = (status?: string) => {
@@ -92,8 +124,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     )
   }
 
-  const rating = Number(product.rating) || 0
-  const reviews = product.reviews || 0
+  const rating = currentRating
+  const reviews = currentReviews
 
   return (
     <div className="min-h-screen bg-background">
@@ -103,7 +135,15 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
+                <Image 
+                  src="/logo.jpg"
+                  alt="Greenbeam Logo" 
+                  width={140} 
+                  height={64} 
+                  className="h-10 w-auto sm:h-12 object-contain"
+                  priority
+                  sizes="(max-width: 768px) 120px, 160px"
+                />
                 <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
               </Link>
             </div>
@@ -234,6 +274,45 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
             <div className="mb-6">
               <p className="text-gray-700 text-lg leading-relaxed">{product.description}</p>
+            </div>
+
+            {/* Rating */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-2">Rate this product</h3>
+              <TooltipProvider>
+                <Tooltip open={showRatingSuccess}>
+                  <div className="flex items-center">
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center">
+                        {[1,2,3,4,5].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setUserRating(n)}
+                            className="mr-1"
+                            aria-label={`Rate ${n} star${n>1 ? 's' : ''}`}
+                          >
+                            <Star className={n <= (userRating || Math.round(currentRating)) ? "text-yellow-400 h-6 w-6" : "text-gray-300 h-6 w-6"} />
+                          </button>
+                        ))}
+                        <span className="ml-3 text-sm text-gray-600">{rating.toFixed(1)} ({reviews})</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="flex items-center space-x-2 bg-green-600 text-white border-green-700">
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Rating submitted successfully</span>
+                    </TooltipContent>
+                  </div>
+                </Tooltip>
+              </TooltipProvider>
+              <Button
+                size="sm"
+                className="mt-3 bg-[#0a6650] hover:bg-[#084c3d]"
+                onClick={submitProductRating}
+                disabled={!userRating || submittingRating}
+              >
+                {submittingRating ? "Submitting..." : "Submit Rating"}
+              </Button>
             </div>
 
             {product.features && product.features.length > 0 && (

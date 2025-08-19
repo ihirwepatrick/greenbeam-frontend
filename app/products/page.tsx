@@ -23,6 +23,7 @@ import {
   ChevronUp
 } from "lucide-react"
 import ProductCard from "../../components/ProductCard"
+import { useSettings } from "../../hooks/use-api"
 import { useAuth } from "../../contexts/AuthContext"
 import { useProducts } from "../../hooks/use-api"
 import { productService } from "../../lib/services/api"
@@ -36,6 +37,9 @@ export default function ProductsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   
   const { user, isAuthenticated, logout } = useAuth()
+  
+  // Full settings for branding
+  const { data: settingsData } = useSettings()
   
   // Get URL parameters for initial state
   const [searchParams, setSearchParams] = useState<URLSearchParams>(new URLSearchParams())
@@ -200,12 +204,13 @@ export default function ProductsPage() {
             <div className="flex items-center space-x-2 md:space-x-4">
               <Link href="/" className="flex items-center space-x-2">
                 <Image 
-                  src="/logo.jpg" 
+                  src="/logo.jpg"
                   alt="Greenbeam Logo" 
                   width={140} 
-                  height={72} 
-                  className="w-20 h-10 sm:w-24 sm:h-12 md:w-36 md:h-16 lg:w-40 lg:h-20 transition-all duration-300 hover:scale-105"
+                  height={64} 
+                  className="h-10 w-auto sm:h-12 object-contain"
                   priority
+                  sizes="(max-width: 768px) 120px, 160px"
                 />
               </Link>
             </div>

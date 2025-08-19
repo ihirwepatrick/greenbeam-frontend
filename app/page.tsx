@@ -10,7 +10,7 @@ import { Leaf, Zap, Shield, Truck, MessageCircle, User, LogOut, Menu, X } from "
 import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import { useAuth } from "../contexts/AuthContext"
-import { useProducts } from "../hooks/use-api"
+import { useProducts, useSettings } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
 import { productService } from "../lib/services/api"
 
@@ -20,6 +20,9 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const { user, isAuthenticated, logout } = useAuth()
+  
+  // Full settings (contains general and website)
+  const { data: settingsData } = useSettings()
   
   // Memoize the query parameters for featured products
   const featuredProductsParams = useMemo(() => ({
@@ -151,7 +154,15 @@ export default function HomePage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2 md:space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src="/logo.jpg" alt="Greenbeam Logo" width={140} height={64} />
+                <Image
+                  src="/logo.jpg"
+                  alt="Greenbeam Logo"
+                  width={140}
+                  height={64}
+                  className="h-10 w-auto sm:h-12 object-contain"
+                  priority
+                  sizes="(max-width: 768px) 120px, 160px"
+                />
                 {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
               </Link>
             </div>
@@ -274,15 +285,14 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">Power Your Future with Clean Energy</h1>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">{(settingsData as any)?.data?.website?.content?.homepageHero?.title || "Power Your Future with Clean Energy"}</h1>
               <p className="text-xl mb-8 text-green-100">
-                Discover our premium collection of solar panels, wind turbines, and energy storage solutions. Make the
-                switch to sustainable energy today.
+                {(settingsData as any)?.data?.website?.content?.homepageHero?.subtitle || "Discover our premium collection of solar panels, wind turbines, and energy storage solutions. Make the switch to sustainable energy today."}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/products">
+                <Link href={(settingsData as any)?.data?.website?.content?.homepageHero?.ctaLink || "/products"}>
                   <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100 active:bg-gray-200 relative overflow-hidden group transition-all duration-300">
-                    <span className="relative z-20">Shop Now</span>
+                    <span className="relative z-20">{(settingsData as any)?.data?.website?.content?.homepageHero?.ctaText || "Shop Now"}</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
                   </Button>
                 </Link>
@@ -497,10 +507,10 @@ export default function HomePage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold">Greenbeam</span>
+                <span className="text-2xl font-bold">{(settingsData as any)?.data?.general?.companyName || 'Greenbeam'}</span>
               </div>
               <p className="text-gray-400">
-                Leading provider of sustainable energy solutions for homes and businesses.
+                {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses.'}
               </p>
             </div>
             <div>
@@ -556,7 +566,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Greenbeam. All rights reserved.</p>
+            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || '\u00A9 2024 Greenbeam. All rights reserved.'}</p>
           </div>
         </div>
       </footer>

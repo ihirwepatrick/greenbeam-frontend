@@ -1,9 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Users, Target, Award, Globe, Heart, Clock, TrendingUp, Zap, Shield } from "lucide-react"
+import { useSettings } from "../../hooks/use-api"
 
 const team = [
   {
@@ -110,6 +113,7 @@ const journey = [
 ]
 
 export default function AboutPage() {
+  const { data: settingsData } = useSettings()
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -118,8 +122,15 @@ export default function AboutPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
+                <Image
+                  src="/logo.jpg"
+                  alt="Greenbeam Logo"
+                  width={140}
+                  height={64}
+                  className="h-10 w-auto sm:h-12 object-contain"
+                  priority
+                  sizes="(max-width: 768px) 120px, 160px"
+                />
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -155,10 +166,9 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-[#0a6650] to-[#084c3d] text-white py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">About Greenbeam</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">{(settingsData as any)?.data?.website?.content?.aboutSection?.title || `About ${((settingsData as any)?.data?.general?.companyName || 'Greenbeam')}`}</h1>
           <p className="text-xl mb-8 text-green-100 max-w-3xl mx-auto">
-            We're on a mission to accelerate the world's transition to sustainable energy through innovative
-            renewable energy solutions and exceptional customer service.
+            {(settingsData as any)?.data?.website?.content?.siteDescription || "We're on a mission to accelerate the world's transition to sustainable energy through innovative renewable energy solutions and exceptional customer service."}
           </p>
         </div>
       </section>
@@ -170,9 +180,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
               <p className="text-lg text-gray-600 mb-6">
-                At Greenbeam, we believe that clean, renewable energy should be accessible to everyone. Our mission is to
-                provide high-quality solar panels, wind turbines, and energy storage solutions that help homes and
-                businesses reduce their carbon footprint while saving money on energy costs.
+                {(settingsData as any)?.data?.website?.content?.aboutSection?.content || 'At Greenbeam, we believe that clean, renewable energy should be accessible to everyone. Our mission is to provide high-quality solar panels, wind turbines, and energy storage solutions that help homes and businesses reduce their carbon footprint while saving money on energy costs.'}
               </p>
               <p className="text-lg text-gray-600 mb-8">
                 Founded in 2009, we've been at the forefront of the renewable energy revolution, helping over 10,000
@@ -199,10 +207,14 @@ export default function AboutPage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {(((settingsData as any)?.data?.website?.content?.aboutSection?.stats) || stats).map((stat: any, index: number) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-4">
-                  <stat.icon className="h-12 w-12 text-[#0a6650]" />
+                  {typeof stat.icon === 'function' ? (
+                    <stat.icon className="h-12 w-12 text-[#0a6650]" />
+                  ) : (
+                    <Leaf className="h-12 w-12 text-[#0a6650]" />
+                  )}
                 </div>
                 <div className="text-3xl md:text-4xl font-bold text-[#0a6650] mb-2">{stat.value}</div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -262,35 +274,39 @@ export default function AboutPage() {
       {/* Team */}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Meet Our Team</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="w-32 h-32 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center">
-                    <Users className="h-16 w-16 text-gray-400" />
-                  </div>
-                  <CardTitle className="text-xl">{member.name}</CardTitle>
-                  <Badge variant="secondary" className="bg-[#0a6650]/10 text-[#0a6650]">
-                    {member.role}
-                  </Badge>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600 text-sm mb-4">{member.bio}</p>
-                  <div className="space-y-2 text-sm">
-                    <p className="flex items-center justify-center text-[#0a6650]">
-                      <Users className="h-4 w-4 mr-2" />
-                      {member.email}
-                    </p>
-                    <p className="flex items-center justify-center text-[#0a6650]">
-                      <Shield className="h-4 w-4 mr-2" />
-                      {member.phone}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {(settingsData as any)?.data?.website?.content?.aboutSection?.showTeam !== false && (
+            <>
+              <h2 className="text-3xl font-bold text-center mb-12">Meet Our Team</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {team.map((member, index) => (
+                  <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                      <div className="w-32 h-32 rounded-full bg-gray-200 mx-auto mb-4 flex items-center justify-center">
+                        <Users className="h-16 w-16 text-gray-400" />
+                      </div>
+                      <CardTitle className="text-xl">{member.name}</CardTitle>
+                      <Badge variant="secondary" className="bg-[#0a6650]/10 text-[#0a6650]">
+                        {member.role}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600 text-sm mb-4">{member.bio}</p>
+                      <div className="space-y-2 text-sm">
+                        <p className="flex items-center justify-center text-[#0a6650]">
+                          <Users className="h-4 w-4 mr-2" />
+                          {member.email}
+                        </p>
+                        <p className="flex items-center justify-center text-[#0a6650]">
+                          <Shield className="h-4 w-4 mr-2" />
+                          {member.phone}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -323,10 +339,10 @@ export default function AboutPage() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold">Greenbeam</span>
+                <span className="text-2xl font-bold">{(settingsData as any)?.data?.general?.companyName || 'Greenbeam'}</span>
               </div>
               <p className="text-gray-400">
-                Leading provider of sustainable energy solutions for homes and businesses in Rwanda.
+                {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
               </p>
             </div>
             <div>
@@ -382,7 +398,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Greenbeam. All rights reserved. | Kigali, Rwanda</p>
+            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || '\u00A9 2024 Greenbeam. All rights reserved. | Kigali, Rwanda'}</p>
           </div>
         </div>
       </footer>
