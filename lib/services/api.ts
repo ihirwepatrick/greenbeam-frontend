@@ -34,6 +34,20 @@ import {
   DashboardQueryParams,
   PaginationResponse,
   API_ENDPOINTS,
+  Cart,
+  AddToCartRequest,
+  UpdateCartItemRequest,
+  CartItem,
+  CartQueryParams,
+  Order,
+  CreateOrderRequest,
+  UpdateOrderStatusRequest,
+  OrderQueryParams,
+  Payment,
+  CreatePaymentRequest,
+  ProcessStripePaymentRequest,
+  PaymentQueryParams,
+  RefundPaymentRequest,
 } from '../types/api';
 
 // Authentication Services
@@ -367,6 +381,142 @@ export const notificationService = {
     return apiClient.post<ApiResponse<Notification>>(API_ENDPOINTS.NOTIFICATIONS.BASE, data);
   },
 };
+// Cart Services
+export const cartService = {
+  async getCart(): Promise<ApiResponse<Cart>> {
+    return apiClient.get<ApiResponse<Cart>>(API_ENDPOINTS.CART.BASE);
+  },
+
+  async addToCart(data: AddToCartRequest): Promise<ApiResponse<CartItem>> {
+    return apiClient.post<ApiResponse<CartItem>>(API_ENDPOINTS.CART.ADD, data);
+  },
+
+  async updateCartItem(productId: number, data: UpdateCartItemRequest): Promise<ApiResponse<CartItem>> {
+    return apiClient.put<ApiResponse<CartItem>>(API_ENDPOINTS.CART.UPDATE(productId), data);
+  },
+
+  async removeFromCart(productId: number): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.delete<ApiResponse<{ message: string }>>(API_ENDPOINTS.CART.REMOVE(productId));
+  },
+
+  async clearCart(): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.delete<ApiResponse<{ message: string }>>(API_ENDPOINTS.CART.CLEAR);
+  },
+
+  async getCartCount(): Promise<ApiResponse<{ count: number }>> {
+    return apiClient.get<ApiResponse<{ count: number }>>(API_ENDPOINTS.CART.COUNT);
+  },
+
+  async checkProductInCart(productId: number): Promise<ApiResponse<{ inCart: boolean; quantity?: number }>> {
+    return apiClient.get<ApiResponse<{ inCart: boolean; quantity?: number }>>(API_ENDPOINTS.CART.CHECK(productId));
+  },
+
+  // Admin endpoints
+  async getAllCarts(params?: CartQueryParams): Promise<ApiResponse<PaginationResponse<Cart>>> {
+    return apiClient.get<ApiResponse<PaginationResponse<Cart>>>(API_ENDPOINTS.CART.ADMIN_ALL, params);
+  },
+  async getUserCart(userId: string): Promise<ApiResponse<Cart>> {
+    return apiClient.get<ApiResponse<Cart>>(API_ENDPOINTS.CART.ADMIN_USER(userId));
+  },
+
+  async updateUserCartItem(userId: string, productId: number, data: UpdateCartItemRequest): Promise<ApiResponse<CartItem>> {
+    return apiClient.put<ApiResponse<CartItem>>(API_ENDPOINTS.CART.ADMIN_UPDATE(userId, productId), data);
+  },
+
+  async removeUserCartItem(userId: string, productId: number): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.delete<ApiResponse<{ message: string }>>(API_ENDPOINTS.CART.ADMIN_REMOVE(userId, productId));
+  },
+
+  async clearUserCart(userId: string): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.delete<ApiResponse<{ message: string }>>(API_ENDPOINTS.CART.ADMIN_CLEAR(userId));
+  },
+
+  async getCartStats(): Promise<ApiResponse<any>> {
+    return apiClient.get<ApiResponse<any>>(API_ENDPOINTS.CART.ADMIN_STATS);
+  },
+};
+
+// Order Services
+export const orderService = {
+  async getMyOrders(params?: OrderQueryParams): Promise<ApiResponse<PaginationResponse<Order>>> {
+    return apiClient.get<ApiResponse<PaginationResponse<Order>>>(API_ENDPOINTS.ORDERS.MY_ORDERS, params);
+  },
+
+  async getOrderById(id: string): Promise<ApiResponse<Order>> {
+    return apiClient.get<ApiResponse<Order>>(API_ENDPOINTS.ORDERS.BY_ID(id));
+  },
+
+  async getOrderByNumber(orderNumber: string): Promise<ApiResponse<Order>> {
+    return apiClient.get<ApiResponse<Order>>(API_ENDPOINTS.ORDERS.BY_NUMBER(orderNumber));
+  },
+  async createOrder(data: CreateOrderRequest): Promise<ApiResponse<Order>> {
+    return apiClient.post<ApiResponse<Order>>(API_ENDPOINTS.ORDERS.CREATE, data);
+  },
+
+  async createOrderFromCart(data: CreateOrderRequest): Promise<ApiResponse<Order>> {
+    return apiClient.post<ApiResponse<Order>>(API_ENDPOINTS.ORDERS.CREATE_FROM_CART, data);
+  },
+
+  async cancelOrder(id: string): Promise<ApiResponse<{ message: string }>> {
+    return apiClient.post<ApiResponse<{ message: string }>>(API_ENDPOINTS.ORDERS.CANCEL(id));
+  },
+
+  async getMyOrderStats(): Promise<ApiResponse<any>> {
+    return apiClient.get<ApiResponse<any>>(API_ENDPOINTS.ORDERS.STATS_MY);
+  },
+
+  // Admin endpoints
+  async getAllOrders(params?: OrderQueryParams): Promise<ApiResponse<PaginationResponse<Order>>> {
+    return apiClient.get<ApiResponse<PaginationResponse<Order>>>(API_ENDPOINTS.ORDERS.ADMIN_ALL, params);
+  },
+
+  async updateOrderStatus(id: string, data: UpdateOrderStatusRequest): Promise<ApiResponse<Order>> {
+    return apiClient.put<ApiResponse<Order>>(API_ENDPOINTS.ORDERS.ADMIN_STATUS(id), data);
+  },
+
+  async getOrderStats(): Promise<ApiResponse<any>> {
+    return apiClient.get<ApiResponse<any>>(API_ENDPOINTS.ORDERS.ADMIN_STATS);
+  },
+};
+
+// Payment Services
+export const paymentService = {
+  async getPaymentById(id: string): Promise<ApiResponse<Payment>> {
+    return apiClient.get<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.BY_ID(id));
+  },
+
+  async getPaymentsByOrder(orderId: string): Promise<ApiResponse<Payment[]>> {
+    return apiClient.get<ApiResponse<Payment[]>>(API_ENDPOINTS.PAYMENTS.BY_ORDER(orderId));
+  },
+  async getPaymentByTransaction(transactionId: string): Promise<ApiResponse<Payment>> {
+    return apiClient.get<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.BY_TRANSACTION(transactionId));
+  },
+
+  async createPayment(data: CreatePaymentRequest): Promise<ApiResponse<Payment>> {
+    return apiClient.post<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.CREATE, data);
+  },
+
+  async processStripePayment(data: ProcessStripePaymentRequest): Promise<ApiResponse<Payment>> {
+    return apiClient.post<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.STRIPE_PROCESS, data);
+  },
+
+  // Admin endpoints
+  async getAllPayments(params?: PaymentQueryParams): Promise<ApiResponse<PaginationResponse<Payment>>> {
+    return apiClient.get<ApiResponse<PaginationResponse<Payment>>>(API_ENDPOINTS.PAYMENTS.ADMIN_ALL, params);
+  },
+
+  async updatePaymentStatus(id: string, data: { status: Payment['status']; transactionId?: string }): Promise<ApiResponse<Payment>> {
+    return apiClient.put<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.ADMIN_STATUS(id), data);
+  },
+
+  async processRefund(id: string, data: RefundPaymentRequest): Promise<ApiResponse<Payment>> {
+    return apiClient.post<ApiResponse<Payment>>(API_ENDPOINTS.PAYMENTS.ADMIN_REFUND(id), data);
+  },
+
+  async getPaymentStats(): Promise<ApiResponse<any>> {
+    return apiClient.get<ApiResponse<any>>(API_ENDPOINTS.PAYMENTS.ADMIN_STATS);
+  },
+};
 
 // Export all services
 export const apiService = {
@@ -377,4 +527,7 @@ export const apiService = {
   settings: settingsService,
   upload: uploadService,
   notification: notificationService,
+  cart: cartService,
+  order: orderService,
+  payment: paymentService,
 }; 

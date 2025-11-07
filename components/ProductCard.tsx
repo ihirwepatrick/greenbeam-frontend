@@ -1,13 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { MessageCircle, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 import { Product } from "../lib/types/api"
+import { MessageCircle, Eye, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Check } from "lucide-react"
+import { useCart } from "../contexts/CartContext"
+import { useAuth } from "../contexts/AuthContext"
 
 interface ProductCardProps {
   product: Product
@@ -24,9 +26,28 @@ export default function ProductCard({
 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
+  const [quantity, setQuantity] = useState(1)
+  const [justAdded, setJustAdded] = useState(false)
+  const { addToCart, isInCart, getCartItemQuantity, updateCartItem, loading } = useCart()
+  const { isAuthenticated } = useAuth()
+  
   
   const rating = Number(product.rating) || 0
   const reviews = product.reviews || 0
+  const productId = Number(product.id)
+  const isProductInCart = isInCart(productId)
+  const cartQuantity = getCartItemQuantity(productId)
+
+  // Reset justAdded state after 2 seconds
+  useEffect(() => {
+    if (justAdded) {
+      const timer = setTimeout(() => {
+        setJustAdded(false)
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [justAdded])
+  
   
   // Get all available images (thumbnail + gallery)
   const allImages = [
@@ -58,11 +79,48 @@ export default function ProductCard({
         return 'bg-gray-100 text-gray-800'
     }
   }
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    
+    try {
+      if (isProductInCart) {
+        // Update quantity if already in cart
+        await updateCartItem(productId, { quantity: cartQuantity + quantity })
+      } else {
+        // Add new item to cart with full product data
+        await addToCart({ 
+          productId, 
+          quantity,
+          product: {
+            id: productId,
+            name: product.name,
+            description: product.description,
+            category: product.category,
+            image: product.image,
+            images: product.images,
+            price: '0.00', // Price will be set when product details are loaded
+            createdAt: product.createdAt
+          }
+        } as any)
+      }
+      
+      // Show success state
+      setJustAdded(true)
+    } catch (error) {
+      console.error('Error adding to cart:', error)
+    }
+  }
+
+  const handleQuantityChange = (delta: number) => {
+    setQuantity(Math.max(1, quantity + delta))
+  }
+  const isAvailable = product.status?.toLowerCase() === 'available' || !product.status
 
   const formatStatus = (status?: string) => {
     if (!status) return 'Available'
     return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
   }
+
 
   return (
     <Card 
@@ -182,7 +240,78 @@ export default function ProductCard({
         </div>
 
         {showActions && (
-          <div className="flex items-center justify-between gap-2 mt-4">
+          <div className="space-y-3 mt-4">
+            {/* Cart functionality - Always show for both guest and authenticated users */}
+            <div className="space-y-2">
+              {/* Quantity selector */}
+              <div className="flex items-center justify-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => { e.preventDefault(); handleQuantityChange(-1) }}
+                  disabled={quantity <= 1}
+                  className="h-8 w-8 p-0"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="text-sm font-medium min-w-[2rem] text-center">
+                  {quantity}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => { e.preventDefault(); handleQuantityChange(1) }}
+                  className="h-8 w-8 p-0"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
+              
+              {/* Add to Cart button */}
+              <Button
+                onClick={handleAddToCart}
+                disabled={!isAvailable || loading}
+                size={compact ? "sm" : "default"}
+                className={`w-full transition-all duration-300 ${
+                  justAdded 
+                    ? 'bg-green-600 hover:bg-green-700 scale-105' 
+                    : isProductInCart 
+                      ? 'bg-[#0a6650] hover:bg-[#0a6650]/90' 
+                      : 'bg-[#0a6650] hover:bg-[#0a6650]/90'
+                } text-white`}
+              >
+                <span className="flex items-center">
+                  {justAdded ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      Added!
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      {loading ? 'Adding...' : isProductInCart ? 'Update Cart' : 'Add to Cart'}
+                    </>
+                  )}
+                </span>
+              </Button>
+              
+              {isProductInCart && !justAdded && (
+                <p className="text-xs text-[#0a6650] text-center">
+                  Already in cart ({cartQuantity} items)
+                </p>
+              )}
+              
+              {justAdded && (
+                <p className="text-xs text-green-600 text-center font-medium animate-pulse">
+                  ✓ Successfully added to cart!
+                </p>
+              )}
+              
+
+            </div>
+            
+            {/* Action buttons */}
+            <div className="flex items-center gap-2">
             <Link href={`/products/${product.id}`} className="flex-1">
               <Button 
                 variant="outline" 
@@ -208,6 +337,7 @@ export default function ProductCard({
                 </span>
               </Button>
             )}
+            </div>
           </div>
         )}
       </CardContent>

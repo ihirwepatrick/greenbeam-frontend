@@ -5,7 +5,12 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Users, Target, Award, Globe, Heart, Clock, TrendingUp, Zap, Shield } from "lucide-react"
+import { Leaf, Users, Target, Award, Globe, Heart, Clock, TrendingUp, Zap, Shield, Facebook, Instagram, Linkedin } from "lucide-react"
+const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
+    <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
+  </svg>
+)
 import { useSettings } from "../../hooks/use-api"
 
 const team = [
@@ -155,7 +160,7 @@ export default function AboutPage() {
               </Link>
               <Link href="/admin">
                 <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                  Admin Login
+                  Login
                 </Button>
               </Link>
             </div>
@@ -344,6 +349,22 @@ export default function AboutPage() {
               <p className="text-gray-400">
                 {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
               </p>
+              {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
+                <div className="flex items-center gap-4 mt-6 text-gray-300">
+                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:text-white">
+                    <Facebook className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:text-white">
+                    <XIcon className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:text-white">
+                    <Linkedin className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:text-white">
+                    <Instagram className="h-5 w-5" />
+                  </Link>
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Products</h3>

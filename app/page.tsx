@@ -6,10 +6,17 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, MessageCircle, User, LogOut, Menu, X } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle, User, LogOut, Menu, X, Facebook, Instagram, Linkedin } from "lucide-react"
+const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
+    <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
+  </svg>
+)
 import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
+import CartPreview from "../components/CartPreview"
 import { useAuth } from "../contexts/AuthContext"
+import { useCart } from "../contexts/CartContext"
 import { useProducts, useSettings } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
 import { productService } from "../lib/services/api"
@@ -149,7 +156,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
+      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2 md:space-x-4">
@@ -184,6 +191,9 @@ export default function HomePage() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
+              {/* Cart Preview - Show for all users */}
+              <CartPreview />
+              
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
@@ -195,7 +205,7 @@ export default function HomePage() {
               ) : (
                 <Link href="/admin">
                   <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Admin Login
+                    Login
                   </Button>
                 </Link>
               )}
@@ -251,8 +261,13 @@ export default function HomePage() {
                   Contact
                 </Link>
                 <div className="border-t pt-2 mt-2">
+                  {/* Cart - Show for all users on mobile */}
+                  <div className="px-3 py-2">
+                    <CartPreview />
+                  </div>
+                  
                   {isAuthenticated ? (
-                    <div className="px-3 py-2">
+                    <div className="px-3 py-2 space-y-2">
                       <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
                       <Button 
                         variant="outline" 
@@ -270,7 +285,7 @@ export default function HomePage() {
                       className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Admin Login
+                      Login
                     </Link>
                   )}
                 </div>
@@ -512,6 +527,22 @@ export default function HomePage() {
               <p className="text-gray-400">
                 {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses.'}
               </p>
+              {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
+                <div className="flex items-center gap-4 mt-6 text-gray-300">
+                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:text-white">
+                    <Facebook className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:text-white">
+                    <XIcon className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:text-white">
+                    <Linkedin className="h-5 w-5" />
+                  </Link>
+                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:text-white">
+                    <Instagram className="h-5 w-5" />
+                  </Link>
+                </div>
+              )}
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Products</h3>

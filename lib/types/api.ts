@@ -11,6 +11,74 @@ export interface ApiError {
     message: string;
   };
 }
+export interface DashboardQueryParams {
+  period?: number;
+  limit?: number;
+}
+
+// Cart Types
+export interface CartItem {
+  id: string;
+  productId: number;
+  product: Product;
+  quantity: number;
+  price: string;
+  total: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Cart {
+  id: string;
+  userId: string;
+  items: CartItem[];
+  totalItems: number;
+  subtotal: string;
+  total: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AddToCartRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface UpdateCartItemRequest {
+  quantity: number;
+}
+
+// Order Types
+export interface Address {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+export interface OrderItem {
+  id: string;
+  productId: number;
+  product: Product;
+  quantity: number;
+  price: string;
+  total: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  userId: string;
+  user: User;
+  items: OrderItem[];
+}
+
+
 
 export interface PaginationResponse<T> {
   data: T[];
@@ -319,6 +387,159 @@ export interface DashboardQueryParams {
   limit?: number;
 }
 
+// Cart Types
+export interface CartItem {
+  id: string;
+  productId: number;
+  product: Product;
+  quantity: number;
+  price: string;
+  total: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Cart {
+  id: string;
+  userId: string;
+  items: CartItem[];
+  totalItems: number;
+  subtotal: string;
+  total: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AddToCartRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface UpdateCartItemRequest {
+  quantity: number;
+}
+
+// Order Types
+export interface Address {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+}
+
+export interface OrderItem {
+  id: string;
+  productId: number;
+  product: Product;
+  quantity: number;
+  price: string;
+  total: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  userId: string;
+  user: User;
+  items: OrderItem[];
+  shippingAddress: Address;
+  billingAddress: Address;
+  subtotal: string;
+  shippingCost: string;
+  tax: string;
+  total: string;
+  status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  paymentStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
+  paymentMethod: string;
+  notes?: string;
+  trackingNumber?: string;
+  estimatedDelivery?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateOrderRequest {
+  items?: Array<{
+    productId: number;
+    quantity: number;
+  }>;
+  shippingAddress: Address;
+  billingAddress?: Address;
+  paymentMethod: string;
+  notes?: string;
+}
+
+export interface UpdateOrderStatusRequest {
+  status: Order['status'];
+  trackingNumber?: string;
+  estimatedDelivery?: string;
+}
+
+// Payment Types
+export interface Payment {
+  id: string;
+  orderId: string;
+  order: Order;
+  amount: string;
+  currency: string;
+  paymentMethod: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
+  transactionId?: string;
+  metadata?: Record<string, any>;
+  refundAmount?: string;
+  refundReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePaymentRequest {
+  orderId: string;
+  amount: string;
+  currency: string;
+  paymentMethod: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ProcessStripePaymentRequest {
+  orderId: string;
+  amount: string;
+  currency: string;
+  paymentMethod: string;
+}
+
+export interface RefundPaymentRequest {
+  refundAmount: string;
+  reason: string;
+}
+
+// Cart Query Parameters
+export interface CartQueryParams extends PaginationParams {
+  search?: string;
+}
+
+// Order Query Parameters
+export interface OrderQueryParams extends PaginationParams {
+  status?: Order['status'];
+  paymentStatus?: Payment['status'];
+  search?: string;
+}
+
+// Payment Query Parameters
+export interface PaymentQueryParams extends PaginationParams {
+  status?: Payment['status'];
+  search?: string;
+}
+
+// API Endpoints
+
+// API Endpoints
+
+
 // API Endpoints
 export const API_ENDPOINTS = {
   AUTH: {
@@ -341,6 +562,51 @@ export const API_ENDPOINTS = {
     CATEGORIES: '/products/categories/all',
     RATE: (id: string | number) => `/products/${id}/rate`,
     
+  },
+  
+  CART: {
+    BASE: '/cart',
+    ADD: '/cart/add',
+    UPDATE: (productId: number) => `/cart/update/${productId}`,
+    REMOVE: (productId: number) => `/cart/remove/${productId}`,
+    CLEAR: '/cart/clear',
+    COUNT: '/cart/count',
+    CHECK: (productId: number) => `/cart/check/${productId}`,
+    // Admin endpoints
+    ADMIN_ALL: '/cart/admin/all',
+    ADMIN_USER: (userId: string) => `/cart/admin/user/${userId}`,
+    ADMIN_UPDATE: (userId: string, productId: number) => `/cart/admin/user/${userId}/product/${productId}`,
+    ADMIN_REMOVE: (userId: string, productId: number) => `/cart/admin/user/${userId}/product/${productId}`,
+    ADMIN_CLEAR: (userId: string) => `/cart/admin/user/${userId}/clear`,
+    ADMIN_STATS: '/cart/admin/stats',
+  },
+  ORDERS: {
+    BASE: '/orders',
+    BY_ID: (id: string) => `/orders/${id}`,
+    BY_NUMBER: (orderNumber: string) => `/orders/number/${orderNumber}`,
+    MY_ORDERS: '/orders/my-orders',
+    CREATE_FROM_CART: '/orders/create-from-cart',
+    CREATE: '/orders/create',
+    CANCEL: (id: string) => `/orders/${id}/cancel`,
+    STATS_MY: '/orders/stats/my',
+    // Admin endpoints
+    ADMIN_ALL: '/orders/admin/all',
+    ADMIN_STATUS: (id: string) => `/orders/admin/${id}/status`,
+    ADMIN_STATS: '/orders/admin/stats',
+  },
+  PAYMENTS: {
+    BASE: '/payments',
+    BY_ID: (id: string) => `/payments/${id}`,
+    CREATE: '/payments/create',
+    STRIPE_PROCESS: '/payments/stripe/process',
+    STRIPE_WEBHOOK: '/payments/stripe/webhook',
+    BY_ORDER: (orderId: string) => `/payments/order/${orderId}`,
+    BY_TRANSACTION: (transactionId: string) => `/payments/transaction/${transactionId}`,
+    // Admin endpoints
+    ADMIN_ALL: '/payments/admin/all',
+    ADMIN_STATUS: (id: string) => `/payments/admin/${id}/status`,
+    ADMIN_REFUND: (id: string) => `/payments/admin/${id}/refund`,
+    ADMIN_STATS: '/payments/admin/stats',
   },
   DASHBOARD: {
     STATS: '/dashboard/stats',

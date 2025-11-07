@@ -173,7 +173,7 @@ export default function ProductDetailPage() {
               ) : (
                 <Link href="/admin">
                   <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Admin Login
+                    Login
                   </Button>
                 </Link>
               )}

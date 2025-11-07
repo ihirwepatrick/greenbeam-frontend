@@ -20,7 +20,8 @@ import {
   Menu, 
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ShoppingCart
 } from "lucide-react"
 import ProductCard from "../../components/ProductCard"
 import { useSettings } from "../../hooks/use-api"
@@ -243,7 +244,7 @@ export default function ProductsPage() {
               ) : (
                 <Link href="/admin">
                   <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Admin Login
+                    Login
                   </Button>
                 </Link>
               )}
@@ -318,7 +319,7 @@ export default function ProductsPage() {
                       className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Admin Login
+                      Login
                     </Link>
                   )}
                 </div>

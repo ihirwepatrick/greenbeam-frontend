@@ -3,12 +3,18 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { AuthProvider } from '../contexts/AuthContext'
-import AuthDebug from '../components/AuthDebug'
+
+import { CartProvider } from '../contexts/CartContext'
 
 export const metadata: Metadata = {
   title: 'GreenBeam',
   description: 'GreenBeam is a renewable energy company that provides solar panel installation and maintenance services.',
   generator: 'GreenBeam',
+  icons: {
+    icon: '/logo.jpg',
+    shortcut: '/logo.jpg',
+    apple: '/logo.jpg',
+  },
 }
 
 export default function RootLayout({
@@ -29,8 +35,10 @@ html {
       </head>
       <body>
         <AuthProvider>
-          <AuthDebug />
-          {children}
+        <CartProvider>
+
+            {children}
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

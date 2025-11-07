@@ -8,10 +8,57 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Leaf, Search, Eye, MoreHorizontal, Download, RefreshCw } from "lucide-react"
+import { 
+  Database, 
+  Search, 
+  Eye, 
+  MoreHorizontal, 
+  Download, 
+  RefreshCw,
+  Package,
+  CreditCard,
+  Users,
+  Settings,
+  Home,
+  ShoppingCart,
+  LogOut,
+  DollarSign,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Truck
+} from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import AdminGuard from "../../../components/AdminGuard"
+import { useAuth } from "../../../contexts/AuthContext"
+import { useAllOrders, useOrderStats } from "../../../hooks/use-api"
 
-const orders = [
+const sidebarLinks = [
+	{ name: "Dashboard", href: "/admin", icon: Home },
+	{ name: "Products", href: "/admin/products", icon: Package },
+	{ name: "Enquiries", href: "/admin/enquiries", icon: Users },
+	{ name: "Website", href: "/admin/website", icon: Eye },
+	{ name: "Settings", href: "/admin/settings", icon: Settings },
+	{ name: 'Carts', href: '/admin/carts', icon: ShoppingCart },
+    { name: 'Orders', href: '/admin/orders', icon: CreditCard },
+    { name: 'Payments', href: '/admin/payments', icon: DollarSign },
+]
+
+// Fallback data interface for display
+interface DisplayOrder {
+  id: string;
+  customer: string;
+  email: string;
+  products: string[];
+  total: number;
+  status: string;
+  paymentStatus: string;
+  date: string;
+  shippingAddress: string;
+}
+
+const fallbackOrders: DisplayOrder[] = [
   {
     id: "#3462",
     customer: "John Smith",
@@ -70,11 +117,23 @@ const orders = [
 ]
 
 export default function AdminOrdersPage() {
+  const { logout, user } = useAuth()
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [selectedPaymentStatus, setSelectedPaymentStatus] = useState("all")
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  
+  const { data: ordersData, loading, error } = useAllOrders({
+    search: searchTerm || undefined,
+    status: selectedStatus !== 'all' ? selectedStatus : undefined,
+    page,
+    limit
+  })
+  
+  const { data: statsData } = useOrderStats()
 
-  const filteredOrders = orders.filter((order) => {
+  const filteredOrders = fallbackOrders.filter((order: DisplayOrder) => {
     const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,41 +169,106 @@ export default function AdminOrdersPage() {
     return <Badge variant={config.variant}>{config.label}</Badge>
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation */}
-      <nav className="bg-white border-b">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/admin" className="flex items-center space-x-2">
-                <Leaf className="h-8 w-8 text-green-600" />
-                <span className="text-2xl font-bold text-green-600">Greenbeam</span>
-              </Link>
-              <Badge variant="secondary">Admin</Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-              <Button variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
+  const ordersToShow = ordersData?.data || fallbackOrders
+  const pagination = ordersData?.pagination
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-            <p className="text-gray-600">Manage and track customer orders</p>
+  // Helper function to get display data from order
+  const getOrderDisplayData = (order: any) => {
+    if ('customer' in order) {
+      // It's a DisplayOrder (fallback data)
+      return order as DisplayOrder
+    } else {
+      // It's an actual Order from API
+      return {
+        id: order.orderNumber || order.id,
+        customer: order.user?.name || 'N/A',
+        email: order.user?.email || 'N/A',
+        products: order.items?.map((item: any) => item.product?.name || 'Unknown') || [],
+        total: typeof order.total === 'string' ? parseFloat(order.total) : order.total || 0,
+        status: order.status || 'unknown',
+        paymentStatus: order.paymentStatus || 'unknown',
+        date: order.createdAt || order.updatedAt || new Date().toISOString(),
+        shippingAddress: order.shippingAddress ? 
+          `${order.shippingAddress.address}, ${order.shippingAddress.city}, ${order.shippingAddress.state}` 
+          : 'N/A'
+      }
+    }
+  }
+
+  return (
+    <AdminGuard>
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Sidebar - Fixed */}
+        <div className="w-64 bg-white border-r shadow-sm flex flex-col h-screen">
+          <div className="p-6">
+            <Link href="/admin" className="flex items-center space-x-2">
+              <Database className="h-8 w-8 text-[#0a6650]" />
+              <span className="text-xl font-bold text-[#0a6650]">Admin Portal</span>
+              <Badge variant="secondary" className="ml-2">v2.1</Badge>
+            </Link>
+          </div>
+          
+          <nav className="flex-1 px-4">
+            <div className="space-y-2">
+              {sidebarLinks.map((link) => {
+                const Icon = link.icon
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      link.href === "/admin/orders" 
+                        ? "bg-[#0a6650] text-white" 
+                        : "text-gray-700 hover:bg-gray-100 hover:text-[#0a6650]"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{link.name}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </nav>
+
+          <div className="p-4 border-t">
+            <Link href="/">
+              <Button variant="outline" className="w-full justify-start mb-2">
+                <Eye className="h-4 w-4 mr-2" />
+                View Website
+              </Button>
+            </Link>
+            <Button variant="outline" className="w-full justify-start" onClick={() => logout()}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
           </div>
         </div>
+
+        {/* Main Content - Scrollable */}
+        <div className="flex-1 flex flex-col h-screen">
+          {/* Top Navigation - Fixed */}
+          <nav className="bg-white border-b shadow-sm">
+            <div className="px-8 py-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
+                  <p className="text-gray-600">Manage and track customer orders</p>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                  <Button onClick={() => window.location.reload()}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </nav>
+
+          <div className="flex-1 overflow-y-auto p-8">
 
         {/* Filters */}
         <Card className="mb-6">
@@ -208,28 +332,39 @@ export default function AdminOrdersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-mono font-medium">{order.id}</TableCell>
+                {ordersToShow.filter((order) => {
+                  const displayData = getOrderDisplayData(order)
+                  const matchesSearch = searchTerm === "" ||
+                    displayData.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    displayData.customer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    displayData.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                  const matchesStatus = selectedStatus === "all" || displayData.status === selectedStatus
+                  const matchesPaymentStatus = selectedPaymentStatus === "all" || displayData.paymentStatus === selectedPaymentStatus
+                  return matchesSearch && matchesStatus && matchesPaymentStatus
+                }).map((order) => {
+                  const displayData = getOrderDisplayData(order)
+                  return (
+                  <TableRow key={displayData.id}>
+                    <TableCell className="font-mono font-medium">{displayData.id}</TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium">{order.customer}</p>
-                        <p className="text-sm text-gray-600">{order.email}</p>
+                        <p className="font-medium">{displayData.customer}</p>
+                        <p className="text-sm text-gray-600">{displayData.email}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="max-w-xs">
-                        {order.products.map((product, index) => (
+                        {displayData.products.map((product: string, index: number) => (
                           <p key={index} className="text-sm truncate">
                             {product}
                           </p>
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">${order.total.toFixed(2)}</TableCell>
-                    <TableCell>{getStatusBadge(order.status)}</TableCell>
-                    <TableCell>{getPaymentStatusBadge(order.paymentStatus)}</TableCell>
-                    <TableCell className="text-sm text-gray-600">{order.date}</TableCell>
+                    <TableCell className="font-medium">${displayData.total.toFixed(2)}</TableCell>
+                    <TableCell>{getStatusBadge(displayData.status)}</TableCell>
+                    <TableCell>{getPaymentStatusBadge(displayData.paymentStatus)}</TableCell>
+                    <TableCell className="text-sm text-gray-600">{displayData.date}</TableCell>
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -249,11 +384,21 @@ export default function AdminOrdersPage() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
+                  )
+                })}
               </TableBody>
             </Table>
 
-            {filteredOrders.length === 0 && (
+            {ordersToShow.filter((order) => {
+              const displayData = getOrderDisplayData(order)
+              const matchesSearch = searchTerm === "" ||
+                displayData.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                displayData.customer?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                displayData.email?.toLowerCase().includes(searchTerm.toLowerCase())
+              const matchesStatus = selectedStatus === "all" || displayData.status === selectedStatus
+              const matchesPaymentStatus = selectedPaymentStatus === "all" || displayData.paymentStatus === selectedPaymentStatus
+              return matchesSearch && matchesStatus && matchesPaymentStatus
+            }).length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">No orders found matching your criteria.</p>
                 <Button
@@ -271,7 +416,9 @@ export default function AdminOrdersPage() {
             )}
           </CardContent>
         </Card>
+          </div>
+        </div>
       </div>
-    </div>
+    </AdminGuard>
   )
 }

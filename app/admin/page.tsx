@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangle, Home, LogOut, Bell } from "lucide-react"
+import { Database, Package, Plus, Users, Eye, Settings, TrendingUp, AlertTriangle, Home, LogOut, Bell, CreditCard, ShoppingCart, DollarSign } from "lucide-react"
 import NotificationSystem from "../components/NotificationSystem"
 import { useAuth } from "../../contexts/AuthContext"
 import { useDashboardStats, useEnquiries } from "../../hooks/use-api"
@@ -15,9 +15,11 @@ const sidebarLinks = [
 	{ name: "Dashboard", href: "/admin", icon: Home },
 	{ name: "Products", href: "/admin/products", icon: Package },
 	{ name: "Enquiries", href: "/admin/enquiries", icon: Users },
-	// { name: "Orders", href: "/admin/orders", icon: Package },
 	{ name: "Website", href: "/admin/website", icon: Eye },
 	{ name: "Settings", href: "/admin/settings", icon: Settings },
+	{ name: 'Carts', href: '/admin/carts', icon: ShoppingCart },
+    { name: 'Orders', href: '/admin/orders', icon: CreditCard },
+    { name: 'Payments', href: '/admin/payments', icon: DollarSign },
 ]
 
 export default function AdminDashboard() {

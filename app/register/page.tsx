@@ -83,7 +83,7 @@ export default function RegisterPage() {
             <div className="text-center text-sm">
               Already have an account?{" "}
               <Link href="/admin" className="text-green-600 hover:underline">
-                Already have an account? Admin Login
+                Already have an account? Login
               </Link>
             </div>
           </CardContent>
