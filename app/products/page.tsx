@@ -242,7 +242,7 @@ export default function ProductsPage() {
                   </Button>
                 </div>
               ) : (
-                <Link href="/admin">
+                <Link href="/login">
                   <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
                     Login
                   </Button>
@@ -315,7 +315,7 @@ export default function ProductsPage() {
                     </div>
                   ) : (
                     <Link 
-                      href="/admin" 
+                      href="/login" 
                       className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
