@@ -1,4 +1,7 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://greenbeam-backend.onrender.com/api/v1';
+// Production: env only. Development: fallback so local runs without .env
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "https://api.greenbeam.online/api/v1");
 
 class ApiClient {
   private baseURL: string;

@@ -1,6 +1,11 @@
+// Dev-only fallback so local runs without .env; production always uses env
+const getApiBaseUrl = () =>
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "https://api.greenbeam.online/api/v1");
+
 export const config = {
   api: {
-    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://greenbeam-backend.onrender.com/api/v1',
+    baseUrl: getApiBaseUrl(),
     timeout: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '30000'),
     retryAttempts: parseInt(process.env.NEXT_PUBLIC_API_RETRY_ATTEMPTS || '3'),
     retryDelay: parseInt(process.env.NEXT_PUBLIC_API_RETRY_DELAY || '1000'),
@@ -62,7 +67,7 @@ export const getConfig = (): Config => {
       ...config,
       api: {
         ...config.api,
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://greenbeam-backend.onrender.com/api/v1',
+        baseUrl: getApiBaseUrl(),
       },
     };
   }
@@ -72,7 +77,7 @@ export const getConfig = (): Config => {
       ...config,
       api: {
         ...config.api,
-        baseUrl: process.env.NEXT_PUBLIC_API_URL || 'https://api.greenbeam.com/api/v1',
+        baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "",
       },
       features: {
         ...config.features,
