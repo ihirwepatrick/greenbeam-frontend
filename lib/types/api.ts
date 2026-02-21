@@ -96,6 +96,7 @@ export interface User {
   email: string;
   name: string;
   role: string;
+  phone?: string;
 }
 
 export interface AuthResponse {
@@ -132,6 +133,11 @@ export interface Enquiry {
   createdAt: string;
   updatedAt?: string;
   responses?: EnquiryResponse[];
+  product?: string;
+  productId?: string | number;
+  productImage?: string;
+  phone?: string;
+  priority?: string;
 }
 
 export interface EnquiryResponse {
@@ -145,6 +151,8 @@ export interface CreateEnquiryRequest {
   email: string;
   phone?: string;
   product?: string;
+  productId?: string | number;
+  productImage?: string;
   subject: string;
   message: string;
   priority?: 'LOW' | 'MEDIUM' | 'HIGH';
@@ -170,6 +178,8 @@ export interface Product {
   images: string[] | null;
   features?: string[];
   specifications?: any;
+  price?: string | number;
+  sku?: string;
   status?: string;
   rating?: number | string;
   reviews?: number;
@@ -456,6 +466,7 @@ export interface Order {
   status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
   paymentStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' | 'CANCELLED' | 'REFUNDED';
   paymentMethod: string;
+  payment?: { transactionId?: string };
   notes?: string;
   trackingNumber?: string;
   estimatedDelivery?: string;

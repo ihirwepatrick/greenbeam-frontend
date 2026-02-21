@@ -80,6 +80,8 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
         email: formData.email.trim(),
         phone: formData.phone.trim() || undefined,
         product: product?.name || undefined,
+        productId: product?.id != null ? String(product.id) : undefined,
+        productImage: (product as any)?.image || undefined,
         subject: formData.subject.trim(),
         message: formData.message.trim(),
         priority: formData.priority

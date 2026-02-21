@@ -10,11 +10,14 @@ import { Separator } from "@/components/ui/separator"
 import { ShoppingCart, X, Plus, Minus, Trash2, ArrowRight, CreditCard } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
 import { useAuth } from "../contexts/AuthContext"
+import { useCurrency } from "../contexts/CurrencyContext"
+import { formatPrice } from "../lib/utils"
 
 export default function CartPreview() {
   const [isOpen, setIsOpen] = useState(false)
   const { cart, getCartCount, updateCartItem, removeFromCart, clearCart, loading } = useCart()
   const { isAuthenticated } = useAuth()
+  const { currency } = useCurrency()
 
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -151,7 +154,7 @@ export default function CartPreview() {
                             {item.product.name}
                           </h4>
                           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-                            ${parseFloat(item.price).toFixed(2)} each
+                            {formatPrice(item.price, currency)} each
                           </p>
                           
                           {/* Quantity Controls */}
@@ -183,7 +186,7 @@ export default function CartPreview() {
                         {/* Price and Remove */}
                         <div className="flex flex-col items-end space-y-2">
                           <span className="font-semibold text-[#0a6650] text-sm sm:text-base">
-                            ${parseFloat(item.total).toFixed(2)}
+                            {formatPrice(item.total, currency)}
                           </span>
                           <Button
                             variant="ghost"

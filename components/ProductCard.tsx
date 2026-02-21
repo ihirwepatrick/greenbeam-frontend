@@ -10,6 +10,8 @@ import { Product } from "../lib/types/api"
 import { MessageCircle, Eye, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Check } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
 import { useAuth } from "../contexts/AuthContext"
+import { useCurrency } from "../contexts/CurrencyContext"
+import { formatPrice } from "../lib/utils"
 
 interface ProductCardProps {
   product: Product
@@ -30,6 +32,8 @@ export default function ProductCard({
   const [justAdded, setJustAdded] = useState(false)
   const { addToCart, isInCart, getCartItemQuantity, updateCartItem, loading } = useCart()
   const { isAuthenticated } = useAuth()
+  const { currency } = useCurrency()
+  const priceStr = product.price != null ? String(product.price) : "0"
   
   
   const rating = Number(product.rating) || 0
@@ -98,7 +102,7 @@ export default function ProductCard({
             category: product.category,
             image: product.image,
             images: product.images,
-            price: '0.00', // Price will be set when product details are loaded
+            price: priceStr,
             createdAt: product.createdAt
           }
         } as any)
@@ -215,6 +219,10 @@ export default function ProductCard({
           
           <p className={`text-gray-600 ${compact ? 'text-xs' : 'text-sm'} mb-3 line-clamp-2 transition-colors duration-200 group-hover:text-gray-800`}>
             {product.description}
+          </p>
+
+          <p className={`font-semibold text-[#0a6650] ${compact ? 'text-sm' : 'text-lg'} mb-3`}>
+            {formatPrice(priceStr, currency)}
           </p>
 
           {product.features && product.features.length > 0 && (

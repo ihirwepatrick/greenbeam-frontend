@@ -24,6 +24,7 @@ import {
   ShoppingCart
 } from "lucide-react"
 import ProductCard from "../../components/ProductCard"
+import CurrencySwitcher from "../../components/CurrencySwitcher"
 import { useSettings } from "../../hooks/use-api"
 import { useAuth } from "../../contexts/AuthContext"
 import { useProducts } from "../../hooks/use-api"
@@ -233,6 +234,7 @@ export default function ProductsPage() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
+              <CurrencySwitcher />
               {isAuthenticated ? (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-700">Welcome, {user?.name}</span>

@@ -23,6 +23,8 @@ import {
 } from 'lucide-react'
 import { useOrder } from '../../../hooks/use-api'
 import { Order } from '../../../lib/types/api'
+import { useCurrency } from '../../../contexts/CurrencyContext'
+import { formatPrice } from '../../../lib/utils'
 
 export default function OrderDetailsPage() {
   const params = useParams()
@@ -103,12 +105,8 @@ export default function OrderDetailsPage() {
     })
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
-  }
+  const { currency } = useCurrency()
+  const formatAmount = (amount: string | number) => formatPrice(String(amount), currency)
 
   if (loading) {
     return (
@@ -198,12 +196,12 @@ export default function OrderDetailsPage() {
                     </div>
                     <div className="flex-1">
                       <h4 className="font-semibold">{item.product.name}</h4>
-                      <p className="text-sm text-gray-600">SKU: {item.product.sku}</p>
+                      <p className="text-sm text-gray-600">SKU: {item.product.sku ?? '—'}</p>
                       <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">{formatCurrency(item.price)}</p>
-                      <p className="text-sm text-gray-600">Total: {formatCurrency(item.total)}</p>
+                      <p className="font-semibold">{formatAmount(item.price)}</p>
+                      <p className="text-sm text-gray-600">Total: {formatAmount(item.total)}</p>
                     </div>
                   </div>
                 ))}
@@ -223,20 +221,20 @@ export default function OrderDetailsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span>{formatCurrency(order.subtotal)}</span>
+                  <span>{formatAmount(order.subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span>{formatCurrency(order.shippingCost)}</span>
+                  <span>{formatAmount(order.shippingCost)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
-                  <span>{formatCurrency(order.tax)}</span>
+                  <span>{formatAmount(order.tax)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>{formatCurrency(order.total)}</span>
+                  <span>{formatAmount(order.total)}</span>
                 </div>
               </div>
             </CardContent>

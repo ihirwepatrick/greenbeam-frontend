@@ -3,8 +3,8 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { AuthProvider } from '../contexts/AuthContext'
-
 import { CartProvider } from '../contexts/CartContext'
+import { CurrencyProvider } from '../contexts/CurrencyContext'
 
 export const metadata: Metadata = {
   title: 'GreenBeam',
@@ -35,10 +35,11 @@ html {
       </head>
       <body>
         <AuthProvider>
-        <CartProvider>
-
-            {children}
-          </CartProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              {children}
+            </CartProvider>
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

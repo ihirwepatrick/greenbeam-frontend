@@ -113,6 +113,11 @@ export const enquiryService = {
       createdAt: e.createdAt,
       updatedAt: e.updatedAt,
       responses: e.responses,
+      product: e.product,
+      productId: e.productId,
+      productImage: e.productImage,
+      phone: e.phone,
+      priority: e.priority,
     }));
 
     const mapped: ApiResponse<PaginationResponse<Enquiry>> = {
@@ -157,6 +162,11 @@ export const enquiryService = {
         createdAt: e.createdAt,
         updatedAt: e.updatedAt,
         responses: e.responses,
+        product: e.product,
+        productId: e.productId,
+        productImage: e.productImage,
+        phone: e.phone,
+        priority: e.priority,
       },
     };
     return mapped;

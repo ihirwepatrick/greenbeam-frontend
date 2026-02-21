@@ -15,6 +15,7 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import CartPreview from "../components/CartPreview"
+import CurrencySwitcher from "../components/CurrencySwitcher"
 import { useAuth } from "../contexts/AuthContext"
 import { useCart } from "../contexts/CartContext"
 import { useProducts, useSettings } from "../hooks/use-api"
@@ -191,6 +192,7 @@ export default function HomePage() {
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
+              <CurrencySwitcher />
               {/* Cart Preview - Show for all users */}
               <CartPreview />
               

@@ -21,12 +21,15 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useCurrency } from '../../contexts/CurrencyContext'
 import { useProducts } from '../../hooks/use-api'
 import { CartItem } from '../../lib/types/api'
+import { formatPrice } from '../../lib/utils'
 
 export default function CartPage() {
   const { cart, loading, error, updateCartItem, removeFromCart, clearCart } = useCart()
   const { isAuthenticated } = useAuth()
+  const { currency } = useCurrency()
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set())
 
   const handleQuantityChange = async (item: CartItem, delta: number) => {
@@ -165,7 +168,7 @@ export default function CartPage() {
                         {item.product.category}
                       </Badge>
                       <span className="text-sm text-gray-500 ml-2">
-                        ${item.price} each
+                        {formatPrice(item.price, currency)} each
                       </span>
                     </div>
                   </div>
@@ -197,7 +200,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className="font-semibold text-lg">${item.total}</p>
+                    <p className="font-semibold text-lg">{formatPrice(item.total, currency)}</p>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -224,7 +227,7 @@ export default function CartPage() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Subtotal ({cart.totalItems} items)</span>
-                  <span>${cart.subtotal}</span>
+                  <span>{formatPrice(cart.subtotal, currency)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
@@ -232,12 +235,12 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
-                  <span>$0.00</span>
+                  <span>{formatPrice("0", currency)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total</span>
-                  <span>${cart.total}</span>
+                  <span>{formatPrice(cart.total, currency)}</span>
                 </div>
               </div>
 

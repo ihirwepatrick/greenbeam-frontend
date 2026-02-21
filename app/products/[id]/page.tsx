@@ -14,11 +14,14 @@ import { productService } from "../../../lib/services/api"
 import EnquiryForm from "../../components/EnquiryForm"
 import { Product } from "../../../lib/types/api"
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
+import { useCurrency } from "../../../contexts/CurrencyContext"
+import { formatPrice } from "../../../lib/utils"
 
 export default function ProductDetailPage() {
   const routeParams = useParams<{ id: string }>()
   const id = routeParams?.id as string
   const { user, isAuthenticated, logout } = useAuth()
+  const { currency } = useCurrency()
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
   const [userRating, setUserRating] = useState<number>(0)
   const [submittingRating, setSubmittingRating] = useState<boolean>(false)
@@ -27,6 +30,7 @@ export default function ProductDetailPage() {
   const [showRatingSuccess, setShowRatingSuccess] = useState<boolean>(false)
   
   const { data: product, loading, error } = useProduct(id)
+  const priceStr = product ? (product.price != null ? String(product.price) : "0") : "0"
 
   const handleEnquireNow = () => {
     setShowEnquiryForm(true)
@@ -270,6 +274,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
+              <p className="text-2xl font-semibold text-[#0a6650]">{formatPrice(priceStr, currency)}</p>
             </div>
 
             <div className="mb-6">

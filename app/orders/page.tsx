@@ -24,12 +24,15 @@ import {
 import { useMyOrders, useMyOrderStats } from '../../hooks/use-api'
 import { Order } from '../../lib/types/api'
 import Link from 'next/link'
+import { useCurrency } from '../../contexts/CurrencyContext'
+import { formatPrice } from '../../lib/utils'
 
 export default function OrdersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
+  const { currency } = useCurrency()
   
   const { data: ordersData, loading, error } = useMyOrders({
     search: searchTerm || undefined,
@@ -260,13 +263,13 @@ export default function OrdersPage() {
                             <div>
                               <p className="font-medium">{item.product.name}</p>
                               <p className="text-sm text-gray-500">
-                                ${item.price} each
+                                {formatPrice(item.price, currency)} each
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
                             <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                            <p className="font-semibold">${item.total}</p>
+                            <p className="font-semibold">{formatPrice(item.total, currency)}</p>
                           </div>
                         </div>
                       ))}

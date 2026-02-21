@@ -23,12 +23,15 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useCurrency } from '../../contexts/CurrencyContext'
 import { useCreateOrderFromCart } from '../../hooks/use-api'
+import { formatPrice } from '../../lib/utils'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { cart, clearCart } = useCart()
   const { user, isAuthenticated } = useAuth()
+  const { currency } = useCurrency()
   
   const [formData, setFormData] = useState({
     // Shipping Information
@@ -448,7 +451,7 @@ export default function CheckoutPage() {
                           <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                         </div>
                       </div>
-                      <p className="font-semibold">${(parseFloat(item.price) * item.quantity).toFixed(2)}</p>
+                      <p className="font-semibold">{formatPrice(String(parseFloat(item.price) * item.quantity), currency)}</p>
                     </div>
                   ))}
                 </div>
@@ -459,20 +462,20 @@ export default function CheckoutPage() {
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span>${calculateSubtotal().toFixed(2)}</span>
+                    <span>{formatPrice(String(calculateSubtotal()), currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span>{calculateShipping() === 0 ? 'Free' : `$${calculateShipping().toFixed(2)}`}</span>
+                    <span>{calculateShipping() === 0 ? 'Free' : formatPrice(String(calculateShipping()), currency)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>${calculateTax().toFixed(2)}</span>
+                    <span>{formatPrice(String(calculateTax()), currency)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span>${calculateTotal().toFixed(2)}</span>
+                    <span>{formatPrice(String(calculateTotal()), currency)}</span>
                   </div>
                 </div>
 
@@ -541,7 +544,7 @@ export default function CheckoutPage() {
                     ) : (
                       <>
                         <Lock className="h-4 w-4 mr-2" />
-                        Complete Purchase (${calculateTotal().toFixed(2)})
+                        Complete Purchase ({formatPrice(String(calculateTotal()), currency)})
                       </>
                     )}
                   </Button>
