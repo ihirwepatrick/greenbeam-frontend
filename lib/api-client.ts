@@ -1,7 +1,7 @@
-// Production: env only. Development: fallback so local runs without .env
+// Production: use env. Development: use env or /api/v1 (Next proxy) to avoid CORS
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "https://api.greenbeam.online/api/v1");
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "/api/v1");
 
 class ApiClient {
   private baseURL: string;

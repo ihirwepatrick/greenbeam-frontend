@@ -1,7 +1,7 @@
-// Dev-only fallback so local runs without .env; production always uses env
+// Production: use env. Development: use env or proxy path to avoid CORS (Next rewrites /api/v1 to the API)
 const getApiBaseUrl = () =>
-  process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "https://api.greenbeam.online/api/v1");
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === "production" ? "" : "/api/v1");
 
 export const config = {
   api: {
