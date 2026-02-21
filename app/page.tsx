@@ -6,7 +6,8 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Zap, Shield, Truck, MessageCircle, User, LogOut, Menu, X, Facebook, Instagram, Linkedin } from "lucide-react"
+import { Leaf, Zap, Shield, Truck, MessageCircle, User, Menu, X, Facebook, Instagram, Linkedin } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
     <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
@@ -16,7 +17,6 @@ import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import CartPreview from "../components/CartPreview"
 import CurrencySwitcher from "../components/CurrencySwitcher"
-import { useAuth } from "../contexts/AuthContext"
 import { useCart } from "../contexts/CartContext"
 import { useProducts, useSettings } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
@@ -26,8 +26,6 @@ export default function HomePage() {
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  
-  const { user, isAuthenticated, logout } = useAuth()
   
   // Full settings (contains general and website)
   const { data: settingsData } = useSettings()
@@ -118,23 +116,13 @@ export default function HomePage() {
     ).length
   }
 
-  // Fallback categories if API fails or returns empty
-  const fallbackCategories = [
-    { name: "Solar Panels", icon: "☀️", count: 0 },
-    { name: "Wind Energy", icon: "💨", count: 0 },
-    { name: "Energy Storage", icon: "🔋", count: 0 },
-    { name: "Inverters", icon: "⚡", count: 0 },
-    { name: "Monitoring", icon: "📊", count: 0 },
-    { name: "Accessories", icon: "🔧", count: 0 },
-  ]
+  const categories = categoryNames.map((name: string) => ({
+    name,
+    icon: getCategoryIcon(name),
+    count: getCategoryProductCount(name),
+  }))
 
-  const categories = categoryNames.length > 0 
-    ? categoryNames.map((name: string) => ({ 
-        name, 
-        icon: getCategoryIcon(name), 
-        count: getCategoryProductCount(name) 
-      }))
-    : fallbackCategories
+  const CATEGORY_SKELETON_COUNT = 6
 
   const handleEnquireNow = (product: Product) => {
     setSelectedProduct(product)
@@ -144,10 +132,6 @@ export default function HomePage() {
   const closeEnquiryForm = () => {
     setShowEnquiryForm(false)
     setSelectedProduct(null)
-  }
-
-  const handleLogout = async () => {
-    await logout()
   }
 
   const toggleMobileMenu = () => {
@@ -193,24 +177,7 @@ export default function HomePage() {
             
             <div className="hidden md:flex items-center space-x-4">
               <CurrencySwitcher />
-              {/* Cart Preview - Show for all users */}
               <CartPreview />
-              
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Login
-                  </Button>
-                </Link>
-              )}
             </div>
 
             {/* Mobile menu button */}
@@ -263,33 +230,9 @@ export default function HomePage() {
                   Contact
                 </Link>
                 <div className="border-t pt-2 mt-2">
-                  {/* Cart - Show for all users on mobile */}
                   <div className="px-3 py-2">
                     <CartPreview />
                   </div>
-                  
-                  {isAuthenticated ? (
-                    <div className="px-3 py-2 space-y-2">
-                      <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleLogout}
-                        className="w-full mt-2"
-                      >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  ) : (
-                    <Link 
-                      href="/login" 
-                      className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                  )}
                 </div>
               </div>
             </div>
@@ -375,45 +318,20 @@ export default function HomePage() {
           </div>
           
           {categoriesLoadingState && !categoriesErrorState ? (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
+              {Array.from({ length: CATEGORY_SKELETON_COUNT }).map((_, index) => (
+                <Card key={index} className="h-full border-0 bg-white/80">
+                  <CardContent className="p-6 text-center h-full flex flex-col justify-center">
+                    <Skeleton className="w-14 h-14 rounded-full mx-auto mb-4" />
+                    <Skeleton className="h-5 w-24 mx-auto mb-2" />
+                    <Skeleton className="h-4 w-16 mx-auto" />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : categoriesErrorState ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">Unable to load categories. Showing default categories.</p>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-                {fallbackCategories.map((category: any, index: number) => (
-                  <Link 
-                    key={index} 
-                    href={`/products?category=${encodeURIComponent(category.name)}`}
-                    className="group"
-                  >
-                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer border-0 bg-white/80 backdrop-blur-sm hover:bg-white hover:scale-105 hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-green-200/50">
-                      <CardContent className="p-6 text-center h-full flex flex-col justify-center">
-                        <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                          {category.icon}
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2 text-sm lg:text-base group-hover:text-green-700 transition-colors duration-300">
-                          {category.name}
-                        </h3>
-                        <div className="flex items-center justify-center space-x-1">
-                          <span className="text-xs text-gray-500 group-hover:text-green-600 transition-colors duration-300">
-                            {category.count}
-                          </span>
-                          <span className="text-xs text-gray-400 group-hover:text-green-500 transition-colors duration-300">
-                            products
-                          </span>
-                        </div>
-                        
-                        {/* Hover indicator */}
-                        <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-8 h-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-full mx-auto"></div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
-              </div>
+              <p className="text-gray-600 mb-4">Unable to load categories. Please try again later.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">

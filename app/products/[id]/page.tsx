@@ -7,8 +7,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Star, ArrowLeft, MessageCircle, User, LogOut, Heart, Share2, CheckCircle2 } from "lucide-react"
-import { useAuth } from "../../../contexts/AuthContext"
+import { Leaf, Star, ArrowLeft, MessageCircle, User, Heart, Share2, CheckCircle2 } from "lucide-react"
 import { useProduct } from "../../../hooks/use-api"
 import { productService } from "../../../lib/services/api"
 import EnquiryForm from "../../components/EnquiryForm"
@@ -20,7 +19,6 @@ import { formatPrice } from "../../../lib/utils"
 export default function ProductDetailPage() {
   const routeParams = useParams<{ id: string }>()
   const id = routeParams?.id as string
-  const { user, isAuthenticated, logout } = useAuth()
   const { currency } = useCurrency()
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
   const [userRating, setUserRating] = useState<number>(0)
@@ -38,10 +36,6 @@ export default function ProductDetailPage() {
 
   const closeEnquiryForm = () => {
     setShowEnquiryForm(false)
-  }
-
-  const handleLogout = async () => {
-    await logout()
   }
 
   // Sync rating state when product loads
@@ -164,23 +158,6 @@ export default function ProductDetailPage() {
               <Link href="/contact" className="text-gray-700 hover:text-[#0a6650]">
                 Contact
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Login
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
         </div>

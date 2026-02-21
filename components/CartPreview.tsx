@@ -9,14 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { ShoppingCart, X, Plus, Minus, Trash2, ArrowRight, CreditCard } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
-import { useAuth } from "../contexts/AuthContext"
 import { useCurrency } from "../contexts/CurrencyContext"
 import { formatPrice } from "../lib/utils"
 
 export default function CartPreview() {
   const [isOpen, setIsOpen] = useState(false)
   const { cart, getCartCount, updateCartItem, removeFromCart, clearCart, loading } = useCart()
-  const { isAuthenticated } = useAuth()
   const { currency } = useCurrency()
 
   // Prevent body scroll when modal is open

@@ -11,7 +11,6 @@ import { X, Send, CheckCircle, AlertCircle, Phone, Mail, MapPin, Star } from "lu
 import Image from "next/image"
 import { Product } from "../../lib/types/api"
 import { enquiryService } from "../../lib/services/api"
-import { useAuth } from "../../contexts/AuthContext"
 
 interface EnquiryFormProps {
   isOpen: boolean
@@ -20,12 +19,10 @@ interface EnquiryFormProps {
 }
 
 export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormProps) {
-  const { user, isAuthenticated } = useAuth()
-  
   const [formData, setFormData] = useState({
-    firstName: user?.name?.split(' ')[0] || "",
-    lastName: user?.name?.split(' ').slice(1).join(' ') || "",
-    email: user?.email || "",
+    firstName: "",
+    lastName: "",
+    email: "",
     phone: "",
     subject: product ? `Enquiry about ${product.name}` : "",
     message: product ? `Hi, I'm interested in learning more about ${product.name}. Could you please provide more information about:\n\n- Pricing and availability\n- Technical specifications\n- Warranty details\n- Installation requirements\n\nThank you!` : "",

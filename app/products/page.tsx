@@ -14,7 +14,6 @@ import {
   Truck, 
   MessageCircle, 
   User, 
-  LogOut, 
   Search, 
   Filter, 
   Menu, 
@@ -26,7 +25,6 @@ import {
 import ProductCard from "../../components/ProductCard"
 import CurrencySwitcher from "../../components/CurrencySwitcher"
 import { useSettings } from "../../hooks/use-api"
-import { useAuth } from "../../contexts/AuthContext"
 import { useProducts } from "../../hooks/use-api"
 import { productService } from "../../lib/services/api"
 import { Product } from "../../lib/types/api"
@@ -38,21 +36,34 @@ export default function ProductsPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
   
-  const { user, isAuthenticated, logout } = useAuth()
-  
   // Full settings for branding
   const { data: settingsData } = useSettings()
-  
-  // Get URL parameters for initial state
-  const [searchParams, setSearchParams] = useState<URLSearchParams>(new URLSearchParams())
-  
-  // Initialize filters from URL params
+
   const [filters, setFilters] = useState({
-    search: searchParams.get('search') || '',
-    category: searchParams.get('category') || '',
+    search: '',
+    category: '',
     sortBy: 'rating',
     sortOrder: 'desc' as 'asc' | 'desc'
   })
+  const [filtersInitialized, setFiltersInitialized] = useState(false)
+
+  // Sync filters from URL on load / when navigating to this page (e.g. category link from homepage)
+  useEffect(() => {
+    if (filtersInitialized || typeof window === 'undefined') return
+    const params = new URLSearchParams(window.location.search)
+    const category = params.get('category') || ''
+    const search = params.get('search') || ''
+    const sortBy = params.get('sortBy') || 'rating'
+    const sortOrder = (params.get('sortOrder') === 'asc' ? 'asc' : 'desc') as 'asc' | 'desc'
+    setFilters(prev => ({
+      ...prev,
+      category,
+      search,
+      sortBy,
+      sortOrder
+    }))
+    setFiltersInitialized(true)
+  }, [filtersInitialized])
   
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(12)
@@ -119,7 +130,6 @@ export default function ProductsPage() {
     
     const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`
     window.history.replaceState({}, '', newUrl)
-    setSearchParams(params)
   }, [filters])
   
   // Refetch products when filters change
@@ -135,10 +145,6 @@ export default function ProductsPage() {
   const closeEnquiryForm = () => {
     setShowEnquiryForm(false)
     setSelectedProduct(null)
-  }
-  
-  const handleLogout = async () => {
-    await logout()
   }
   
   const toggleMobileMenu = () => {
@@ -235,21 +241,6 @@ export default function ProductsPage() {
             
             <div className="hidden md:flex items-center space-x-4">
               <CurrencySwitcher />
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Login
-                  </Button>
-                </Link>
-              )}
             </div>
 
             {/* Mobile menu button */}
@@ -301,30 +292,6 @@ export default function ProductsPage() {
                 >
                   Contact
                 </Link>
-                <div className="border-t pt-2 mt-2">
-                  {isAuthenticated ? (
-                    <div className="px-3 py-2">
-                      <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleLogout}
-                        className="w-full mt-2"
-                      >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Logout
-                      </Button>
-                    </div>
-                  ) : (
-                    <Link 
-                      href="/login" 
-                      className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-                  )}
-                </div>
               </div>
             </div>
           )}

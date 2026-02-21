@@ -22,7 +22,6 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
-import { useAuth } from '../../contexts/AuthContext'
 import { useCurrency } from '../../contexts/CurrencyContext'
 import { useCreateOrderFromCart } from '../../hooks/use-api'
 import { formatPrice } from '../../lib/utils'
@@ -30,14 +29,13 @@ import { formatPrice } from '../../lib/utils'
 export default function CheckoutPage() {
   const router = useRouter()
   const { cart, clearCart } = useCart()
-  const { user, isAuthenticated } = useAuth()
   const { currency } = useCurrency()
   
   const [formData, setFormData] = useState({
     // Shipping Information
-    firstName: user?.name?.split(' ')[0] || '',
-    lastName: user?.name?.split(' ')[1] || '',
-    email: user?.email || '',
+    firstName: '',
+    lastName: '',
+    email: '',
     phone: '',
     address: '',
     city: '',

@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Product } from "../lib/types/api"
 import { MessageCircle, Eye, ChevronLeft, ChevronRight, ShoppingCart, Plus, Minus, Check } from "lucide-react"
 import { useCart } from "../contexts/CartContext"
-import { useAuth } from "../contexts/AuthContext"
 import { useCurrency } from "../contexts/CurrencyContext"
 import { formatPrice } from "../lib/utils"
 
@@ -31,7 +30,6 @@ export default function ProductCard({
   const [quantity, setQuantity] = useState(1)
   const [justAdded, setJustAdded] = useState(false)
   const { addToCart, isInCart, getCartItemQuantity, updateCartItem, loading } = useCart()
-  const { isAuthenticated } = useAuth()
   const { currency } = useCurrency()
   const priceStr = product.price != null ? String(product.price) : "0"
   

@@ -20,7 +20,6 @@ import {
   AlertCircle
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
-import { useAuth } from '../../contexts/AuthContext'
 import { useCurrency } from '../../contexts/CurrencyContext'
 import { useProducts } from '../../hooks/use-api'
 import { CartItem } from '../../lib/types/api'
@@ -28,7 +27,6 @@ import { formatPrice } from '../../lib/utils'
 
 export default function CartPage() {
   const { cart, loading, error, updateCartItem, removeFromCart, clearCart } = useCart()
-  const { isAuthenticated } = useAuth()
   const { currency } = useCurrency()
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set())
 

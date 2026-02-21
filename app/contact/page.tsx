@@ -8,26 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, User, LogOut, Facebook, Instagram, Linkedin } from "lucide-react"
+import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, User, Facebook, Instagram, Linkedin } from "lucide-react"
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
     <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
   </svg>
 )
-import { useAuth } from "../../contexts/AuthContext"
 import { enquiryService } from "../../lib/services/api"
 import { useSettings } from "../../hooks/use-api"
 
 export default function ContactPage() {
-  const { user, isAuthenticated, logout } = useAuth()
-  
-  // Load all settings once
   const { data: settingsData } = useSettings()
   
   const [formData, setFormData] = useState({
-    firstName: user?.name?.split(' ')[0] || "",
-    lastName: user?.name?.split(' ').slice(1).join(' ') || "",
-    email: user?.email || "",
+    firstName: "",
+    lastName: "",
+    email: "",
     phone: "",
     subject: "",
     message: ""
@@ -156,10 +152,6 @@ export default function ContactPage() {
     }
   }
 
-  const handleLogout = async () => {
-    await logout()
-  }
-
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -192,23 +184,6 @@ export default function ContactPage() {
               <Link href="/contact" className="text-[#0a6650] font-medium">
                 Contact
               </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                  <Button variant="outline" size="sm" onClick={handleLogout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
-              ) : (
-                <Link href="/login">
-                  <Button className="bg-white text-[#0a6650] hover:bg-gray-50">
-                    Login
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
         </div>
