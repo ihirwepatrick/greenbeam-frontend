@@ -16,8 +16,8 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="text-center">
           <Link href="/" className="flex items-center justify-center space-x-2">
-            <Leaf className="h-12 w-12 text-green-600" />
-            <span className="text-3xl font-bold text-green-600">Greenbeam</span>
+            <Leaf className="h-12 w-12 text-greenbeam-teal" />
+            <span className="text-3xl font-bold text-greenbeam-teal">Greenbeam</span>
           </Link>
         </div>
 
@@ -57,11 +57,11 @@ export default function RegisterPage() {
               <Checkbox id="terms" />
               <Label htmlFor="terms" className="text-sm">
                 I agree to the{" "}
-                <Link href="/terms" className="text-green-600 hover:underline">
+                <Link href="/terms" className="text-greenbeam-teal hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-green-600 hover:underline">
+                <Link href="/privacy" className="text-greenbeam-teal hover:underline">
                   Privacy Policy
                 </Link>
               </Label>
@@ -82,7 +82,7 @@ export default function RegisterPage() {
 
             <div className="text-center text-sm">
               Already have an account?{" "}
-              <Link href="/login" className="text-green-600 hover:underline">
+              <Link href="/login" className="text-greenbeam-teal hover:underline">
                 Login
               </Link>
             </div>

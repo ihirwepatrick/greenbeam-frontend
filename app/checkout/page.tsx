@@ -197,7 +197,7 @@ export default function CheckoutPage() {
           <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Link href="/cart" className="inline-flex items-center text-[#0a6650] hover:text-[#0a6650]/80 mb-4">
+        <Link href="/cart" className="inline-flex items-center text-greenbeam-teal hover:opacity-80 mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Cart
         </Link>
@@ -479,12 +479,12 @@ export default function CheckoutPage() {
 
                 {/* Shipping Info */}
                 {calculateShipping() === 0 && (
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                  <div className="mt-4 p-3 bg-teal-50 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <Truck className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-800">Free Shipping</span>
+                      <Truck className="h-4 w-4 text-greenbeam-teal" />
+                      <span className="text-sm font-medium text-teal-800">Free Shipping</span>
                     </div>
-                    <p className="text-xs text-green-600 mt-1">Orders over $100 qualify for free shipping</p>
+                    <p className="text-xs text-greenbeam-teal mt-1">Orders over $100 qualify for free shipping</p>
                   </div>
                 )}
 
@@ -511,11 +511,11 @@ export default function CheckoutPage() {
                     />
                     <Label htmlFor="termsAccepted" className="text-sm">
                       I agree to the{' '}
-                      <Link href="/terms" className="text-green-600 hover:underline">
+                      <Link href="/terms" className="text-greenbeam-teal hover:underline">
                         Terms and Conditions
                       </Link>{' '}
                       and{' '}
-                      <Link href="/privacy" className="text-green-600 hover:underline">
+                      <Link href="/privacy" className="text-greenbeam-teal hover:underline">
                         Privacy Policy
                       </Link>
                     </Label>
@@ -530,13 +530,13 @@ export default function CheckoutPage() {
                   {/* Submit Button */}
                   <Button 
                     type="submit" 
-                    className="w-full bg-[#0a6650] hover:bg-[#0a6650]/90 text-white" 
+                    className="w-full bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal" 
                     size="lg"
                     disabled={loading || orderLoading}
                   >
                     {loading || orderLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-greenbeam-teal mr-2"></div>
                         Processing...
                       </>
                     ) : (

@@ -71,7 +71,7 @@ export default function CartPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-greenbeam-teal mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading your cart...</p>
         </div>
       </div>
@@ -110,13 +110,13 @@ export default function CartPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
         <Link href="/products">
-          <Button variant="ghost" size="sm" className="mr-4 text-[#0a6650] hover:text-[#0a6650]/80">
+          <Button variant="ghost" size="sm" className="mr-4 text-greenbeam-teal hover:opacity-80">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Continue Shopping
           </Button>
         </Link>
         <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-        <Badge variant="secondary" className="ml-4 bg-[#0a6650] text-white">
+        <Badge variant="secondary" className="ml-4 bg-greenbeam-teal text-white">
           {cart.totalItems} {cart.totalItems === 1 ? 'item' : 'items'}
         </Badge>
         
@@ -229,7 +229,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between">
                   <span>Shipping</span>
-                  <span className="text-green-600">Free</span>
+                  <span className="text-greenbeam-teal">Free</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax</span>
@@ -244,7 +244,7 @@ export default function CartPage() {
 
               <div className="space-y-3">
                 <Link href="/checkout">
-                  <Button className="w-full bg-[#0a6650] hover:bg-[#0a6650]/90 text-white" size="lg">
+                  <Button className="w-full bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal" size="lg">
                     <CreditCard className="h-4 w-4 mr-2" />
                     Proceed to Checkout
                   </Button>
@@ -258,12 +258,12 @@ export default function CartPage() {
                 </Link>
               </div>
 
-              <div className="bg-green-50 p-4 rounded-lg">
+              <div className="bg-teal-50 p-4 rounded-lg">
                 <div className="flex items-start space-x-3">
-                  <Truck className="h-5 w-5 text-green-600 mt-0.5" />
+                  <Truck className="h-5 w-5 text-greenbeam-teal mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-green-800">Free Shipping</h4>
-                    <p className="text-sm text-green-700">
+                    <h4 className="font-semibold text-teal-800">Free Shipping</h4>
+                    <p className="text-sm text-teal-700">
                       Free standard shipping on orders over $50
                     </p>
                   </div>

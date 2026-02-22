@@ -195,7 +195,7 @@ export default function ProductCard({
       <CardContent className={`${compact ? 'p-4' : 'p-6'} flex-1 flex flex-col justify-between`}>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant="secondary" className="text-xs transition-all duration-200 group-hover:bg-green-100 group-hover:text-green-800">
+            <Badge variant="secondary" className="text-xs transition-all duration-200 group-hover:bg-teal-100 group-hover:text-greenbeam-teal">
               {product.category}
             </Badge>
             {rating > 0 && (
@@ -211,7 +211,7 @@ export default function ProductCard({
             )}
           </div>
           
-          <CardTitle className={`${compact ? 'text-base' : 'text-lg'} mb-2 line-clamp-2 transition-colors duration-200 group-hover:text-green-700`}>
+          <CardTitle className={`${compact ? 'text-base' : 'text-lg'} mb-2 line-clamp-2 transition-colors duration-200 group-hover:text-greenbeam-teal`}>
             {product.name}
           </CardTitle>
           
@@ -219,7 +219,7 @@ export default function ProductCard({
             {product.description}
           </p>
 
-          <p className={`font-semibold text-[#0a6650] ${compact ? 'text-sm' : 'text-lg'} mb-3`}>
+          <p className={`font-semibold text-greenbeam-teal ${compact ? 'text-sm' : 'text-lg'} mb-3`}>
             {formatPrice(priceStr, currency)}
           </p>
 
@@ -230,7 +230,7 @@ export default function ProductCard({
                   <Badge 
                     key={index} 
                     variant="outline" 
-                    className="text-xs px-1.5 py-0.5 transition-all duration-200 hover:bg-green-50 hover:border-green-200"
+                    className="text-xs px-1.5 py-0.5 transition-all duration-200 hover:bg-teal-50 hover:border-teal-200"
                   >
                     {feature}
                   </Badge>
@@ -280,11 +280,9 @@ export default function ProductCard({
                 size={compact ? "sm" : "default"}
                 className={`w-full transition-all duration-300 ${
                   justAdded 
-                    ? 'bg-green-600 hover:bg-green-700 scale-105' 
-                    : isProductInCart 
-                      ? 'bg-[#0a6650] hover:bg-[#0a6650]/90' 
-                      : 'bg-[#0a6650] hover:bg-[#0a6650]/90'
-                } text-white`}
+                    ? 'bg-white text-greenbeam-teal border-2 border-greenbeam-teal scale-105' 
+                    : 'bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal'
+                }`}
               >
                 <span className="flex items-center">
                   {justAdded ? (
@@ -302,13 +300,13 @@ export default function ProductCard({
               </Button>
               
               {isProductInCart && !justAdded && (
-                <p className="text-xs text-[#0a6650] text-center">
+                <p className="text-xs text-greenbeam-teal text-center">
                   Already in cart ({cartQuantity} items)
                 </p>
               )}
               
               {justAdded && (
-                <p className="text-xs text-green-600 text-center font-medium animate-pulse">
+                <p className="text-xs text-greenbeam-teal text-center font-medium animate-pulse">
                   ✓ Successfully added to cart!
                 </p>
               )}
@@ -322,7 +320,7 @@ export default function ProductCard({
               <Button 
                 variant="outline" 
                 size={compact ? "sm" : "default"} 
-                className="w-full"
+                className="w-full border-greenbeam-teal text-greenbeam-teal hover:bg-teal-50"
               >
                 <span className="flex items-center">
                   <Eye className="h-4 w-4 mr-2" />
@@ -335,7 +333,7 @@ export default function ProductCard({
               <Button 
                 onClick={() => onEnquire(product)}
                 size={compact ? "sm" : "default"}
-                className="bg-[#0a6650] hover:bg-[#084c3d] active:bg-[#063a2e] flex-1"
+                className="bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal flex-1"
               >
                 <span className="flex items-center">
                   <MessageCircle className="h-4 w-4 mr-2" />

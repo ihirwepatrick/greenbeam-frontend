@@ -6,10 +6,15 @@
   .text-balance {
     text-wrap: balance;
   }
+  .skeleton-teal {
+    @apply animate-pulse bg-teal-200/60 rounded-md;
+  }
 }
 
 @layer base {
   :root {
+    --greenbeam-teal: #006766;
+    --greenbeam-teal-dark: #004d4c;
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;

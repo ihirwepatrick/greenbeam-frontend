@@ -95,7 +95,7 @@ export default function ProductDetailPage() {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-greenbeam-teal"></div>
             <span className="ml-3 text-lg">Loading product...</span>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
             <p className="text-gray-600 mb-6">The product you're looking for doesn't exist or has been removed.</p>
             <Link href="/products">
-              <Button className="bg-[#0a6650] hover:bg-[#084c3d]">
+              <Button className="bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Products
               </Button>
@@ -129,23 +129,23 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <nav className="border-b bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 <div className="flex items-center space-x-4">
               <SiteLogo showBrandName />
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/" className="text-gray-700 hover:text-greenbeam-teal">
                 Home
               </Link>
-              <Link href="/products" className="text-[#0a6650] font-medium">
+              <Link href="/products" className="text-greenbeam-teal font-medium">
                 Products
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/about" className="text-gray-700 hover:text-greenbeam-teal">
                 About
               </Link>
-              <Link href="/contact" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
               </Link>
             </div>
@@ -154,7 +154,7 @@ export default function ProductDetailPage() {
       </nav>
 
       {/* Breadcrumb */}
-      <div className="bg-gray-50 py-4">
+      <div className="bg-teal-50 py-4">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-2">
@@ -241,7 +241,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
               <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-              <p className="text-2xl font-semibold text-[#0a6650]">{formatPrice(priceStr, currency)}</p>
+              <p className="text-2xl font-semibold text-greenbeam-teal">{formatPrice(priceStr, currency)}</p>
             </div>
 
             <div className="mb-6">
@@ -270,7 +270,7 @@ export default function ProductDetailPage() {
                         <span className="ml-3 text-sm text-gray-600">{rating.toFixed(1)} ({reviews})</span>
                       </div>
                     </TooltipTrigger>
-                    <TooltipContent side="top" className="flex items-center space-x-2 bg-green-600 text-white border-green-700">
+                    <TooltipContent side="top" className="flex items-center space-x-2 bg-greenbeam-teal text-white border-greenbeam-teal-dark">
                       <CheckCircle2 className="h-4 w-4" />
                       <span>Rating submitted successfully</span>
                     </TooltipContent>
@@ -279,7 +279,7 @@ export default function ProductDetailPage() {
               </TooltipProvider>
               <Button
                 size="sm"
-                className="mt-3 bg-[#0a6650] hover:bg-[#084c3d]"
+                className="mt-3 bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal"
                 onClick={submitProductRating}
                 disabled={!userRating || submittingRating}
               >
@@ -293,7 +293,7 @@ export default function ProductDetailPage() {
                 <div className="grid grid-cols-1 gap-3">
                   {product.features.map((feature, index) => (
                     <div key={index} className="flex items-center text-gray-600">
-                      <div className="h-2 w-2 bg-[#0a6650] rounded-full mr-3"></div>
+                      <div className="h-2 w-2 bg-greenbeam-teal rounded-full mr-3"></div>
                       {feature}
                     </div>
                   ))}
@@ -304,7 +304,7 @@ export default function ProductDetailPage() {
             <div className="space-y-4">
               <Button 
                 onClick={handleEnquireNow}
-                className="w-full bg-[#0a6650] hover:bg-[#084c3d] py-3"
+                className="w-full bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal py-3"
                 size="lg"
               >
                 <MessageCircle className="h-5 w-5 mr-2" />

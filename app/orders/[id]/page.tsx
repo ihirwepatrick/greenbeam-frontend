@@ -112,7 +112,7 @@ export default function OrderDetailsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-greenbeam-teal mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading order details...</p>
         </div>
       </div>
@@ -140,7 +140,7 @@ export default function OrderDetailsPage() {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Link href="/orders" className="inline-flex items-center text-green-600 hover:text-green-700 mb-4">
+        <Link href="/orders" className="inline-flex items-center text-greenbeam-teal hover:opacity-80 mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Orders
         </Link>
@@ -364,7 +364,7 @@ export default function OrderDetailsPage() {
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <CheckCircle className="h-4 w-4 text-greenbeam-teal" />
               </div>
               <div>
                 <p className="font-medium">Order Placed</p>
@@ -411,7 +411,7 @@ export default function OrderDetailsPage() {
             {order.status === 'DELIVERED' && (
               <div className="flex items-center space-x-4">
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <CheckCircle className="h-4 w-4 text-greenbeam-teal" />
                 </div>
                 <div>
                   <p className="font-medium">Delivered</p>

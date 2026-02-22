@@ -156,23 +156,23 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <nav className="border-b bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <SiteLogo />
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/" className="text-gray-700 hover:text-greenbeam-teal">
                 Home
               </Link>
-              <Link href="/products" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/products" className="text-gray-700 hover:text-greenbeam-teal">
                 Products
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/about" className="text-gray-700 hover:text-greenbeam-teal">
                 About
               </Link>
-              <Link href="/contact" className="text-[#0a6650] font-medium">
+              <Link href="/contact" className="text-greenbeam-teal font-medium">
                 Contact
               </Link>
             </div>
@@ -181,10 +181,10 @@ export default function ContactPage() {
       </nav>
 
       {/* Header */}
-      <section className="bg-gradient-to-r from-[#0a6650] to-[#084c3d] text-white py-16">
+      <section className="bg-gradient-to-r from-greenbeam-teal to-greenbeam-teal-dark text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-green-100">
+          <p className="text-xl text-white/90">
             Get in touch with our team for any questions or support
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function ContactPage() {
             {contactInfo.map((info: any, index: number) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="w-16 h-16 bg-[#0a6650] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-greenbeam-teal rounded-full flex items-center justify-center mx-auto mb-4">
                     <info.icon className="h-8 w-8 text-white" />
                   </div>
                   <h3 className="text-lg font-semibold mb-2">{info.title}</h3>
@@ -215,25 +215,25 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form and Team */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div>
-              <h2 className="text-3xl font-bold mb-8">Send us a Message</h2>
+              <h2 id="contact-form" className="text-3xl font-bold mb-8">Send us a Message</h2>
               
               {isSubmitted ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <MessageCircle className="h-8 w-8 text-green-600" />
+                <div className="bg-teal-50 border border-teal-200 rounded-lg p-6 text-center">
+                  <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageCircle className="h-8 w-8 text-greenbeam-teal" />
                   </div>
-                  <h3 className="text-xl font-semibold text-green-800 mb-2">Message Sent!</h3>
-                  <p className="text-green-700 mb-4">
+                  <h3 className="text-xl font-semibold text-greenbeam-teal mb-2">Message Sent!</h3>
+                  <p className="text-teal-800 mb-4">
                     Thank you for contacting us. We'll get back to you within 24 hours.
                   </p>
                   <Button 
                     onClick={() => setIsSubmitted(false)}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal"
                   >
                     Send Another Message
                   </Button>
@@ -325,11 +325,11 @@ export default function ContactPage() {
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full bg-[#0a6650] hover:bg-[#084c3d]"
+                    className="w-full bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-greenbeam-teal mr-2"></div>
                         Sending Message...
                       </>
                     ) : (
@@ -356,7 +356,7 @@ export default function ContactPage() {
                         </div>
                         <div className="flex-1">
                           <h3 className="text-lg font-semibold mb-1">{member.name}</h3>
-                          <p className="text-[#0a6650] font-medium mb-2">{member.role}</p>
+                          <p className="text-greenbeam-teal font-medium mb-2">{member.role}</p>
                           <p className="text-gray-600 text-sm mb-3">{member.bio}</p>
                           <div className="space-y-1 text-sm text-gray-600">
                             <div className="flex items-center">
@@ -388,7 +388,7 @@ export default function ContactPage() {
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <CardTitle className="flex items-center">
-                    <HelpCircle className="h-5 w-5 text-[#0a6650] mr-2" />
+                    <HelpCircle className="h-5 w-5 text-greenbeam-teal mr-2" />
                     {faq.question}
                   </CardTitle>
                 </CardHeader>
@@ -402,49 +402,50 @@ export default function ContactPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[#0a6650] text-white">
+      <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Go Green?</h2>
-          <p className="text-xl mb-8 text-green-100">
+          <p className="text-xl mb-8 text-white/90">
             Contact us today to learn more about our sustainable energy solutions
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">
-              <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100">
+              <Button size="lg" className="bg-white text-greenbeam-teal hover:bg-gray-100">
                 Browse Products
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[#0a6650]">
-              Schedule Consultation
-            </Button>
+            <Link href="#contact-form">
+              <Button size="lg" variant="outline" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-greenbeam-teal">
+                Schedule Consultation
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-greenbeam-teal text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold">Greenbeam</span>
+              <div className="mb-4">
+                <SiteLogo variant="footer" />
               </div>
-              <p className="text-gray-400">
+              <p className="text-white/90">
                 Leading provider of sustainable energy solutions for homes and businesses.
               </p>
               {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
-                <div className="flex items-center gap-4 mt-6 text-gray-300">
-                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:text-white">
+                <div className="flex items-center gap-4 mt-6 text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
                     <Facebook className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
                     <XIcon className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
                     <Linkedin className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
                     <Instagram className="h-5 w-5" />
                   </Link>
                 </div>
@@ -452,57 +453,33 @@ export default function ContactPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Products</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/products?category=Solar%20Panels">Solar Panels</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Wind%20Energy">Wind Turbines</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Energy%20Storage">Battery Storage</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Inverters">Inverters</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/products?category=Solar%20Panels" className="hover:opacity-90">Solar Panels</Link></li>
+                <li><Link href="/products?category=Wind%20Energy" className="hover:opacity-90">Wind Turbines</Link></li>
+                <li><Link href="/products?category=Energy%20Storage" className="hover:opacity-90">Battery Storage</Link></li>
+                <li><Link href="/products?category=Inverters" className="hover:opacity-90">Inverters</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/about">About Us</Link>
-                </li>
-                <li>
-                  <Link href="/contact">Contact</Link>
-                </li>
-                <li>
-                  <Link href="/careers">Careers</Link>
-                </li>
-                <li>
-                  <Link href="/blog">Blog</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/about" className="hover:opacity-90">About Us</Link></li>
+                <li><Link href="/contact" className="hover:opacity-90">Contact</Link></li>
+                <li><Link href="/careers" className="hover:opacity-90">Careers</Link></li>
+                <li><Link href="/blog" className="hover:opacity-90">Blog</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/help">Help Center</Link>
-                </li>
-                <li>
-                  <Link href="/warranty">Warranty</Link>
-                </li>
-                <li>
-                  <Link href="/installation">Installation</Link>
-                </li>
-                <li>
-                  <Link href="/maintenance">Maintenance</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/help" className="hover:opacity-90">Help Center</Link></li>
+                <li><Link href="/warranty" className="hover:opacity-90">Warranty</Link></li>
+                <li><Link href="/installation" className="hover:opacity-90">Installation</Link></li>
+                <li><Link href="/maintenance" className="hover:opacity-90">Maintenance</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/80">
             <p>&copy; 2024 Greenbeam. All rights reserved.</p>
           </div>
         </div>

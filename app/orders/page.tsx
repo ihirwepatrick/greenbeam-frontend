@@ -121,7 +121,7 @@ export default function OrdersPage() {
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center space-x-3">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+                <CheckCircle className="h-8 w-8 text-greenbeam-teal" />
                 <div>
                   <p className="text-sm text-gray-600">Delivered</p>
                   <p className="text-2xl font-bold">{statsData.deliveredOrders || 0}</p>
@@ -194,7 +194,7 @@ export default function OrdersPage() {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-greenbeam-teal mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading orders...</p>
         </div>
       ) : error ? (

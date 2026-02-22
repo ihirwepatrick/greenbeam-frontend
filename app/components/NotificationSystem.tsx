@@ -101,7 +101,7 @@ export default function NotificationSystem({ isOpen, onClose }: NotificationSyst
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2">
-              <Bell className="h-6 w-6 text-[#0a6650]" />
+              <Bell className="h-6 w-6 text-greenbeam-teal" />
               <h2 className="text-xl font-bold">Notifications</h2>
               {unreadCount > 0 && (
                 <Badge className="bg-red-500 text-white">

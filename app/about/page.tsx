@@ -123,23 +123,23 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <nav className="border-b bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-4">
               <SiteLogo />
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/" className="text-gray-700 hover:text-greenbeam-teal">
                 Home
               </Link>
-              <Link href="/products" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/products" className="text-gray-700 hover:text-greenbeam-teal">
                 Products
               </Link>
-              <Link href="/about" className="text-[#0a6650] font-medium">
+              <Link href="/about" className="text-greenbeam-teal font-medium">
                 About
               </Link>
-              <Link href="/contact" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
               </Link>
             </div>
@@ -155,10 +155,10 @@ export default function AboutPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-[#0a6650] to-[#084c3d] text-white py-24">
+      <section className="relative bg-gradient-to-r from-greenbeam-teal to-greenbeam-teal-dark text-white py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{(settingsData as any)?.data?.website?.content?.aboutSection?.title || `About ${((settingsData as any)?.data?.general?.companyName || 'Greenbeam')}`}</h1>
-          <p className="text-xl mb-8 text-green-100 max-w-3xl mx-auto">
+          <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto">
             {(settingsData as any)?.data?.website?.content?.siteDescription || "We're on a mission to accelerate the world's transition to sustainable energy through innovative renewable energy solutions and exceptional customer service."}
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function AboutPage() {
                 customers make the switch to sustainable energy solutions across East Africa.
               </p>
               <Link href="/products">
-                <Button size="lg" className="bg-[#0a6650] hover:bg-[#084c3d]">Explore Our Products</Button>
+                <Button size="lg" className="bg-white text-greenbeam-teal hover:bg-gray-100">Explore Our Products</Button>
               </Link>
             </div>
             <div className="relative">
@@ -195,19 +195,19 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {(((settingsData as any)?.data?.website?.content?.aboutSection?.stats) || stats).map((stat: any, index: number) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-4">
                   {typeof stat.icon === 'function' ? (
-                    <stat.icon className="h-12 w-12 text-[#0a6650]" />
+                    <stat.icon className="h-12 w-12 text-greenbeam-teal" />
                   ) : (
-                    <Leaf className="h-12 w-12 text-[#0a6650]" />
+                    <Leaf className="h-12 w-12 text-greenbeam-teal" />
                   )}
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-[#0a6650] mb-2">{stat.value}</div>
+                <div className="text-3xl md:text-4xl font-bold text-greenbeam-teal mb-2">{stat.value}</div>
                 <div className="text-gray-600">{stat.label}</div>
               </div>
             ))}
@@ -224,14 +224,14 @@ export default function AboutPage() {
               {journey.map((milestone, index) => (
                 <div key={index} className="flex items-start space-x-6">
                   <div className="flex-shrink-0">
-                    <div className="w-16 h-16 bg-[#0a6650] rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    <div className="w-16 h-16 bg-greenbeam-teal rounded-full flex items-center justify-center text-white font-bold text-lg">
                       {milestone.year}
                     </div>
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold mb-2">{milestone.title}</h3>
                     <p className="text-gray-600 mb-2">{milestone.description}</p>
-                    <Badge variant="outline" className="bg-[#0a6650]/10 text-[#0a6650] border-[#0a6650]">
+                    <Badge variant="outline" className="bg-greenbeam-teal/10 text-greenbeam-teal border-greenbeam-teal">
                       {milestone.achievement}
                     </Badge>
                   </div>
@@ -243,14 +243,14 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <value.icon className="h-12 w-12 text-[#0a6650] mx-auto mb-4" />
+                  <value.icon className="h-12 w-12 text-greenbeam-teal mx-auto mb-4" />
                   <CardTitle className="text-xl">{value.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -276,18 +276,18 @@ export default function AboutPage() {
                         <Users className="h-16 w-16 text-gray-400" />
                       </div>
                       <CardTitle className="text-xl">{member.name}</CardTitle>
-                      <Badge variant="secondary" className="bg-[#0a6650]/10 text-[#0a6650]">
+                      <Badge variant="secondary" className="bg-greenbeam-teal/10 text-greenbeam-teal">
                         {member.role}
                       </Badge>
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-600 text-sm mb-4">{member.bio}</p>
                       <div className="space-y-2 text-sm">
-                        <p className="flex items-center justify-center text-[#0a6650]">
+                        <p className="flex items-center justify-center text-greenbeam-teal">
                           <Users className="h-4 w-4 mr-2" />
                           {member.email}
                         </p>
-                        <p className="flex items-center justify-center text-[#0a6650]">
+                        <p className="flex items-center justify-center text-greenbeam-teal">
                           <Shield className="h-4 w-4 mr-2" />
                           {member.phone}
                         </p>
@@ -302,20 +302,20 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-[#0a6650] text-white">
+      <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Go Green?</h2>
-          <p className="text-xl mb-8 text-green-100 max-w-3xl mx-auto">
+          <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto">
             Join thousands of customers who have already made the switch to renewable energy.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/products">
-              <Button size="lg" className="bg-white text-[#0a6650] hover:bg-gray-100">
+              <Button size="lg" className="bg-white text-greenbeam-teal hover:bg-gray-100">
                 Shop Now
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-[#0a6650]">
+              <Button size="lg" variant="outline" className="border-2 border-white bg-transparent text-white hover:bg-white hover:text-greenbeam-teal">
                 Contact Us
               </Button>
             </Link>
@@ -324,29 +324,28 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-greenbeam-teal text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Leaf className="h-8 w-8 text-[#0a6650]" />
-                <span className="text-2xl font-bold">{(settingsData as any)?.data?.general?.companyName || 'Greenbeam'}</span>
+              <div className="mb-4">
+                <SiteLogo variant="footer" />
               </div>
-              <p className="text-gray-400">
+              <p className="text-white/90">
                 {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
               </p>
               {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
-                <div className="flex items-center gap-4 mt-6 text-gray-300">
-                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:text-white">
+                <div className="flex items-center gap-4 mt-6 text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
                     <Facebook className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
                     <XIcon className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
                     <Linkedin className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:text-white">
+                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
                     <Instagram className="h-5 w-5" />
                   </Link>
                 </div>
@@ -354,57 +353,33 @@ export default function AboutPage() {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Products</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/products?category=Solar%20Panels">Solar Panels</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Wind%20Energy">Wind Turbines</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Energy%20Storage">Battery Storage</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Inverters">Inverters</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/products?category=Solar%20Panels" className="hover:opacity-90">Solar Panels</Link></li>
+                <li><Link href="/products?category=Wind%20Energy" className="hover:opacity-90">Wind Turbines</Link></li>
+                <li><Link href="/products?category=Energy%20Storage" className="hover:opacity-90">Battery Storage</Link></li>
+                <li><Link href="/products?category=Inverters" className="hover:opacity-90">Inverters</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/about">About Us</Link>
-                </li>
-                <li>
-                  <Link href="/contact">Contact</Link>
-                </li>
-                <li>
-                  <Link href="/careers">Careers</Link>
-                </li>
-                <li>
-                  <Link href="/blog">Blog</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/about" className="hover:opacity-90">About Us</Link></li>
+                <li><Link href="/contact" className="hover:opacity-90">Contact</Link></li>
+                <li><Link href="/careers" className="hover:opacity-90">Careers</Link></li>
+                <li><Link href="/blog" className="hover:opacity-90">Blog</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link href="/help">Help Center</Link>
-                </li>
-                <li>
-                  <Link href="/warranty">Warranty</Link>
-                </li>
-                <li>
-                  <Link href="/installation">Installation</Link>
-                </li>
-                <li>
-                  <Link href="/maintenance">Maintenance</Link>
-                </li>
+              <ul className="space-y-2 text-white">
+                <li><Link href="/help" className="hover:opacity-90">Help Center</Link></li>
+                <li><Link href="/warranty" className="hover:opacity-90">Warranty</Link></li>
+                <li><Link href="/installation" className="hover:opacity-90">Installation</Link></li>
+                <li><Link href="/maintenance" className="hover:opacity-90">Maintenance</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/80">
             <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || '\u00A9 2024 Greenbeam. All rights reserved. | Kigali, Rwanda'}</p>
           </div>
         </div>

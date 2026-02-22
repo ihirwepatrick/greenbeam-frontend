@@ -207,7 +207,7 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
+      <nav className="border-b bg-white relative z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 <div className="flex items-center space-x-2 md:space-x-4">
@@ -216,16 +216,16 @@ export default function ProductsPage() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <Link href="/" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/" className="text-gray-700 hover:text-greenbeam-teal">
                 Home
               </Link>
-              <Link href="/products" className="text-[#0a6650] font-medium">
+              <Link href="/products" className="text-greenbeam-teal font-medium">
                 Products
               </Link>
-              <Link href="/about" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/about" className="text-gray-700 hover:text-greenbeam-teal">
                 About
               </Link>
-              <Link href="/contact" className="text-gray-700 hover:text-[#0a6650]">
+              <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
               </Link>
             </div>
@@ -257,28 +257,28 @@ export default function ProductsPage() {
               <div className="px-2 py-2 space-y-1">
                 <Link 
                   href="/" 
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-teal-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Home
                 </Link>
                 <Link 
                   href="/products" 
-                  className="block px-3 py-2 rounded-md text-base font-medium text-[#0a6650] hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-greenbeam-teal hover:bg-teal-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Products
                 </Link>
                 <Link 
                   href="/about" 
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-teal-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   About
                 </Link>
                 <Link 
                   href="/contact" 
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-teal-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Contact
@@ -290,24 +290,24 @@ export default function ProductsPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#0a6650] to-[#084c3d] text-white py-16">
+      <section className="bg-gradient-to-r from-greenbeam-teal to-greenbeam-teal-dark text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Products</h1>
-          <p className="text-xl text-green-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Discover our comprehensive range of sustainable energy solutions and renewable technology
           </p>
         </div>
       </section>
 
       {/* Filters Section */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-8 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-lg shadow-sm border">
             {/* Mobile Filters Toggle */}
             <div className="md:hidden border-b">
               <button
                 onClick={toggleFilters}
-                className="w-full px-4 py-3 flex items-center justify-between text-left font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full px-4 py-3 flex items-center justify-between text-left font-medium text-gray-700 hover:bg-teal-50"
               >
                 <span className="flex items-center">
                   <Filter className="h-4 w-4 mr-2" />
@@ -336,7 +336,7 @@ export default function ProductsPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                     <select
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0a6650] focus:border-[#0a6650]"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-greenbeam-teal focus:border-greenbeam-teal"
                       value={filters.category}
                       onChange={(e) => handleFilterChange("category", e.target.value)}
                       disabled={categoriesLoadingState}
@@ -396,7 +396,7 @@ export default function ProductsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {productsLoading ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-greenbeam-teal"></div>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12">

@@ -151,14 +151,14 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
               <div className="text-center text-sm text-gray-500 mb-4">
                 This window will close automatically in a few seconds
               </div>
-              <Button onClick={onClose} className="bg-[#0a6650] hover:bg-[#084c3d]">
+              <Button onClick={onClose} className="bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal">
                 Close Now
               </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {product && (
-                <Card className="bg-gradient-to-r from-green-50 to-green-100 border-green-200">
+                <Card className="bg-gradient-to-r from-teal-50 to-teal-100 border-teal-200">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-lg text-green-800">Product Information</CardTitle>
                   </CardHeader>
@@ -319,11 +319,11 @@ export default function EnquiryForm({ isOpen, onClose, product }: EnquiryFormPro
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  className="bg-[#0a6650] hover:bg-[#084c3d]"
+                  className="bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-greenbeam-teal mr-2"></div>
                       Submitting...
                     </>
                   ) : (

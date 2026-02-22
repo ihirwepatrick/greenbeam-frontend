@@ -81,7 +81,7 @@ export default function CartPreview() {
       <Button
         variant="outline"
         size="sm"
-        className="relative border-[#0a6650] text-[#0a6650] hover:bg-[#0a6650] hover:text-white transition-colors"
+        className="relative border-greenbeam-teal text-greenbeam-teal hover:bg-teal-50 transition-colors"
         onClick={() => setIsOpen(true)}
       >
         <ShoppingCart className="h-4 w-4 mr-2" />
@@ -162,7 +162,7 @@ export default function CartPreview() {
                               size="sm"
                               onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
                               disabled={loading}
-                              className="h-7 w-7 sm:h-8 sm:w-8 p-0 border-gray-300 hover:border-[#0a6650] hover:text-[#0a6650]"
+                              className="h-7 w-7 sm:h-8 sm:w-8 p-0 border-gray-300 hover:border-greenbeam-teal hover:text-greenbeam-teal"
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
@@ -174,7 +174,7 @@ export default function CartPreview() {
                               size="sm"
                               onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
                               disabled={loading}
-                              className="h-7 w-7 sm:h-8 sm:w-8 p-0 border-gray-300 hover:border-[#0a6650] hover:text-[#0a6650]"
+                              className="h-7 w-7 sm:h-8 sm:w-8 p-0 border-gray-300 hover:border-greenbeam-teal hover:text-greenbeam-teal"
                             >
                               <Plus className="h-3 w-3" />
                             </Button>
@@ -183,7 +183,7 @@ export default function CartPreview() {
 
                         {/* Price and Remove */}
                         <div className="flex flex-col items-end space-y-2">
-                          <span className="font-semibold text-[#0a6650] text-sm sm:text-base">
+                          <span className="font-semibold text-greenbeam-teal text-sm sm:text-base">
                             {formatPrice(item.total, currency)}
                           </span>
                           <Button
@@ -213,7 +213,7 @@ export default function CartPreview() {
                     <Button
                       variant="outline"
                       onClick={() => setIsOpen(false)}
-                      className="text-[#0a6650] border-[#0a6650] hover:bg-[#0a6650] hover:text-white w-full sm:w-auto px-6 py-2"
+                      className="text-greenbeam-teal border border-greenbeam-teal hover:bg-gray-100 w-full sm:w-auto px-6 py-2"
                     >
                       Continue Shopping
                     </Button>
@@ -228,7 +228,7 @@ export default function CartPreview() {
                 {/* Total */}
                 <div className="flex items-center justify-between">
                   <span className="text-base sm:text-lg font-semibold text-gray-900">Total:</span>
-                  <span className="text-lg sm:text-xl font-bold text-[#0a6650]">
+                  <span className="text-lg sm:text-xl font-bold text-greenbeam-teal">
                     ${parseFloat(cartTotal).toFixed(2)}
                   </span>
                 </div>
@@ -248,7 +248,7 @@ export default function CartPreview() {
                     <Link href="/cart" className="flex-1" onClick={() => setIsOpen(false)}>
                       <Button
                         variant="outline"
-                        className="w-full border-[#0a6650] text-[#0a6650] hover:bg-[#0a6650] hover:text-white h-10 sm:h-auto"
+                        className="w-full border-greenbeam-teal text-greenbeam-teal hover:bg-gray-100 h-10 sm:h-auto"
                       >
                         <span className="hidden sm:inline">View Full Cart</span>
                         <span className="sm:hidden">View Cart</span>
@@ -260,7 +260,7 @@ export default function CartPreview() {
                   {/* Checkout Button */}
                   <Link href="/checkout" onClick={() => setIsOpen(false)}>
                     <Button
-                      className="w-full bg-[#0a6650] hover:bg-[#0a6650]/90 text-white h-12 sm:h-12 text-base sm:text-lg font-semibold"
+                      className="w-full bg-white text-greenbeam-teal hover:bg-gray-100 border border-greenbeam-teal h-12 sm:h-12 text-base sm:text-lg font-semibold"
                     >
                       <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Proceed to Checkout

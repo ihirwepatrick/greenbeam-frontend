@@ -62,6 +62,10 @@ const config: Config = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
+  			},
+  			greenbeam: {
+  				teal: 'var(--greenbeam-teal)',
+  				'teal-dark': 'var(--greenbeam-teal-dark)'
   			}
   		},
   		borderRadius: {
