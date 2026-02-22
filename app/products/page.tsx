@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import ProductCard from "../../components/ProductCard"
 import CurrencySwitcher from "../../components/CurrencySwitcher"
+import SiteLogo from "../../components/SiteLogo"
 import { useSettings } from "../../hooks/use-api"
 import { useProducts } from "../../hooks/use-api"
 import { productService } from "../../lib/services/api"
@@ -209,18 +210,8 @@ export default function ProductsPage() {
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 relative z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Image 
-                  src="/logo.jpg"
-                  alt="Greenbeam Logo" 
-                  width={140} 
-                  height={64} 
-                  className="h-10 w-auto sm:h-12 object-contain"
-                  priority
-                  sizes="(max-width: 768px) 120px, 160px"
-                />
-              </Link>
+<div className="flex items-center space-x-2 md:space-x-4">
+              <SiteLogo />
             </div>
             
             {/* Desktop Navigation */}

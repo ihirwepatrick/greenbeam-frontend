@@ -17,6 +17,7 @@ import EnquiryForm from "./components/EnquiryForm"
 import ProductCard from "../components/ProductCard"
 import CartPreview from "../components/CartPreview"
 import CurrencySwitcher from "../components/CurrencySwitcher"
+import SiteLogo from "../components/SiteLogo"
 import { useCart } from "../contexts/CartContext"
 import { useProducts, useSettings } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
@@ -145,18 +146,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2 md:space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Image
-                  src="/logo.jpg"
-                  alt="Greenbeam Logo"
-                  width={140}
-                  height={64}
-                  className="h-10 w-auto sm:h-12 object-contain"
-                  priority
-                  sizes="(max-width: 768px) 120px, 160px"
-                />
-                {/* <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span> */}
-              </Link>
+              <SiteLogo />
             </div>
             
             {/* Desktop Navigation */}

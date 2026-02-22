@@ -11,6 +11,7 @@ import { Leaf, Star, ArrowLeft, MessageCircle, User, Heart, Share2, CheckCircle2
 import { useProduct } from "../../../hooks/use-api"
 import { productService } from "../../../lib/services/api"
 import EnquiryForm from "../../components/EnquiryForm"
+import SiteLogo from "../../../components/SiteLogo"
 import { Product } from "../../../lib/types/api"
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 import { useCurrency } from "../../../contexts/CurrencyContext"
@@ -131,19 +132,8 @@ export default function ProductDetailPage() {
       <nav className="border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="flex items-center space-x-2">
-                <Image 
-                  src="/logo.jpg"
-                  alt="Greenbeam Logo" 
-                  width={140} 
-                  height={64} 
-                  className="h-10 w-auto sm:h-12 object-contain"
-                  priority
-                  sizes="(max-width: 768px) 120px, 160px"
-                />
-                <span className="text-2xl font-bold text-[#0a6650]">Greenbeam</span>
-              </Link>
+<div className="flex items-center space-x-4">
+              <SiteLogo showBrandName />
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <Link href="/" className="text-gray-700 hover:text-[#0a6650]">
