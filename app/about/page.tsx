@@ -324,7 +324,7 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-greenbeam-teal text-white py-12">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -379,7 +379,7 @@ export default function AboutPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/80">
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || '\u00A9 2024 Greenbeam. All rights reserved. | Kigali, Rwanda'}</p>
           </div>
         </div>

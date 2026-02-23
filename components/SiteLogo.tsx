@@ -14,27 +14,29 @@ export interface SiteLogoProps {
   variant?: "default" | "footer"
 }
 
-const logoHeights = { default: "h-16 max-h-16", footer: "h-48 max-h-48" }
+const logoHeights = { default: "h-16 max-h-16", footer: "h-20 max-h-20" }
+/** Teal logo for navbar (white bg); white logo for footer (dark bg). Source images 1296x577. */
+const logoSources = { default: "/logo-renovated-teal.png", footer: "/logo-renovated-white.png" }
 
 /**
- * Shared site logo for the navbar and footer. Clips to navbar height so the words stay visible
- * and sunburst/gear overflow is hidden. Links to home (greenbeam.online).
+ * Shared site logo for the navbar and footer. Navbar uses teal logo, footer uses white logo.
+ * Links to home (greenbeam.online).
  */
 export default function SiteLogo({ className = "", showBrandName = false, variant = "default" }: SiteLogoProps) {
   const sizeClass = logoHeights[variant]
+  const src = logoSources[variant]
   return (
     <Link
       href={LOGO_HOME_URL}
       className={`flex items-center space-x-2 ${className}`}
       aria-label="Greenbeam – Go to homepage"
     >
-      {/* Clip height so only the text area is visible; overflow hidden clips the rest */}
       <span className={`flex ${sizeClass} shrink-0 items-center overflow-hidden`}>
         <Image
-          src="/logo.jpg"
+          src={src}
           alt="Greenbeam Logo"
-          width={300}
-          height={135}
+          width={1296}
+          height={577}
           className={`${sizeClass} w-auto object-contain object-center`}
           priority={variant === "default"}
           sizes={variant === "footer" ? "320px" : "(max-width: 768px) 180px, 240px"}

@@ -424,7 +424,7 @@ export default function ContactPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-greenbeam-teal text-white py-12">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -479,7 +479,7 @@ export default function ContactPage() {
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/80">
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
             <p>&copy; 2024 Greenbeam. All rights reserved.</p>
           </div>
         </div>
