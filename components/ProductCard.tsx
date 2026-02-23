@@ -133,7 +133,7 @@ export default function ProductCard({
       <CardHeader className="p-0 relative overflow-hidden">
         <div className="relative">
           <Image
-            src={allImages[currentImageIndex] || "/placeholder.svg"}
+            src={allImages[currentImageIndex] || "/solar-panel-1.jpg"}
             alt={product.name}
             width={300}
             height={compact ? 200 : 300}

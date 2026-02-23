@@ -218,7 +218,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: data.product?.name || `Product ${data.productId}`,
           description: data.product?.description || 'Product details will be loaded when viewing cart',
           category: data.product?.category || 'General',
-          image: data.product?.image || '/placeholder.svg',
+          image: data.product?.image || '/solar-panel-1.jpg',
           images: data.product?.images || null,
           createdAt: data.product?.createdAt || new Date().toISOString(),
         },

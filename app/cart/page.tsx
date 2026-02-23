@@ -147,7 +147,7 @@ export default function CartPage() {
                 <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                   <div className="relative w-20 h-20 flex-shrink-0">
                     <Image
-                      src={item.product.image || '/placeholder.svg'}
+                      src={item.product.image || '/solar-panel-1.jpg'}
                       alt={item.product.name}
                       fill
                       className="object-cover rounded-md"

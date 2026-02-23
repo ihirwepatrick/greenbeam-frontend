@@ -191,7 +191,7 @@ export default function ProductDetailPage() {
           <div>
             <div className="mb-4 relative">
               <Image
-                src={product.image || "/placeholder.svg"}
+                src={product.image || "/solar-panel-1.jpg"}
                 alt={product.name}
                 width={600}
                 height={600}

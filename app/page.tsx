@@ -502,7 +502,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || '\u00A9 2024 Greenbeam. All rights reserved.'}</p>
+            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved.`}</p>
           </div>
         </div>
       </footer>

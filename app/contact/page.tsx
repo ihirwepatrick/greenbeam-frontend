@@ -9,7 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, User, Facebook, Instagram, Linkedin } from "lucide-react"
+import { Leaf, Mail, Phone, MapPin, Clock, Send, Users, Shield, HelpCircle, MessageCircle, User, Facebook, Instagram, Linkedin, Menu } from "lucide-react"
+import CurrencySwitcher from "../../components/CurrencySwitcher"
+import CartPreview from "../../components/CartPreview"
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
     <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
@@ -20,6 +22,7 @@ import { useSettings } from "../../hooks/use-api"
 
 export default function ContactPage() {
   const { data: settingsData } = useSettings()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -40,7 +43,7 @@ export default function ContactPage() {
       role: "CEO & Founder",
       email: "sarah@greenbeam.com",
       phone: "+250 788 123 456",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "/solar-panel-1.jpg",
       bio: "Former renewable energy consultant with 15+ years in the industry."
     },
     {
@@ -48,7 +51,7 @@ export default function ContactPage() {
       role: "CTO",
       email: "michael@greenbeam.com",
       phone: "+250 788 234 567",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "/solar-panel-2.jpg",
       bio: "Expert in solar technology and energy storage systems."
     },
     {
@@ -56,7 +59,7 @@ export default function ContactPage() {
       role: "Head of Operations",
       email: "emily@greenbeam.com",
       phone: "+250 788 345 678",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "/robot-with-solar-panel.jpg",
       bio: "Specializes in sustainable business operations and logistics."
     },
     {
@@ -64,7 +67,7 @@ export default function ContactPage() {
       role: "Head of Engineering",
       email: "david@greenbeam.com",
       phone: "+250 788 456 789",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "/solar-panel-1.jpg",
       bio: "Mechanical engineer with expertise in renewable energy systems."
     }
   ]
@@ -156,10 +159,10 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-white">
+      <nav className="border-b bg-white sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <SiteLogo />
             </div>
             <div className="hidden md:flex items-center space-x-8">
@@ -176,7 +179,31 @@ export default function ContactPage() {
                 Contact
               </Link>
             </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <CurrencySwitcher />
+              <CartPreview />
+            </div>
+            <div className="md:hidden">
+              <Button variant="ghost" size="sm" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2">
+                {mobileMenuOpen ? <XIcon className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t bg-white">
+              <div className="px-2 py-2 space-y-1">
+                <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+                <Link href="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Products</Link>
+                <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                <Link href="/contact" className="block px-3 py-2 rounded-md text-base font-medium text-greenbeam-teal hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+                <div className="border-t pt-2 mt-2">
+                  <div className="px-3 py-2">
+                    <CartPreview />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
@@ -480,7 +507,7 @@ export default function ContactPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Greenbeam. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Greenbeam. All rights reserved. | Kigali, Rwanda</p>
           </div>
         </div>
       </footer>
