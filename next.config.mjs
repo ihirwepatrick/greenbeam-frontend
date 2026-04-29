@@ -7,6 +7,9 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    // Disable Vercel/Next.js optimization endpoint (/_next/image) to avoid
+    // 402 responses when image optimization quota/tokens expire.
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
