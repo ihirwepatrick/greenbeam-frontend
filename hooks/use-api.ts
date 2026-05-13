@@ -173,6 +173,33 @@ export function useSettings(category?: string) {
   return useApi(apiFunction, true);
 }
 
+/** Public site configuration for the storefront (no auth). Refetches on window focus / tab visible. */
+export function useSiteConfig() {
+  const apiFunction = useCallback(async () => {
+    const { settingsService } = await import('../lib/services/api');
+    return settingsService.getPublicSiteConfig();
+  }, []);
+
+  const result = useApi(apiFunction, true);
+
+  useEffect(() => {
+    const refresh = () => {
+      void result.execute();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [result.execute]);
+
+  return result;
+}
+
 export function useFiles(params?: any) {
   const apiFunction = useCallback(async () => {
     const { uploadService } = await import('../lib/services/api');

@@ -19,7 +19,7 @@ import CartPreview from "../components/CartPreview"
 import CurrencySwitcher from "../components/CurrencySwitcher"
 import SiteLogo from "../components/SiteLogo"
 import { useCart } from "../contexts/CartContext"
-import { useProducts, useSettings } from "../hooks/use-api"
+import { useProducts, useSiteConfig } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
 import { productService } from "../lib/services/api"
 
@@ -29,7 +29,7 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   // Full settings (contains general and website)
-  const { data: settingsData } = useSettings()
+  const { data: siteConfig } = useSiteConfig()
   
   // Memoize the query parameters for featured products
   const featuredProductsParams = useMemo(() => ({
@@ -235,14 +235,14 @@ export default function HomePage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">{(settingsData as any)?.data?.website?.content?.homepageHero?.title || "Power Your Future with Clean Energy"}</h1>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">{(siteConfig as any)?.website?.content?.homepageHero?.title || "Power Your Future with Clean Energy"}</h1>
               <p className="text-xl mb-8 text-white/90">
-                {(settingsData as any)?.data?.website?.content?.homepageHero?.subtitle || "Discover our premium collection of solar panels, wind turbines, and energy storage solutions. Make the switch to sustainable energy today."}
+                {(siteConfig as any)?.website?.content?.homepageHero?.subtitle || "Discover our premium collection of solar panels, wind turbines, and energy storage solutions. Make the switch to sustainable energy today."}
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href={(settingsData as any)?.data?.website?.content?.homepageHero?.ctaLink || "/products"}>
+                <Link href={(siteConfig as any)?.website?.content?.homepageHero?.ctaLink || "/products"}>
                   <Button size="lg" className="bg-white text-greenbeam-teal hover:bg-gray-100 active:bg-gray-200 transition-all duration-300">
-                    <span className="relative z-20">{(settingsData as any)?.data?.website?.content?.homepageHero?.ctaText || "Shop Now"}</span>
+                    <span className="relative z-20">{(siteConfig as any)?.website?.content?.homepageHero?.ctaText || "Shop Now"}</span>
                   </Button>
                 </Link>
                 <Button
@@ -430,20 +430,20 @@ export default function HomePage() {
                 <SiteLogo variant="footer" />
               </div>
               <p className="text-white/90">
-                {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses.'}
+                {(siteConfig as any)?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses.'}
               </p>
-              {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
+              {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
-                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
                     <Facebook className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
                     <XIcon className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
                     <Linkedin className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
                     <Instagram className="h-5 w-5" />
                   </Link>
                 </div>
@@ -502,7 +502,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved.`}</p>
+            <p>{(siteConfig as any)?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved.`}</p>
           </div>
         </div>
       </footer>

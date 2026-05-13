@@ -15,7 +15,7 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
   </svg>
 )
-import { useSettings } from "../../hooks/use-api"
+import { useSiteConfig } from "../../hooks/use-api"
 
 const team = [
   {
@@ -122,7 +122,7 @@ const journey = [
 ]
 
 export default function AboutPage() {
-  const { data: settingsData } = useSettings()
+  const { data: siteConfig } = useSiteConfig()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   return (
     <div className="min-h-screen bg-background">
@@ -178,9 +178,9 @@ export default function AboutPage() {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-greenbeam-teal to-greenbeam-teal-dark text-white py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">{(settingsData as any)?.data?.website?.content?.aboutSection?.title || `About ${((settingsData as any)?.data?.general?.companyName || 'Greenbeam')}`}</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">{(siteConfig as any)?.website?.content?.aboutSection?.title || `About ${((siteConfig as any)?.general?.companyName || 'Greenbeam')}`}</h1>
           <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto">
-            {(settingsData as any)?.data?.website?.content?.siteDescription || "We're on a mission to accelerate the world's transition to sustainable energy through innovative renewable energy solutions and exceptional customer service."}
+            {(siteConfig as any)?.website?.content?.siteDescription || "We're on a mission to accelerate the world's transition to sustainable energy through innovative renewable energy solutions and exceptional customer service."}
           </p>
         </div>
       </section>
@@ -192,7 +192,7 @@ export default function AboutPage() {
             <div>
               <h2 className="text-3xl font-bold mb-6">Our Mission</h2>
               <p className="text-lg text-gray-600 mb-6">
-                {(settingsData as any)?.data?.website?.content?.aboutSection?.content || 'At Greenbeam, we believe that clean, renewable energy should be accessible to everyone. Our mission is to provide high-quality solar panels, wind turbines, and energy storage solutions that help homes and businesses reduce their carbon footprint while saving money on energy costs.'}
+                {(siteConfig as any)?.website?.content?.aboutSection?.content || 'At Greenbeam, we believe that clean, renewable energy should be accessible to everyone. Our mission is to provide high-quality solar panels, wind turbines, and energy storage solutions that help homes and businesses reduce their carbon footprint while saving money on energy costs.'}
               </p>
               <p className="text-lg text-gray-600 mb-8">
                 Founded in 2025, we've been at the forefront of the renewable energy revolution, helping over 10,000
@@ -219,7 +219,7 @@ export default function AboutPage() {
       <section className="py-16 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {(((settingsData as any)?.data?.website?.content?.aboutSection?.stats) || stats).map((stat: any, index: number) => (
+            {(((siteConfig as any)?.website?.content?.aboutSection?.stats) || stats).map((stat: any, index: number) => (
               <div key={index} className="text-center">
                 <div className="flex justify-center mb-4">
                   {typeof stat.icon === 'function' ? (
@@ -286,7 +286,7 @@ export default function AboutPage() {
       {/* Team */}
       <section className="py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {(settingsData as any)?.data?.website?.content?.aboutSection?.showTeam !== false && (
+          {(siteConfig as any)?.website?.content?.aboutSection?.showTeam !== false && (
             <>
               <h2 className="text-3xl font-bold text-center mb-12">Meet Our Team</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -353,20 +353,20 @@ export default function AboutPage() {
                 <SiteLogo variant="footer" />
               </div>
               <p className="text-white/90">
-                {(settingsData as any)?.data?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
+                {(siteConfig as any)?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
               </p>
-              {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
+              {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
-                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
                     <Facebook className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
                     <XIcon className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
                     <Linkedin className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
                     <Instagram className="h-5 w-5" />
                   </Link>
                 </div>
@@ -401,7 +401,7 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{(settingsData as any)?.data?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved. | Kigali, Rwanda`}</p>
+            <p>{(siteConfig as any)?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved. | Kigali, Rwanda`}</p>
           </div>
         </div>
       </footer>

@@ -25,7 +25,6 @@ import {
 import ProductCard from "../../components/ProductCard"
 import CurrencySwitcher from "../../components/CurrencySwitcher"
 import SiteLogo from "../../components/SiteLogo"
-import { useSettings } from "../../hooks/use-api"
 import { useProducts } from "../../hooks/use-api"
 import { productService } from "../../lib/services/api"
 import { Product } from "../../lib/types/api"
@@ -38,8 +37,6 @@ export default function ProductsPage() {
   const [filtersOpen, setFiltersOpen] = useState(false)
   
   // Full settings for branding
-  const { data: settingsData } = useSettings()
-
   const [filters, setFilters] = useState({
     search: '',
     category: '',

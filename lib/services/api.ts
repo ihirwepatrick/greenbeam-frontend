@@ -296,6 +296,13 @@ export const settingsService = {
   async deleteSingleSetting(category: string, key: string): Promise<ApiResponse<{ message: string }>> {
     return apiClient.delete<ApiResponse<{ message: string }>>(API_ENDPOINTS.SETTINGS.BY_KEY(category, key));
   },
+
+  /** Public site copy + safe general fields (no auth). */
+  async getPublicSiteConfig(): Promise<ApiResponse<{ website: Record<string, unknown>; general: Record<string, unknown> }>> {
+    return apiClient.get<ApiResponse<{ website: Record<string, unknown>; general: Record<string, unknown> }>>(
+      API_ENDPOINTS.PUBLIC.SITE_CONFIG
+    );
+  },
 };
 
 // Upload/File Services

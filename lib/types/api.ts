@@ -629,6 +629,10 @@ export const API_ENDPOINTS = {
     BY_CATEGORY: (category: string) => `/settings/${category}`,
     BY_KEY: (category: string, key: string) => `/settings/${category}/${key}`,
   },
+  // Unauthenticated read for live storefront
+  PUBLIC: {
+    SITE_CONFIG: '/public/site-config',
+  },
   UPLOAD: {
     SINGLE: '/upload/single',
     MULTIPLE: '/upload/multiple',

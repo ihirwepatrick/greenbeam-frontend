@@ -18,10 +18,10 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 )
 import { enquiryService } from "../../lib/services/api"
-import { useSettings } from "../../hooks/use-api"
+import { useSiteConfig } from "../../hooks/use-api"
 
 export default function ContactPage() {
-  const { data: settingsData } = useSettings()
+  const { data: siteConfig } = useSiteConfig()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -100,7 +100,7 @@ export default function ContactPage() {
   ]
 
   const contactInfo = (() => {
-    const info = (settingsData as any)?.data?.website?.content?.contactInfo
+    const info = (siteConfig as any)?.website?.content?.contactInfo
     const address = info?.address || "Kigali, Rwanda"
     const phone = info?.phone || "+250 788 123 456"
     const email = info?.email || "info@greenbeam.com"
@@ -461,18 +461,18 @@ export default function ContactPage() {
               <p className="text-white/90">
                 Leading provider of sustainable energy solutions for homes and businesses.
               </p>
-              {((settingsData as any)?.data?.website?.social?.showSocialIcons ?? true) && (
+              {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
-                  <Link href={(settingsData as any)?.data?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
                     <Facebook className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.twitter || "https://twitter.com"} target="_blank" aria-label="X (Twitter)" className="hover:opacity-80">
                     <XIcon className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.linkedin || "https://linkedin.com"} target="_blank" aria-label="LinkedIn" className="hover:opacity-80">
                     <Linkedin className="h-5 w-5" />
                   </Link>
-                  <Link href={(settingsData as any)?.data?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
+                  <Link href={(siteConfig as any)?.website?.social?.instagram || "https://instagram.com"} target="_blank" aria-label="Instagram" className="hover:opacity-80">
                     <Instagram className="h-5 w-5" />
                   </Link>
                 </div>
