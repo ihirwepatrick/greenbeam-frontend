@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import SiteLogo from "../../components/SiteLogo"
@@ -9,13 +9,22 @@ import CurrencySwitcher from "../../components/CurrencySwitcher"
 import CartPreview from "../../components/CartPreview"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Leaf, Users, Target, Award, Globe, Heart, Clock, TrendingUp, Zap, Shield, Facebook, Instagram, Linkedin, Menu } from "lucide-react"
+import { Leaf, Users, Clock, TrendingUp, Zap, Shield, Truck, Facebook, Instagram, Linkedin, Menu } from "lucide-react"
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" {...props}>
     <path fill="currentColor" d="M9.294 6.928L14.357 1h-1.2L8.762 6.147L5.25 1H1.2l5.31 7.784L1.2 15h1.2l4.642-5.436L10.751 15h4.05zM7.651 8.852l-.538-.775L2.832 1.91h1.843l3.454 4.977l.538.775l4.491 6.47h-1.843z"/>
   </svg>
 )
 import { useSiteConfig } from "../../hooks/use-api"
+import { getSiteContent } from "../../lib/site-content"
+import type { ValuePropIcon } from "../../lib/site-content"
+
+const VALUE_PROP_ICONS: Record<ValuePropIcon, typeof Zap> = {
+  zap: Zap,
+  shield: Shield,
+  truck: Truck,
+  leaf: Leaf,
+}
 
 const team = [
   {
@@ -59,29 +68,6 @@ const stats = [
   { label: "Energy Saved", value: "50M kWh", icon: Zap },
 ]
 
-const values = [
-  {
-    icon: Leaf,
-    title: "Sustainability First",
-    description: "Every decision we make prioritizes environmental impact and long-term sustainability.",
-  },
-  {
-    icon: Target,
-    title: "Innovation",
-    description: "We continuously research and adopt the latest renewable energy technologies.",
-  },
-  {
-    icon: Heart,
-    title: "Customer Focus",
-    description: "Our customers' success and satisfaction drive everything we do.",
-  },
-  {
-    icon: Globe,
-    title: "Global Impact",
-    description: "We're committed to making renewable energy accessible worldwide.",
-  },
-]
-
 const journey = [
   {
     year: "2009",
@@ -123,6 +109,7 @@ const journey = [
 
 export default function AboutPage() {
   const { data: siteConfig } = useSiteConfig()
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   return (
     <div className="min-h-screen bg-background">
@@ -146,6 +133,9 @@ export default function AboutPage() {
               <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
               </Link>
+              <Link href="/blog" className="text-gray-700 hover:text-greenbeam-teal">
+                Blog
+              </Link>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <CurrencySwitcher />
@@ -164,6 +154,7 @@ export default function AboutPage() {
                 <Link href="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Products</Link>
                 <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-greenbeam-teal hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>About</Link>
                 <Link href="/contact" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+                <Link href="/blog" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
                 <div className="border-t pt-2 mt-2">
                   <div className="px-3 py-2">
                     <CartPreview />
@@ -180,7 +171,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">{(siteConfig as any)?.website?.content?.aboutSection?.title || `About ${((siteConfig as any)?.general?.companyName || 'Greenbeam')}`}</h1>
           <p className="text-xl mb-8 text-white/90 max-w-3xl mx-auto">
-            {(siteConfig as any)?.website?.content?.siteDescription || "We're on a mission to accelerate the world's transition to sustainable energy through innovative renewable energy solutions and exceptional customer service."}
+            {sc.siteTagline}
           </p>
         </div>
       </section>
@@ -263,22 +254,25 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Values */}
+      {/* Value props (same copy as homepage — CMS) */}
       <section className="py-16 bg-teal-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Values</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Why Greenbeam</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <value.icon className="h-12 w-12 text-greenbeam-teal mx-auto mb-4" />
-                  <CardTitle className="text-xl">{value.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">{value.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+            {sc.valueProps.map((vp, index) => {
+              const Icon = VALUE_PROP_ICONS[vp.icon] || Zap
+              return (
+                <Card key={index} className="text-center hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <Icon className="h-12 w-12 text-greenbeam-teal mx-auto mb-4" />
+                    <CardTitle className="text-xl">{vp.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">{vp.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -352,9 +346,7 @@ export default function AboutPage() {
               <div className="mb-4">
                 <SiteLogo variant="footer" />
               </div>
-              <p className="text-white/90">
-                {(siteConfig as any)?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses in Rwanda.'}
-              </p>
+              <p className="text-white/90">{sc.siteTagline}</p>
               {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
                   <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
@@ -373,35 +365,44 @@ export default function AboutPage() {
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Products</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.productsTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/products?category=Solar%20Panels" className="hover:opacity-90">Solar Panels</Link></li>
-                <li><Link href="/products?category=Wind%20Energy" className="hover:opacity-90">Wind Turbines</Link></li>
-                <li><Link href="/products?category=Energy%20Storage" className="hover:opacity-90">Battery Storage</Link></li>
-                <li><Link href="/products?category=Inverters" className="hover:opacity-90">Inverters</Link></li>
+                {sc.footerNav.productLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.companyTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/about" className="hover:opacity-90">About Us</Link></li>
-                <li><Link href="/contact" className="hover:opacity-90">Contact</Link></li>
-                <li><Link href="/careers" className="hover:opacity-90">Careers</Link></li>
-                <li><Link href="/blog" className="hover:opacity-90">Blog</Link></li>
+                {sc.footerNav.companyLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.supportTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/help" className="hover:opacity-90">Help Center</Link></li>
-                <li><Link href="/warranty" className="hover:opacity-90">Warranty</Link></li>
-                <li><Link href="/installation" className="hover:opacity-90">Installation</Link></li>
-                <li><Link href="/maintenance" className="hover:opacity-90">Maintenance</Link></li>
+                {sc.footerNav.supportLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{(siteConfig as any)?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved. | Kigali, Rwanda`}</p>
+            <p>{sc.footerCopyright}</p>
           </div>
         </div>
       </footer>

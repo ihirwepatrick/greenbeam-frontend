@@ -22,6 +22,15 @@ import { useCart } from "../contexts/CartContext"
 import { useProducts, useSiteConfig } from "../hooks/use-api"
 import { Product } from "../lib/types/api"
 import { productService } from "../lib/services/api"
+import { getSiteContent } from "../lib/site-content"
+import type { ValuePropIcon } from "../lib/site-content"
+
+const VALUE_PROP_ICONS: Record<ValuePropIcon, typeof Zap> = {
+  zap: Zap,
+  shield: Shield,
+  truck: Truck,
+  leaf: Leaf,
+}
 
 export default function HomePage() {
   const [showEnquiryForm, setShowEnquiryForm] = useState(false)
@@ -30,7 +39,8 @@ export default function HomePage() {
   
   // Full settings (contains general and website)
   const { data: siteConfig } = useSiteConfig()
-  
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
+
   // Memoize the query parameters for featured products
   const featuredProductsParams = useMemo(() => ({
     limit: 6, 
@@ -163,6 +173,9 @@ export default function HomePage() {
               <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
               </Link>
+              <Link href="/blog" className="text-gray-700 hover:text-greenbeam-teal">
+                Blog
+              </Link>
             </div>
             
             <div className="hidden md:flex items-center space-x-4">
@@ -219,6 +232,13 @@ export default function HomePage() {
                 >
                   Contact
                 </Link>
+                <Link 
+                  href="/blog" 
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
                 <div className="border-t pt-2 mt-2">
                   <div className="px-3 py-2">
                     <CartPreview />
@@ -272,26 +292,16 @@ export default function HomePage() {
       <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <Zap className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">High Efficiency</h3>
-              <p className="text-white/90">Premium quality equipment with maximum energy output</p>
-            </div>
-            <div className="text-center">
-              <Shield className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">25-Year Warranty</h3>
-              <p className="text-white/90">Long-term protection for your investment</p>
-            </div>
-            <div className="text-center">
-              <Truck className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Free Installation</h3>
-              <p className="text-white/90">Professional installation included with every purchase</p>
-            </div>
-            <div className="text-center">
-              <Leaf className="h-12 w-12 text-white mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Eco-Friendly</h3>
-              <p className="text-white/90">Reduce your carbon footprint and save money</p>
-            </div>
+            {sc.valueProps.map((vp, idx) => {
+              const Icon = VALUE_PROP_ICONS[vp.icon] || Zap
+              return (
+                <div key={`${vp.title}-${idx}`} className="text-center">
+                  <Icon className="h-12 w-12 text-white mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">{vp.title}</h3>
+                  <p className="text-white/90">{vp.description}</p>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -300,9 +310,9 @@ export default function HomePage() {
       <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Shop by Category</h2>
+            <h2 className="text-4xl font-bold mb-4">{sc.homeCategories.title}</h2>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Discover our comprehensive range of sustainable energy solutions
+              {sc.homeCategories.subtitle}
             </p>
           </div>
           
@@ -374,10 +384,10 @@ export default function HomePage() {
       <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
-            <h2 className="text-3xl font-bold">Featured Products</h2>
+            <h2 className="text-3xl font-bold">{sc.featuredSection.title}</h2>
             <Link href="/products">
               <Button className="bg-white text-greenbeam-teal hover:bg-gray-100 border-0">
-                View All Products
+                {sc.featuredSection.viewAllLabel}
               </Button>
             </Link>
           </div>
@@ -398,8 +408,8 @@ export default function HomePage() {
           ) : (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">🌱</div>
-              <h3 className="text-xl font-semibold mb-2">No Products Available</h3>
-              <p className="text-white/90">Check back soon for our sustainable energy solutions!</p>
+              <h3 className="text-xl font-semibold mb-2">{sc.featuredSection.emptyTitle}</h3>
+              <p className="text-white/90">{sc.featuredSection.emptyBody}</p>
             </div>
           )}
         </div>
@@ -408,14 +418,14 @@ export default function HomePage() {
       {/* Newsletter */}
       <section className="py-16 bg-greenbeam-teal text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+          <h2 className="text-3xl font-bold mb-4">{sc.newsletter.title}</h2>
           <p className="text-xl mb-8 text-white/90">
-            Get the latest news on green energy solutions and exclusive offers
+            {sc.newsletter.subtitle}
           </p>
           <div className="max-w-md mx-auto flex gap-4">
-            <input type="email" placeholder="Enter your email" className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
+            <input type="email" placeholder={sc.newsletter.placeholder} className="flex-1 px-4 py-2 rounded-lg text-gray-900" />
             <Button className="bg-white text-greenbeam-teal hover:bg-gray-100 active:bg-gray-200 transition-all duration-300">
-              Subscribe
+              {sc.newsletter.buttonLabel}
             </Button>
           </div>
         </div>
@@ -429,9 +439,7 @@ export default function HomePage() {
               <div className="mb-4">
                 <SiteLogo variant="footer" />
               </div>
-              <p className="text-white/90">
-                {(siteConfig as any)?.website?.content?.siteDescription || 'Leading provider of sustainable energy solutions for homes and businesses.'}
-              </p>
+              <p className="text-white/90">{sc.siteTagline}</p>
               {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
                   <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
@@ -450,59 +458,44 @@ export default function HomePage() {
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Products</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.productsTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li>
-                  <Link href="/products?category=Solar%20Panels" className="hover:opacity-90">Solar Panels</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Wind%20Energy" className="hover:opacity-90">Wind Turbines</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Energy%20Storage" className="hover:opacity-90">Battery Storage</Link>
-                </li>
-                <li>
-                  <Link href="/products?category=Inverters" className="hover:opacity-90">Inverters</Link>
-                </li>
+                {sc.footerNav.productLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.companyTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li>
-                  <Link href="/about" className="hover:opacity-90">About Us</Link>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:opacity-90">Contact</Link>
-                </li>
-                <li>
-                  <Link href="/careers" className="hover:opacity-90">Careers</Link>
-                </li>
-                <li>
-                  <Link href="/blog" className="hover:opacity-90">Blog</Link>
-                </li>
+                {sc.footerNav.companyLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.supportTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li>
-                  <Link href="/help" className="hover:opacity-90">Help Center</Link>
-                </li>
-                <li>
-                  <Link href="/warranty" className="hover:opacity-90">Warranty</Link>
-                </li>
-                <li>
-                  <Link href="/installation" className="hover:opacity-90">Installation</Link>
-                </li>
-                <li>
-                  <Link href="/maintenance" className="hover:opacity-90">Maintenance</Link>
-                </li>
+                {sc.footerNav.supportLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>{(siteConfig as any)?.website?.content?.footer?.copyrightText || `© ${new Date().getFullYear()} Greenbeam. All rights reserved.`}</p>
+            <p>{sc.footerCopyright}</p>
           </div>
         </div>
       </footer>

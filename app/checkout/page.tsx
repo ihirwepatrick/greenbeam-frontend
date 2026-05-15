@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -19,17 +19,19 @@ import {
   Truck, 
   Shield,
   Lock,
-  AlertCircle
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
 import { useCurrency } from '../../contexts/CurrencyContext'
-import { useCreateOrderFromCart } from '../../hooks/use-api'
+import { useCreateOrderFromCart, useSiteConfig } from '../../hooks/use-api'
+import { getSiteContent } from '../../lib/site-content'
 import { formatPrice } from '../../lib/utils'
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { cart, clearCart } = useCart()
   const { currency } = useCurrency()
+  const { data: siteConfig } = useSiteConfig()
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
   
   const [formData, setFormData] = useState({
     // Shipping Information
@@ -183,10 +185,10 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
           <Package className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-          <p className="text-gray-600 mb-6">Add some items to your cart before checking out.</p>
+          <h2 className="text-xl font-semibold mb-2">{sc.checkoutPage.cartEmptyTitle}</h2>
+          <p className="text-gray-600 mb-6">{sc.checkoutPage.cartEmptyBody}</p>
           <Link href="/products">
-            <Button>Continue Shopping</Button>
+            <Button>{sc.checkoutPage.continueShoppingButton}</Button>
           </Link>
         </div>
       </div>
@@ -201,9 +203,9 @@ export default function CheckoutPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Cart
         </Link>
-        <h1 className="text-3xl font-bold">Checkout</h1>
+        <h1 className="text-3xl font-bold">{sc.checkoutPage.pageTitle}</h1>
         <p className="text-gray-600">
-          Complete your purchase
+          {sc.checkoutPage.pageSubtitle}
         </p>
 
       </div>
@@ -509,15 +511,19 @@ export default function CheckoutPage() {
                       checked={formData.termsAccepted}
                       onCheckedChange={(checked) => updateFormData('termsAccepted', checked as boolean)}
                     />
-                    <Label htmlFor="termsAccepted" className="text-sm">
-                      I agree to the{' '}
-                      <Link href="/terms" className="text-greenbeam-teal hover:underline">
-                        Terms and Conditions
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/privacy" className="text-greenbeam-teal hover:underline">
-                        Privacy Policy
-                      </Link>
+                    <Label htmlFor="termsAccepted" className="text-sm leading-relaxed">
+                      <span className="font-medium">{sc.checkoutPage.termsLabel}</span>
+                      <span className="block mt-1 text-muted-foreground">
+                        Read our{' '}
+                        <Link href="/terms" className="text-greenbeam-teal hover:underline">
+                          Terms and Conditions
+                        </Link>{' '}
+                        and{' '}
+                        <Link href="/privacy" className="text-greenbeam-teal hover:underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
                     </Label>
                   </div>
                   {errors.termsAccepted && <p className="text-red-500 text-sm">{errors.termsAccepted}</p>}

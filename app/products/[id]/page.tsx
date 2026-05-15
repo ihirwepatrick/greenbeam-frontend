@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Star, ArrowLeft, MessageCircle, User, Heart, Share2, CheckCircle2 } from "lucide-react"
-import { useProduct } from "../../../hooks/use-api"
+import { useProduct, useSiteConfig } from "../../../hooks/use-api"
 import { productService } from "../../../lib/services/api"
 import EnquiryForm from "../../components/EnquiryForm"
 import SiteLogo from "../../../components/SiteLogo"
@@ -16,6 +16,7 @@ import { Product } from "../../../lib/types/api"
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
 import { useCurrency } from "../../../contexts/CurrencyContext"
 import { formatPrice } from "../../../lib/utils"
+import { getSiteContent } from "../../../lib/site-content"
 
 export default function ProductDetailPage() {
   const routeParams = useParams<{ id: string }>()
@@ -29,6 +30,8 @@ export default function ProductDetailPage() {
   const [showRatingSuccess, setShowRatingSuccess] = useState<boolean>(false)
   
   const { data: product, loading, error } = useProduct(id)
+  const { data: siteConfig } = useSiteConfig()
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
   const priceStr = product ? (product.price != null ? String(product.price) : "0") : "0"
 
   const handleEnquireNow = () => {
@@ -147,6 +150,9 @@ export default function ProductDetailPage() {
               </Link>
               <Link href="/contact" className="text-gray-700 hover:text-greenbeam-teal">
                 Contact
+              </Link>
+              <Link href="/blog" className="text-gray-700 hover:text-greenbeam-teal">
+                Blog
               </Link>
             </div>
           </div>
@@ -327,29 +333,29 @@ export default function ProductDetailPage() {
 
         {/* Additional Information */}
         <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">Product Specifications</h2>
+          <h2 className="text-2xl font-bold mb-8">{sc.productPage.specsSectionTitle}</h2>
           <div className="grid md:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
-                <CardTitle>Technical Details</CardTitle>
+                <CardTitle>{sc.productPage.technicalDetailsTitle}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Category:</span>
+                  <span className="text-gray-600">{sc.productPage.labelCategory}:</span>
                   <span className="font-medium">{product.category}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Rating:</span>
+                  <span className="text-gray-600">{sc.productPage.labelRating}:</span>
                   <span className="font-medium">{rating}/5 ({reviews} reviews)</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Status:</span>
+                  <span className="text-gray-600">{sc.productPage.labelStatus}:</span>
                   <Badge className={getStatusColor(product.status)}>
                     {formatStatus(product.status)}
                   </Badge>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Added:</span>
+                  <span className="text-gray-600">{sc.productPage.labelAdded}:</span>
                   <span className="font-medium">
                     {new Date(product.createdAt).toLocaleDateString()}
                   </span>
@@ -359,25 +365,15 @@ export default function ProductDetailPage() {
             
             <Card>
               <CardHeader>
-                <CardTitle>Installation & Support</CardTitle>
+                <CardTitle>{sc.productPage.installationTitle}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="flex items-center text-gray-600">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
-                  Professional installation included
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
-                  24/7 technical support
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
-                  Maintenance services available
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <div className="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
-                  Training and documentation
-                </div>
+                {sc.productPage.installationBullets.map((line, idx) => (
+                  <div key={idx} className="flex items-center text-gray-600">
+                    <div className="h-2 w-2 bg-green-500 rounded-full mr-3"></div>
+                    {line}
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </div>
@@ -385,14 +381,14 @@ export default function ProductDetailPage() {
 
         {/* Related Products CTA */}
         <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Looking for More Options?</h2>
+          <h2 className="text-2xl font-bold mb-4">{sc.productPage.relatedTitle}</h2>
           <p className="text-gray-600 mb-6">
-            Explore our complete range of sustainable energy solutions
+            {sc.productPage.relatedSubtitle}
           </p>
           <Link href="/products">
             <Button variant="outline" size="lg">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Browse All Products
+              {sc.productPage.relatedButton}
             </Button>
           </Link>
         </div>

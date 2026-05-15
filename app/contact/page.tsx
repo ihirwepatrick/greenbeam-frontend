@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import SiteLogo from "../../components/SiteLogo"
@@ -19,9 +19,11 @@ const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
 )
 import { enquiryService } from "../../lib/services/api"
 import { useSiteConfig } from "../../hooks/use-api"
+import { getSiteContent } from "../../lib/site-content"
 
 export default function ContactPage() {
   const { data: siteConfig } = useSiteConfig()
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   const [formData, setFormData] = useState({
@@ -178,6 +180,9 @@ export default function ContactPage() {
               <Link href="/contact" className="text-greenbeam-teal font-medium">
                 Contact
               </Link>
+              <Link href="/blog" className="text-gray-700 hover:text-greenbeam-teal">
+                Blog
+              </Link>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <CurrencySwitcher />
@@ -196,6 +201,7 @@ export default function ContactPage() {
                 <Link href="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Products</Link>
                 <Link href="/about" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>About</Link>
                 <Link href="/contact" className="block px-3 py-2 rounded-md text-base font-medium text-greenbeam-teal hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
+                <Link href="/blog" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
                 <div className="border-t pt-2 mt-2">
                   <div className="px-3 py-2">
                     <CartPreview />
@@ -458,9 +464,7 @@ export default function ContactPage() {
               <div className="mb-4">
                 <SiteLogo variant="footer" />
               </div>
-              <p className="text-white/90">
-                Leading provider of sustainable energy solutions for homes and businesses.
-              </p>
+              <p className="text-white/90">{sc.siteTagline}</p>
               {((siteConfig as any)?.website?.social?.showSocialIcons ?? true) && (
                 <div className="flex items-center gap-4 mt-6 text-white">
                   <Link href={(siteConfig as any)?.website?.social?.facebook || "https://facebook.com"} target="_blank" aria-label="Facebook" className="hover:opacity-80">
@@ -479,35 +483,44 @@ export default function ContactPage() {
               )}
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Products</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.productsTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/products?category=Solar%20Panels" className="hover:opacity-90">Solar Panels</Link></li>
-                <li><Link href="/products?category=Wind%20Energy" className="hover:opacity-90">Wind Turbines</Link></li>
-                <li><Link href="/products?category=Energy%20Storage" className="hover:opacity-90">Battery Storage</Link></li>
-                <li><Link href="/products?category=Inverters" className="hover:opacity-90">Inverters</Link></li>
+                {sc.footerNav.productLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.companyTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/about" className="hover:opacity-90">About Us</Link></li>
-                <li><Link href="/contact" className="hover:opacity-90">Contact</Link></li>
-                <li><Link href="/careers" className="hover:opacity-90">Careers</Link></li>
-                <li><Link href="/blog" className="hover:opacity-90">Blog</Link></li>
+                {sc.footerNav.companyLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
+              <h3 className="text-lg font-semibold mb-4">{sc.footerNav.supportTitle}</h3>
               <ul className="space-y-2 text-white">
-                <li><Link href="/help" className="hover:opacity-90">Help Center</Link></li>
-                <li><Link href="/warranty" className="hover:opacity-90">Warranty</Link></li>
-                <li><Link href="/installation" className="hover:opacity-90">Installation</Link></li>
-                <li><Link href="/maintenance" className="hover:opacity-90">Maintenance</Link></li>
+                {sc.footerNav.supportLinks.map((link) => (
+                  <li key={link.href + link.label}>
+                    <Link href={link.href} className="hover:opacity-90">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} Greenbeam. All rights reserved. | Kigali, Rwanda</p>
+            <p>{sc.footerCopyright}</p>
           </div>
         </div>
       </footer>

@@ -1,12 +1,11 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { 
   ShoppingCart, 
@@ -21,13 +20,16 @@ import {
 } from 'lucide-react'
 import { useCart } from '../../contexts/CartContext'
 import { useCurrency } from '../../contexts/CurrencyContext'
-import { useProducts } from '../../hooks/use-api'
+import { useSiteConfig } from '../../hooks/use-api'
+import { getSiteContent } from '../../lib/site-content'
 import { CartItem } from '../../lib/types/api'
 import { formatPrice } from '../../lib/utils'
 
 export default function CartPage() {
   const { cart, loading, error, updateCartItem, removeFromCart, clearCart } = useCart()
   const { currency } = useCurrency()
+  const { data: siteConfig } = useSiteConfig()
+  const sc = useMemo(() => getSiteContent(siteConfig), [siteConfig])
   const [updatingItems, setUpdatingItems] = useState<Set<number>>(new Set())
 
   const handleQuantityChange = async (item: CartItem, delta: number) => {
@@ -72,7 +74,7 @@ export default function CartPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-greenbeam-teal mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading your cart...</p>
+          <p className="mt-2 text-gray-600">{sc.cartPage.loadingText}</p>
         </div>
       </div>
     )
@@ -96,10 +98,10 @@ export default function CartPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-md mx-auto text-center">
           <ShoppingCart className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
-          <p className="text-gray-600 mb-6">Start shopping to add items to your cart.</p>
+          <h1 className="text-2xl font-bold mb-2">{sc.cartPage.emptyTitle}</h1>
+          <p className="text-gray-600 mb-6">{sc.cartPage.emptyBody}</p>
           <Link href="/products">
-            <Button className="w-full">Browse Products</Button>
+            <Button className="w-full">{sc.cartPage.browseProductsLabel}</Button>
           </Link>
         </div>
       </div>
@@ -112,10 +114,10 @@ export default function CartPage() {
         <Link href="/products">
           <Button variant="ghost" size="sm" className="mr-4 text-greenbeam-teal hover:opacity-80">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Continue Shopping
+            {sc.cartPage.continueShoppingLabel}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{sc.cartPage.pageTitle}</h1>
         <Badge variant="secondary" className="ml-4 bg-greenbeam-teal text-white">
           {cart.totalItems} {cart.totalItems === 1 ? 'item' : 'items'}
         </Badge>
@@ -253,7 +255,7 @@ export default function CartPage() {
                 <Link href="/products">
                   <Button variant="outline" className="w-full">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Continue Shopping
+                    {sc.cartPage.continueShoppingLabel}
                   </Button>
                 </Link>
               </div>
