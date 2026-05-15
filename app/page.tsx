@@ -265,14 +265,16 @@ export default function HomePage() {
                     <span className="relative z-20">{(siteConfig as any)?.website?.content?.homepageHero?.ctaText || "Shop Now"}</span>
                   </Button>
                 </Link>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-greenbeam-teal active:bg-white active:text-greenbeam-teal bg-transparent relative overflow-hidden group transition-all duration-300"
-                >
-                  <span className="relative z-20">Learn More</span>
-                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
-                </Button>
+                <Link href="/about">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white text-white hover:bg-white hover:text-greenbeam-teal active:bg-white active:text-greenbeam-teal bg-transparent relative overflow-hidden group transition-all duration-300"
+                  >
+                    <span className="relative z-20">Learn More</span>
+                    <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 group-active:scale-x-100 transition-transform duration-500 origin-left pointer-events-none"></div>
+                  </Button>
+                </Link>
               </div>
             </div>
             <div className="relative">
